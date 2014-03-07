@@ -21,6 +21,7 @@
 #include "tiny_obj_loader.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define FULLSCREEN false
 
 //#include <string>
 
