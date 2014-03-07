@@ -105,6 +105,11 @@ class Base
 	  { 2.0f, 2.0f, -2.0f},
 	  { 2.0f, -2.0f, -2.0f} };
 
+	//Camera values
+	float xRot = 0.0f;
+	float yRot = 0.0f;
+	glm::vec3 cameraPos = glm::vec3();
+
 
 	int active = 1;
 	//60 fps (in milliseconds)
