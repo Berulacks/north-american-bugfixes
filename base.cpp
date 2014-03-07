@@ -1,5 +1,4 @@
 #include "base.h"
-#include "teapot.h"
 
 bool Base::init()
 {
@@ -45,7 +44,8 @@ bool Base::init()
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
-	files.push_back( "./rungholt/rungholt.obj");
+	//files.push_back( "./rungholt/rungholt.obj");
+	files.push_back( "./suzanne.obj");
 
 	object tempObj;
 	std::vector<tinyobj::shape_t> tempMesh;
@@ -53,7 +53,7 @@ bool Base::init()
 	for(int i = 0; i < files.size(); i++)
 	{
 		std::string error = tinyobj::LoadObj(tempMesh, files[i]);
-		printf("Done.\n");
+		printf("Loaded file %s.\n", files[i]);
 		if(error.size() > 0)
 			printf("Error: %s", error.c_str() );
 
@@ -70,11 +70,28 @@ bool Base::init()
 		objs.push_back( tempObj );
 		
 
-		printf("Object %i has %lu shapes:\n", i, objs[i].shapes.size() );
+		printf("Object %i (%s) has %lu shapes:\n", i, files[i], objs[i].shapes.size() );
 		for(int j = 0; j < objs[i].shapes.size(); j++ )
 			printf("Shape %i has %lu vertices, %lu indices, %lu texture coordinates, and %lu normals.\n", j, objs[i].shapes[j].mesh.positions.size(), objs[i].shapes[j].mesh.indices.size(), objs[i].shapes[j].mesh.texcoords.size(), objs[i].shapes[j].mesh.normals.size() );
 
 
+	}
+
+
+	//Does our initial model have texturecoords?
+	//I mean, if you're loading a model in without 
+	//texturecoords, things are going to break
+	//so we might as well assume that either all 
+	//your models have textures, or none do
+	if(objs[0].shapes[0].mesh.texcoords.size() <= 0)
+	{
+		hasTexture = false;
+		printf("[NOTICE]: No texcoords found in object 0. Textures will not be loaded.\n");
+	}
+	else
+	{
+		hasTexture = true;
+		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
         objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.05, 0.05, 0.05) );
@@ -149,10 +166,14 @@ bool Base::initGL()
 
 	program = glCreateProgram();
 
-	initShader( GL_VERTEX_SHADER, "vertex.vs" );
+	initShader( GL_VERTEX_SHADER, "./shaders/vertex.vs" );
 	checkGLErrors("End of Vertex shader init");
 	printf("Vertex shader, done...\n");
-	initShader( GL_FRAGMENT_SHADER, "fragment.fs" );
+
+	if(hasTexture)
+		initShader( GL_FRAGMENT_SHADER, "./shaders/fragment.fs" );
+	else
+		initShader( GL_FRAGMENT_SHADER, "./shaders/fragment.notex.fs" );
 	checkGLErrors("End of fragment shader init");
 	printf("Fragment shader, done...\n");
 	printf("Loaded and initialized shaders...\n");
@@ -249,16 +270,19 @@ void Base::initBuffers()
 	gpuLocations.insert( std::pair<const char*, GLuint>("nbo", nbo) );
 
 
-	glGenBuffers( 1, &tbo );
-	glBindBuffer( GL_ARRAY_BUFFER, tbo );
-	checkGLErrors("TBO binding");
-	glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.texcoords.size() * sizeof(float), &objs[0].shapes[0].mesh.texcoords[0], GL_STATIC_DRAW);
-	checkGLErrors("TBO buffer data");
-	gpuLocations.insert( std::pair<const char*, GLuint>("tbo", tbo) );
-	glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
-	checkGLErrors("Describe texture vertex attrib");
-	glEnableVertexAttribArray( gpuLocations.at("textures_attrib") );
-	checkGLErrors("Enable texture vertex attrib array");
+	if(hasTexture)
+	{
+		glGenBuffers( 1, &tbo );
+		glBindBuffer( GL_ARRAY_BUFFER, tbo );
+		checkGLErrors("TBO binding");
+		glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.texcoords.size() * sizeof(float), &objs[0].shapes[0].mesh.texcoords[0], GL_STATIC_DRAW);
+		checkGLErrors("TBO buffer data");
+		gpuLocations.insert( std::pair<const char*, GLuint>("tbo", tbo) );
+		glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
+		checkGLErrors("Describe texture vertex attrib");
+		glEnableVertexAttribArray( gpuLocations.at("textures_attrib") );
+		checkGLErrors("Enable texture vertex attrib array");
+	}
 
 	glGenBuffers( 1, &vbo );
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
@@ -291,24 +315,27 @@ void Base::initBuffers()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	checkGLErrors("Setting texture filtering mode");
 
-	int width, height;
-	std::string base = "./rungholt/";
-	base.append( objs[0].shapes[0].material.diffuse_texname.c_str() );
-	unsigned char* image =
-		    SOIL_load_image(base.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	SOIL_free_image_data(image);
-	
-	// Black/white checkerboard
-	float pixels[] = {
-		0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
-	};
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
-	checkGLErrors("Loading texture");
-	glGenerateMipmap(GL_TEXTURE_2D);
+	if(hasTexture)
+	{
+		int width, height;
+		std::string base = "./";
+		base.append( objs[0].shapes[0].material.diffuse_texname.c_str() );
+		unsigned char* image =
+			    SOIL_load_image(base.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		SOIL_free_image_data(image);
+		
+		// Black/white checkerboard
+		float pixels[] = {
+			0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
+			1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
+		};
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
+		checkGLErrors("Loading texture");
 
-	glActiveTexture(GL_TEXTURE0);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glActiveTexture(GL_TEXTURE0);
+	}
 
 
 	glBindVertexArray(vao);
@@ -396,10 +423,13 @@ void Base::render()
 			glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.normals.size() * sizeof(float), &objs[i].shapes[j].mesh.normals[0], GL_STATIC_DRAW);
 			glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 
-			//Texture Coords
-			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("tbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.texcoords.size() * sizeof(float), &objs[i].shapes[j].mesh.texcoords[0], GL_STATIC_DRAW);
-			glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
+			if(hasTexture)
+			{
+				//Texture Coords
+				glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("tbo") );
+				glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.texcoords.size() * sizeof(float), &objs[i].shapes[j].mesh.texcoords[0], GL_STATIC_DRAW);
+				glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
+			}
 
 			//Vertices
 			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("vbo") );

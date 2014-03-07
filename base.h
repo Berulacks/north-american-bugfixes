@@ -61,6 +61,8 @@ class Base
 	const int deltaT = 16;
 	int timeStepsToProcess = 0;
 
+	bool hasTexture;
+
 	public:
 		Base();
 		bool init(void);
