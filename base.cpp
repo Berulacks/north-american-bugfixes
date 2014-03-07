@@ -18,8 +18,8 @@ bool Base::init()
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 	printf("Creating main window... ");
-	//mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	//mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 
 	if(!mainWindow)
 	{
@@ -45,7 +45,8 @@ bool Base::init()
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
 	//files.push_back( "./rungholt/rungholt.obj");
-	files.push_back( "./models/suzanne.obj");
+	//files.push_back( "./models/suzanne.obj");
+	files.push_back("./models/sphere/sphere.obj");
 
 	object tempObj;
 	std::vector<tinyobj::shape_t> tempMesh;
@@ -94,7 +95,7 @@ bool Base::init()
 		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
-        objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.05, 0.05, 0.05) );
+        //objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.05, 0.05, 0.05) );
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.5f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(1,0,0) ); 
@@ -302,41 +303,34 @@ void Base::initBuffers()
 	glEnableVertexAttribArray(gpuLocations.at("normals_attrib"));
 	checkGLErrors("Enabled ibo attrib array");
 
-	GLuint tex;
-	glGenTextures(1, &tex);
-	checkGLErrors("Generating texture");
-	glBindTexture(GL_TEXTURE_2D, tex);
-	checkGLErrors("Binding texture");
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	checkGLErrors("Setting texture wrap mode");
+	//GLuint tex;
+	//glGenTextures(1, &tex);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	checkGLErrors("Setting texture filtering mode");
-
+	//Normally, here, we'd want to read the diffuse_texname
+	//of our loaded object
+	//But SOIL, for some odd reason, won't accept char* variables
 	if(hasTexture)
 	{
-		int width, height;
-		std::string base = "./";
-		base.append( objs[0].shapes[0].material.diffuse_texname.c_str() );
-		unsigned char* image =
-			    SOIL_load_image(base.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-		SOIL_free_image_data(image);
-		
-		// Black/white checkerboard
-		float pixels[] = {
-			0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
-		};
-		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
-		checkGLErrors("Loading texture");
+		GLuint tex = SOIL_load_OGL_texture
+		(
+			"earthmap1k.jpg",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
 
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glActiveTexture(GL_TEXTURE0);
+
+		checkGLErrors("Generating texture");
+		glBindTexture(GL_TEXTURE_2D, tex);
+		checkGLErrors("Binding texture");
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		checkGLErrors("Setting texture wrap mode");
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		checkGLErrors("Setting texture filtering mode");
 	}
-
 
 	glBindVertexArray(vao);
 	checkGLErrors("Binding vertex array");

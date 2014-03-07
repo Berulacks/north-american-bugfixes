@@ -14,3 +14,4 @@
 
 # The output of our makefile
 runfile
+*.pyc
