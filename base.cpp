@@ -95,7 +95,8 @@ bool Base::init()
 		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
-        //objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.05, 0.05, 0.05) );
+        objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
+	objs[0].translate( glm::vec3(4.0f,0.0f,0.0f));
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.5f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(1,0,0) ); 
@@ -200,10 +201,11 @@ bool Base::initGL()
 
 	//Initialize the actual matrices
 	model = glm::mat4();
-	//model = glm::scale(model, glm::vec3(0.05,0.05,0.05));
 	model = glm::rotate(model, 1.570f, glm::vec3(0.0f, 1.0f, 0.0f) );
 	projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
-	camera = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -1.0f));
+	camera = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -5.0f));
+
+	cubeMatrix = glm::mat4();
 
 	gpuLocations.insert( std::pair<const char*, GLuint>("mvp", glGetUniformLocation(program, "mvp")) );
 	gpuLocations.insert( std::pair<const char*, GLuint>("mv", glGetUniformLocation(program, "mv")) );
@@ -436,6 +438,21 @@ void Base::render()
 			glDrawElements(GL_TRIANGLES, objs[i].shapes[j].mesh.indices.size(), GL_UNSIGNED_INT, NULL); 
 		}
 	}
+
+	mv = camera * cubeMatrix;
+	mvp = projection * mv;
+	rot = (glm::mat3)mv;
+	normal = glm::inverseTranspose(rot);
+
+	glUniformMatrix4fv(gpuLocations.at("mvp"), 1, GL_FALSE, glm::value_ptr(mvp) );
+	glUniformMatrix4fv(gpuLocations.at("mv"), 1, GL_FALSE, glm::value_ptr(mv) );
+	glUniformMatrix3fv(gpuLocations.at("normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal) );
+	
+	//Render cube
+	glBufferData( GL_ARRAY_BUFFER, 16 * sizeof(glm::vec3), &cube[0], GL_STATIC_DRAW );
+	glVertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, GL_FLOAT, 0, 0, 0 );
+	glDrawArrays(GL_LINE_STRIP, 0, 16);
+
 	checkGLErrors("Post render");
 
 	SDL_GL_SwapWindow(mainWindow);

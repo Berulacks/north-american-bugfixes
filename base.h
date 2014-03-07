@@ -38,7 +38,7 @@ struct object
 
 	void translate( glm::vec3 translateBy )
 	{
-		glm::translate( transform, translateBy );
+		transform = glm::translate( transform, translateBy );
 	}
 };
 
@@ -59,6 +59,25 @@ class Base
 	//std::vector<tinyobj::shape_t> shapes;
 	std::vector< object > objs;
 
+	//Just cube things
+	glm::mat4 cubeMatrix;
+	glm::vec3 cube[16] =
+	{ { 2.0f, -2.0f, 2.0f },
+	  { -2.0f, -2.0f, 2.0f },
+	  { -2.0f, 2.0f, 2.0f },
+	  { 2.0f, 2.0f, 2.0f },
+	  { 2.0f, -2.0f, 2.0f },
+	  { 2.0f, -2.0f, -2.0f},
+	  { -2.0f, -2.0f, -2.0f},
+	  { -2.0f, -2.0f, 2.0f},
+	  { -2.0f, 2.0f, 2.0f},
+	  { -2.0f, 2.0f, -2.0f},
+	  { -2.0f, -2.0f, -2.0f},
+	  { -2.0f, 2.0f, -2.0f},
+	  { 2.0f, 2.0f, -2.0f},
+	  { 2.0f, 2.0f, 2.0f},
+	  { 2.0f, 2.0f, -2.0f},
+	  { 2.0f, -2.0f, -2.0f} };
 
 
 	int active = 1;
