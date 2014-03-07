@@ -424,7 +424,8 @@ bool Base::initShader(GLenum type, std::string file)
 
 void Base::physics()
 {
-
+	for(int i = 0; i < objs.size(); i++)
+		objs[i].translate( objs[i].velocity * (float)deltaT );
 
 }
 
