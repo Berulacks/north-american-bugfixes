@@ -30,6 +30,7 @@ struct object
 {
 	std::vector<tinyobj::shape_t> shapes;
 	glm::mat4 transform;
+	glm::vec3 velocity;
 
 	glm::vec3 position()
 	{
@@ -39,6 +40,20 @@ struct object
 	void translate( glm::vec3 translateBy )
 	{
 		transform = glm::translate( transform, translateBy );
+	}
+};
+
+struct plane
+{
+	//A plane is defined
+	//by a point and a 
+	//normal vector
+	glm::vec3 p;
+	glm::vec3 n;
+
+	float distanceFromPlane(glm::vec3 q)
+	{
+		return (glm::dot( q, n )) - glm::dot(n , p);
 	}
 };
 
@@ -59,7 +74,18 @@ class Base
 	//std::vector<tinyobj::shape_t> shapes;
 	std::vector< object > objs;
 
-	//Just cube things
+	//Everything is scaled down.
+	float sphereRadius = 0.5f;
+	float velocity = 0.1f;
+
+	// #justcubethings
+	// (the actual cube we use
+	// for collision checking)
+	plane cubePlanes[4];
+
+	//(the values here are in camera
+	//space coordinates. The "model"
+	//space coordinates are 1/2)
 	glm::mat4 cubeMatrix;
 	glm::vec3 cube[16] =
 	{ { 2.0f, -2.0f, 2.0f },

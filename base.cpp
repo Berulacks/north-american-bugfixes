@@ -47,6 +47,7 @@ bool Base::init()
 	//files.push_back( "./rungholt/rungholt.obj");
 	//files.push_back( "./models/suzanne.obj");
 	files.push_back("./models/sphere/sphere.obj");
+	files.push_back("./models/sphere/sphere.obj");
 
 	object tempObj;
 	std::vector<tinyobj::shape_t> tempMesh;
@@ -97,6 +98,8 @@ bool Base::init()
 
         objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
 	objs[0].translate( glm::vec3(4.0f,0.0f,0.0f));
+        objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
+	objs[1].translate( glm::vec3(-3.0f,0.0f,0.0f));
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.5f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(1,0,0) ); 
@@ -110,6 +113,14 @@ bool Base::init()
 	}
 
 	SDL_GL_SetSwapInterval(1);
+
+	glm::vec3 vertical = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 horizontal = glm::vec3(1.0f, 0.0f, 0.0f);
+
+	cubePlanes[0] = { vertical * 2.0f, -vertical  };//top
+	cubePlanes[1] = { -vertical * 2.0f, vertical };//bottom
+	cubePlanes[2] = { horizontal * 2.0f, -horizontal };//right
+	cubePlanes[3] = { -horizontal * 2.0f, horizontal };//left
 
 	initGL();
 
@@ -502,16 +513,20 @@ void Base::processEvents()
 					mod = -0.1f;
 
 				if(key == SDLK_x)
-					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(1, 0, 0) );
+					objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0.10 * mod, 0, 0) );
 				if(key == SDLK_y)
-					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(0, 1, 0) );
+					objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0, 0.10 * mod, 0) );
 				if(key == SDLK_z)
-					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(0, 0, 1) );
+					objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0, 0, 0.10 * mod) );
 
 				if(key == SDLK_UP)
 					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, 1.1f, 1.f) );
 				if(key == SDLK_DOWN)
 					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, .9f, 1.f) );
+
+				glm::vec3 planetPos = objs[0].position();
+				float d = cubePlanes[2].distanceFromPlane( planetPos );
+				printf("Planet at %f, %f, %f. Distance of %f away from right plane.\n", planetPos[0], planetPos[1], planetPos[2], d); 
 
 				break;
 		}
