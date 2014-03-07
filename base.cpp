@@ -18,8 +18,11 @@ bool Base::init()
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 	printf("Creating main window... ");
-	//mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+	
+	if(FULLSCREEN)
+		mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+	else
+		mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
 	if(!mainWindow)
 	{
@@ -213,9 +216,14 @@ bool Base::initGL()
 	//Initialize the actual matrices
 	model = glm::mat4();
 	model = glm::rotate(model, 1.570f, glm::vec3(0.0f, 1.0f, 0.0f) );
-	projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
-	//camera = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -1.0f));
-	cameraPos = glm::vec3(0.0f, 1.0f, -1.0f);
+
+	if(FULLSCREEN)
+		projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f);
+	else
+		projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
+	
+
+	cameraPos = glm::vec3(0.0f, 1.0f, -6.0f);
 
 	if(xRot < -M_PI)
 		xRot += M_PI * 2;
@@ -344,7 +352,7 @@ void Base::initBuffers()
 	{
 		GLuint tex = SOIL_load_OGL_texture
 		(
-			"rungholt-RGB.png",
+			"earthmap1k.jpg",
 			SOIL_LOAD_AUTO,
 			SOIL_CREATE_NEW_ID,
 			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
