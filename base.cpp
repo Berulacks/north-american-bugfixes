@@ -45,7 +45,7 @@ bool Base::init()
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
 	//files.push_back( "./rungholt/rungholt.obj");
-	files.push_back( "./suzanne.obj");
+	files.push_back( "./models/suzanne.obj");
 
 	object tempObj;
 	std::vector<tinyobj::shape_t> tempMesh;
