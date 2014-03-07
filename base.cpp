@@ -18,8 +18,8 @@ bool Base::init()
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 	printf("Creating main window... ");
-	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-	//mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+	//mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 
 	if(!mainWindow)
 	{
@@ -44,9 +44,9 @@ bool Base::init()
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
-	//files.push_back( "./rungholt/rungholt.obj");
+	files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/suzanne.obj");
-	files.push_back("./models/sphere/sphere.obj");
+	//files.push_back("./models/sphere/sphere.obj");
 
 	object tempObj;
 	std::vector<tinyobj::shape_t> tempMesh;
@@ -95,7 +95,7 @@ bool Base::init()
 		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
-        //objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.05, 0.05, 0.05) );
+        objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.05, 0.05, 0.05) );
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.5f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(1,0,0) ); 
@@ -203,7 +203,26 @@ bool Base::initGL()
 	//model = glm::scale(model, glm::vec3(0.05,0.05,0.05));
 	model = glm::rotate(model, 1.570f, glm::vec3(0.0f, 1.0f, 0.0f) );
 	projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
-	camera = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -1.0f));
+	//camera = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -1.0f));
+	cameraPos = glm::vec3(0.0f, 1.0f, -1.0f);
+
+	if(xRot < -M_PI)
+		xRot += M_PI * 2;
+
+	else if(xRot > M_PI)
+		xRot -= M_PI * 2;
+
+	if(yRot < -M_PI / 2)
+		yRot = -M_PI / 2;
+	if(yRot > M_PI / 2)
+		yRot = M_PI / 2;
+
+	glm::vec3 lookat;
+	lookat.x = sinf(xRot) * cosf(yRot);
+	lookat.y = sinf(yRot);
+	lookat.z = cosf(xRot) * cosf(yRot);
+
+	camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
 
 	gpuLocations.insert( std::pair<const char*, GLuint>("mvp", glGetUniformLocation(program, "mvp")) );
 	gpuLocations.insert( std::pair<const char*, GLuint>("mv", glGetUniformLocation(program, "mv")) );
@@ -313,7 +332,7 @@ void Base::initBuffers()
 	{
 		GLuint tex = SOIL_load_OGL_texture
 		(
-			"earthmap1k.jpg",
+			"rungholt-RGB.png",
 			SOIL_LOAD_AUTO,
 			SOIL_CREATE_NEW_ID,
 			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
@@ -462,10 +481,10 @@ void Base::processEvents()
 					active = false;
 
 				if(key == SDLK_w)
-					camera = glm::translate(camera, glm::vec3(0.0f, 0.0f, 0.1f) * glm::mat3(camera));
+					cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f) *  glm::mat3(camera);
 
 				if(key == SDLK_s)
-					camera = glm::translate(camera, glm::vec3(0.0f, 0.0f, -0.1f)* glm::mat3(camera));
+					cameraPos += glm::vec3(0.0f, 0.0f, 0.1f) *  glm::mat3(camera);
 
 				if(key == SDLK_q)
 					camera = glm::translate(camera, glm::vec3(0.1f, 0.0f, 0.0f)* glm::mat3(camera));
@@ -474,15 +493,16 @@ void Base::processEvents()
 					camera = glm::translate(camera, glm::vec3(-0.1f, 0.0f, 0.0f)* glm::mat3(camera));
 
 				if(key == SDLK_d)
-					camera = glm::rotate(camera, 0.01f, glm::vec3(0.0f,1.0f,0.0f) );
+					xRot -= 0.1;
 
 				if(key == SDLK_a)
-					camera = glm::rotate(camera, -0.01f, glm::vec3(0.0f,1.0f,0.0f) );
+					xRot += 0.1;
 
 				float mod = 0.1f;
 
 				if(event.key.keysym.mod & KMOD_SHIFT)
 					mod = -0.1f;
+
 
 				if(key == SDLK_x)
 					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(1, 0, 0) );
@@ -490,6 +510,24 @@ void Base::processEvents()
 					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(0, 1, 0) );
 				if(key == SDLK_z)
 					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(0, 0, 1) );
+
+				if(xRot < -M_PI)
+					xRot += M_PI * 2;
+
+				else if(xRot > M_PI)
+					xRot -= M_PI * 2;
+
+				if(yRot < -M_PI / 2)
+					yRot = -M_PI / 2;
+				if(yRot > M_PI / 2)
+					yRot = M_PI / 2;
+
+				glm::vec3 lookat;
+				lookat.x = sinf(xRot) * cosf(yRot);
+				lookat.y = sinf(yRot);
+				lookat.z = cosf(xRot) * cosf(yRot);
+
+				camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
 
 				if(key == SDLK_UP)
 					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, 1.1f, 1.f) );
