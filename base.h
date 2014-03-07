@@ -30,6 +30,16 @@ struct object
 {
 	std::vector<tinyobj::shape_t> shapes;
 	glm::mat4 transform;
+
+	glm::vec3 position()
+	{
+		return glm::vec3(transform[3][0], transform[3][1], transform[3][2]);
+	}
+
+	void translate( glm::vec3 translateBy )
+	{
+		glm::translate( transform, translateBy );
+	}
 };
 
 class Base
