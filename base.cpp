@@ -17,9 +17,9 @@ bool Base::init()
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-	printf("Creating main window... ");
-	//mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+
+	isFullscreen = false;
 
 	if(!mainWindow)
 	{
@@ -465,13 +465,14 @@ void Base::processEvents()
 {
 	SDL_Event event;
 	SDL_Keycode key;
+	glm::vec3 lookat;
 
 	while (SDL_PollEvent(&event)) 
 	{
-		SDL_Keycode key = event.key.keysym.sym;
-		switch( event.type )
+		switch(event.type)
 		{
 			case SDL_KEYDOWN:
+				key = event.key.keysym.sym;
 				if(key == SDLK_SPACE
 						||
 					key == SDLK_RETURN
@@ -481,62 +482,49 @@ void Base::processEvents()
 					active = false;
 
 				if(key == SDLK_w)
-					cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f) *  glm::mat3(camera);
+					cameraPos -= glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(camera) * physT;
 
 				if(key == SDLK_s)
-					cameraPos += glm::vec3(0.0f, 0.0f, 0.1f) *  glm::mat3(camera);
-
-				if(key == SDLK_q)
-					camera = glm::translate(camera, glm::vec3(0.1f, 0.0f, 0.0f)* glm::mat3(camera));
-
-				if(key == SDLK_e)
-					camera = glm::translate(camera, glm::vec3(-0.1f, 0.0f, 0.0f)* glm::mat3(camera));
-
-				if(key == SDLK_d)
-					xRot -= 0.1;
+					cameraPos += glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(camera) * physT;
 
 				if(key == SDLK_a)
-					xRot += 0.1;
+					cameraPos -= glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(camera) * physT;
 
-				float mod = 0.1f;
+				if(key == SDLK_d)
+					cameraPos += glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(camera) * physT;
 
-				if(event.key.keysym.mod & KMOD_SHIFT)
-					mod = -0.1f;
-
-
-				if(key == SDLK_x)
-					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(1, 0, 0) );
-				if(key == SDLK_y)
-					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(0, 1, 0) );
-				if(key == SDLK_z)
-					objs[0].transform = glm::rotate( objs[0].transform, mod, glm::vec3(0, 0, 1) );
-
-				if(xRot < -M_PI)
-					xRot += M_PI * 2;
-
-				else if(xRot > M_PI)
-					xRot -= M_PI * 2;
-
-				if(yRot < -M_PI / 2)
-					yRot = -M_PI / 2;
-				if(yRot > M_PI / 2)
-					yRot = M_PI / 2;
-
-				glm::vec3 lookat;
-				lookat.x = sinf(xRot) * cosf(yRot);
-				lookat.y = sinf(yRot);
-				lookat.z = cosf(xRot) * cosf(yRot);
-
-				camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
-
-				if(key == SDLK_UP)
-					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, 1.1f, 1.f) );
-				if(key == SDLK_DOWN)
-					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, .9f, 1.f) );
+				if(key == SDLK_f)
+					toggleFullScreen();
 
 				break;
+
+			case SDL_MOUSEMOTION:
+
+				xRot -= event.motion.xrel * 0.001;
+				yRot -= event.motion.yrel * 0.001;
+				break;
 		}
+
 	}
+
+
+
+	if(xRot < -M_PI)
+		xRot += M_PI * 2;
+
+	else if(xRot > M_PI)
+		xRot -= M_PI * 2;
+
+	if(yRot < -M_PI / 2)
+		yRot = -M_PI / 2;
+	if(yRot > M_PI / 2)
+		yRot = M_PI / 2;
+
+	lookat.x = sinf(xRot) * cosf(yRot);
+	lookat.y = sinf(yRot);
+	lookat.z = cosf(xRot) * cosf(yRot);
+
+	camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
 }
 
 void Base::quit()
@@ -610,5 +598,26 @@ void Base::generateNormals(tinyobj::mesh_t *mesh)
 			
 	}
 
+}
+
+void Base::toggleFullScreen()
+{
+	int w, h;
+	if(!isFullscreen)
+	{
+		SDL_SetWindowFullscreen(mainWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f);
+		SDL_GetWindowSize(mainWindow, &w, &h);
+		glViewport(0,0,w,h);
+		isFullscreen = true;
+	}
+	else
+	{
+		SDL_SetWindowFullscreen(mainWindow, 0);
+		SDL_SetWindowSize( mainWindow, 800, 600);
+		projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
+		glViewport(0,0,800,600);
+		isFullscreen = false;
+	}
 }
 
