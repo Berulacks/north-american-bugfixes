@@ -99,8 +99,8 @@ bool Base::init()
 	}
 
         objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
-	objs[0].velocity = glm::vec3(rand()%6-3, rand()%6-3, rand()%6-3);
-	objs[1].velocity = glm::vec3(rand()%6-3, rand()%6-3, rand()%6-3);
+	objs[0].velocity = glm::vec3(rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3));
+	objs[1].velocity = glm::vec3(rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3));
         objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
 
 	if (GLEW_OK != err)
