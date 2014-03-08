@@ -98,14 +98,9 @@ bool Base::init()
 	}
 
         objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
-	objs[0].translate( glm::vec3(0.0f,0.0f,0.0f));
+	objs[0].velocity = glm::vec3(3.0f, 1.1f, 3.5f);
+	objs[1].velocity = glm::vec3(-3.0f, 3.1f, -2.5f);
         objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
-	objs[1].translate( glm::vec3(0.0f,0.0f,0.0f));
-	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,1,0) ); 
-	//objs[0].transform = glm::rotate( objs[0].transform, 0.5f, glm::vec3(0,1,0) ); 
-	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(1,0,0) ); 
-	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,0,1) ); 
-	//objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0, -20, 0) );
 
 	if (GLEW_OK != err)
 	{
@@ -117,11 +112,14 @@ bool Base::init()
 
 	glm::vec3 vertical = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 horizontal = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 theotherthing = glm::vec3(0.0f,0.0f,1.0f);
 
 	cubePlanes[0] = { vertical * 2.0f, -vertical  };//top
 	cubePlanes[1] = { vertical * -2.0f, vertical };//bottom
 	cubePlanes[2] = { horizontal * 2.0f, -horizontal };//right
 	cubePlanes[3] = { horizontal * -2.0f, horizontal };//left
+	cubePlanes[4] = { theotherthing * 2.0f, -theotherthing };//top
+	cubePlanes[5] = { theotherthing * -2.0f, theotherthing };//bottom
 
 	initGL();
 
@@ -247,13 +245,14 @@ bool Base::initGL()
 	gpuLocations.insert( std::pair<const char*, GLuint>("Ld", glGetUniformLocation(program, "Ld")) );
 	
 	//Position of light
-	glUniform4fv(gpuLocations.at("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
+	//glUniform4fv(gpuLocations.at("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
+	glUniform4fv(gpuLocations.at("LightPosition"), 1, glm::value_ptr( glm::vec3(0,0,0) ) ); 
 	checkGLErrors("Init LP uniform");
 	//Light constant
-	glUniform3fv(gpuLocations.at("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
+	glUniform3fv(gpuLocations.at("Kd"), 1, glm::value_ptr( glm::vec3(0.8) ) ); 
 	checkGLErrors("Init Kd uniform");
 	//Light intensity
-	glUniform3fv(gpuLocations.at("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
+	glUniform3fv(gpuLocations.at("Ld"), 1, glm::value_ptr( glm::vec3(0.9) ) ); 
 	checkGLErrors("Init Ld uniform");
 
 	glUniform1i(glGetUniformLocation(program, "texSampler"), 0);
@@ -531,7 +530,7 @@ void Base::processEvents()
 					mod = -1.0f;
 
 				if(key == SDLK_v)
-					objs[0].velocity = {0.4*mod, 0.1*mod, 0.1*mod};
+					objs[0].velocity = {0.0, 0.0, 0.1*mod};
 				if(key == SDLK_b)
 					objs[0].velocity = {0.0,0.4*mod, 0.0};
 
@@ -655,12 +654,14 @@ void Base::physics()
 		objs[i].translate( objs[i].velocity * physT );
 
 		glm::vec3 planetPos = objs[i].position();
-		for(j = 0; j < 4; j++)
+		for(j = 0; j < 6; j++)
 		{
-			d = cubePlanes[j].distanceFromPlane( planetPos );
-			if(abs(d) < sphereRadius/5)
+			//We multiply our distance with 2 since it needs to be scaled
+			//up for the sphere
+			d = cubePlanes[j].distanceFromPlane( planetPos ) * 2.0f;
+			if(abs(d) < sphereRadius)
 			{
-				//printf("[d=%f] Planet %i is colliding with plane %i!\n", d, i, j);
+				printf("[d=%f] Planet %i is colliding with plane %i!\n", d, i, j);
 				handlePlaneCollision(&objs[i], cubePlanes[j]);
 			}
 		}

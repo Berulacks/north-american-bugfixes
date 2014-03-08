@@ -81,7 +81,7 @@ class Base
 	// #justcubethings
 	// (the actual cube we use
 	// for collision checking)
-	plane cubePlanes[4];
+	plane cubePlanes[6];
 
 	//(the values here are in camera
 	//space coordinates. The "model"
