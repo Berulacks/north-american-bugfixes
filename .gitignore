@@ -16,4 +16,8 @@
 runfile
 *.pyc
 
+# Models I don't want in
+# version control
 rungholt
+rungholt*
+house*
