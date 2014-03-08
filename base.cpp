@@ -71,7 +71,6 @@ bool Base::init()
 
 		tempObj.shapes = tempMesh;
 		tempObj.transform = glm::mat4();
-		tempObj.mass = 1.0f;
 
 		objs.push_back( tempObj );
 		
@@ -82,6 +81,9 @@ bool Base::init()
 
 
 	}
+
+	objs[0].mass = MASS_1;
+	objs[1].mass = MASS_2;
 
 
 	//Does our initial model have texturecoords?
@@ -662,7 +664,7 @@ void Base::physics()
 
 	if( checkForSphereCollision(objs[0], objs[1] ) )
 	{
-		handleSphereCollision(&objs[0], &objs[1], 1.0);
+		handleSphereCollision(&objs[0], &objs[1], E_CONSTANT);
 		//printf("BOOM!\n");
 	}
 	

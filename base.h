@@ -23,9 +23,12 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-//#include <string>
+#define E_CONSTANT 1.0
+#define MASS_1 1.0
+#define MASS_2 1.0
 
-//#include "teapot.h"
+
+
 
 struct object
 {
