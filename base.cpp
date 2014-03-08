@@ -19,10 +19,8 @@ bool Base::init()
 
 	printf("Creating main window... ");
 	
-	if(FULLSCREEN)
-		mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
-	else
-		mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	isFullscreen = false;
 
 	if(!mainWindow)
 	{
@@ -100,9 +98,9 @@ bool Base::init()
 	}
 
         objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
-	objs[0].translate( glm::vec3(4.0f,0.0f,0.0f));
+	objs[0].translate( glm::vec3(0.0f,0.0f,0.0f));
         objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
-	objs[1].translate( glm::vec3(-3.0f,0.0f,0.0f));
+	objs[1].translate( glm::vec3(0.0f,0.0f,0.0f));
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.5f, glm::vec3(0,1,0) ); 
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(1,0,0) ); 
@@ -121,9 +119,9 @@ bool Base::init()
 	glm::vec3 horizontal = glm::vec3(1.0f, 0.0f, 0.0f);
 
 	cubePlanes[0] = { vertical * 2.0f, -vertical  };//top
-	cubePlanes[1] = { -vertical * 2.0f, vertical };//bottom
+	cubePlanes[1] = { vertical * -2.0f, vertical };//bottom
 	cubePlanes[2] = { horizontal * 2.0f, -horizontal };//right
-	cubePlanes[3] = { -horizontal * 2.0f, horizontal };//left
+	cubePlanes[3] = { horizontal * -2.0f, horizontal };//left
 
 	initGL();
 
@@ -217,10 +215,7 @@ bool Base::initGL()
 	model = glm::mat4();
 	model = glm::rotate(model, 1.570f, glm::vec3(0.0f, 1.0f, 0.0f) );
 
-	if(FULLSCREEN)
-		projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f);
-	else
-		projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
+	projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
 	
 
 	cameraPos = glm::vec3(0.0f, 1.0f, -6.0f);
@@ -422,13 +417,6 @@ bool Base::initShader(GLenum type, std::string file)
 	return true;
 }
 
-void Base::physics()
-{
-	for(int i = 0; i < objs.size(); i++)
-		objs[i].translate( objs[i].velocity * (float)deltaT );
-
-}
-
 void Base::render()
 {
 	glClearColor(1.0f,0.8f,0.8f,1.0f);
@@ -528,16 +516,24 @@ void Base::processEvents()
 				if(key == SDLK_e)
 					camera = glm::translate(camera, glm::vec3(-0.1f, 0.0f, 0.0f)* glm::mat3(camera));
 
+				if(key == SDLK_f)
+					toggleFullScreen();
+
 				if(key == SDLK_d)
 					xRot -= 0.1;
 
 				if(key == SDLK_a)
 					xRot += 0.1;
 
-				float mod = 0.1f;
+				float mod = 1.0f;
 
 				if(event.key.keysym.mod & KMOD_SHIFT)
-					mod = -0.1f;
+					mod = -1.0f;
+
+				if(key == SDLK_v)
+					objs[0].velocity = {0.4*mod, 0.1*mod, 0.1*mod};
+				if(key == SDLK_b)
+					objs[0].velocity = {0.0,0.4*mod, 0.0};
 
 
 				if(key == SDLK_x)
@@ -569,10 +565,6 @@ void Base::processEvents()
 					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, 1.1f, 1.f) );
 				if(key == SDLK_DOWN)
 					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, .9f, 1.f) );
-
-				glm::vec3 planetPos = objs[0].position();
-				float d = cubePlanes[2].distanceFromPlane( planetPos );
-				printf("Planet at %f, %f, %f. Distance of %f away from right plane.\n", planetPos[0], planetPos[1], planetPos[2], d); 
 
 				break;
 		}
@@ -652,3 +644,57 @@ void Base::generateNormals(tinyobj::mesh_t *mesh)
 
 }
 
+void Base::physics()
+{
+	int i, j;
+	int numObjects = objs.size();
+	float d;
+	
+	for(i = 0; i < numObjects; i++)
+	{
+		objs[i].translate( objs[i].velocity * physT );
+
+		glm::vec3 planetPos = objs[i].position();
+		for(j = 0; j < 4; j++)
+		{
+			d = cubePlanes[j].distanceFromPlane( planetPos );
+			if(abs(d) < sphereRadius/5)
+			{
+				//printf("[d=%f] Planet %i is colliding with plane %i!\n", d, i, j);
+				handlePlaneCollision(&objs[i], cubePlanes[j]);
+			}
+		}
+	}
+}
+
+void Base::handlePlaneCollision(object* s, plane p)
+{
+	float dot = glm::dot(p.n, s->velocity);
+	//If our dot product is > 0, then we're
+	//moving away from the plane
+	if(dot > 0)
+		return;
+	
+	s-> velocity = -2.0f * glm::dot(s->velocity, p.n) * p.n + s->velocity;
+
+
+}
+
+void Base::toggleFullScreen()
+{
+	//if(mainWindow->flags == SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN )
+	if(!isFullscreen)
+	{
+		SDL_SetWindowSize( mainWindow, 1920, 1080);
+		SDL_SetWindowFullscreen(mainWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f);
+		isFullscreen = true;
+	}
+	else
+	{
+		SDL_SetWindowFullscreen(mainWindow, 0);
+		SDL_SetWindowSize( mainWindow, 800, 600);
+		projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
+		isFullscreen = false;
+	}
+}

@@ -21,7 +21,6 @@
 #include "tiny_obj_loader.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-#define FULLSCREEN true
 
 //#include <string>
 
@@ -119,10 +118,17 @@ class Base
 	//because SDL
 	//(using constant dT to
 	//prevent explosions)
+	//
 	const int deltaT = 16;
+	//In seconds
+	const float physT = 0.06;
+
 	int timeStepsToProcess = 0;
 
 	bool hasTexture;
+	bool isFullscreen;
+
+	void handlePlaneCollision(object* s, plane p);
 
 	public:
 		Base();
@@ -144,6 +150,8 @@ class Base
 		//For when our .obj's don't have normals
 		void generateNormals(tinyobj::mesh_t *mesh);
 		void initBuffers(void);
+
+		void toggleFullScreen(void);
 
 
 
