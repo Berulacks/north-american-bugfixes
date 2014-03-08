@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mouse.h>
 #include <SOIL/SOIL.h>
 
 #ifndef GLM_FORCE_RADIANS
@@ -31,6 +32,7 @@ struct object
 	std::vector<tinyobj::shape_t> shapes;
 	glm::mat4 transform;
 	glm::vec3 velocity;
+	float mass;
 
 	glm::vec3 position()
 	{
@@ -108,6 +110,7 @@ class Base
 	//Camera values
 	float xRot = 0.0f;
 	float yRot = 0.0f;
+	float mouseX, mouseY;
 	glm::vec3 cameraPos = glm::vec3();
 
 
@@ -128,7 +131,6 @@ class Base
 	bool hasTexture;
 	bool isFullscreen;
 
-	void handlePlaneCollision(object* s, plane p);
 
 	public:
 		Base();
@@ -152,6 +154,10 @@ class Base
 		void initBuffers(void);
 
 		void toggleFullScreen(void);
+
+		float checkForSphereCollision(object s1, object s2);
+		void handleSphereCollision(object* s1, object* s2, float e); 
+		void handlePlaneCollision(object* s, plane p);
 
 
 

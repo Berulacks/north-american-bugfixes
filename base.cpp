@@ -21,6 +21,7 @@ bool Base::init()
 	printf("Creating main window... ");
 	
 	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+
 	isFullscreen = false;
 
 	if(!mainWindow)
@@ -70,6 +71,7 @@ bool Base::init()
 
 		tempObj.shapes = tempMesh;
 		tempObj.transform = glm::mat4();
+		tempObj.mass = 1.0f;
 
 		objs.push_back( tempObj );
 		
@@ -99,9 +101,15 @@ bool Base::init()
 	}
 
         objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
+        objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
+
 	objs[0].velocity = glm::vec3(rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3));
 	objs[1].velocity = glm::vec3(rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3));
-        objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
+	
+	objs[0].translate( glm::vec3(2,0,0) );
+	objs[1].translate( glm::vec3(-2,0,0) );
+	//objs[0].velocity = glm::vec3(0.1,0,0);
+	//objs[1].velocity = glm::vec3(-0.1,0,0);;
 
 	if (GLEW_OK != err)
 	{
@@ -123,6 +131,9 @@ bool Base::init()
 	cubePlanes[5] = { theotherthing * -2.0f, theotherthing };//bottom
 
 	initGL();
+
+	SDL_SetRelativeMouseMode( SDL_TRUE );
+
 
 	printf("Completed initialization!\n");
 
@@ -217,7 +228,7 @@ bool Base::initGL()
 	projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
 	
 
-	cameraPos = glm::vec3(0.0f, 1.0f, -6.0f);
+	cameraPos = glm::vec3(0.0f, 0.0f, -6.0f);
 
 	if(xRot < -M_PI)
 		xRot += M_PI * 2;
@@ -489,13 +500,14 @@ void Base::processEvents()
 {
 	SDL_Event event;
 	SDL_Keycode key;
+	glm::vec3 lookat;
 
 	while (SDL_PollEvent(&event)) 
 	{
-		SDL_Keycode key = event.key.keysym.sym;
-		switch( event.type )
+		switch(event.type)
 		{
 			case SDL_KEYDOWN:
+				key = event.key.keysym.sym;
 				if(key == SDLK_SPACE
 						||
 					key == SDLK_RETURN
@@ -505,70 +517,49 @@ void Base::processEvents()
 					active = false;
 
 				if(key == SDLK_w)
-					cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f) *  glm::mat3(camera);
+					cameraPos -= glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(camera) * physT;
 
 				if(key == SDLK_s)
-					cameraPos += glm::vec3(0.0f, 0.0f, 0.1f) *  glm::mat3(camera);
+					cameraPos += glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(camera) * physT;
 
-				if(key == SDLK_q)
-					camera = glm::translate(camera, glm::vec3(0.1f, 0.0f, 0.0f)* glm::mat3(camera));
+				if(key == SDLK_a)
+					cameraPos -= glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(camera) * physT;
 
-				if(key == SDLK_e)
-					camera = glm::translate(camera, glm::vec3(-0.1f, 0.0f, 0.0f)* glm::mat3(camera));
+				if(key == SDLK_d)
+					cameraPos += glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(camera) * physT;
 
 				if(key == SDLK_f)
 					toggleFullScreen();
 
-				if(key == SDLK_d)
-					xRot -= 0.1;
+				break;
 
-				if(key == SDLK_a)
-					xRot += 0.1;
+			case SDL_MOUSEMOTION:
 
-				float mod = 1.0f;
-
-				if(event.key.keysym.mod & KMOD_SHIFT)
-					mod = -1.0f;
-
-				if(key == SDLK_v)
-					objs[0].velocity = {0.0, 0.0, 0.1*mod};
-				if(key == SDLK_b)
-					objs[0].velocity = {0.0,0.4*mod, 0.0};
-
-
-				if(key == SDLK_x)
-					objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0.10 * mod, 0, 0) );
-				if(key == SDLK_y)
-					objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0, 0.10 * mod, 0) );
-				if(key == SDLK_z)
-					objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0, 0, 0.10 * mod) );
-
-				if(xRot < -M_PI)
-					xRot += M_PI * 2;
-
-				else if(xRot > M_PI)
-					xRot -= M_PI * 2;
-
-				if(yRot < -M_PI / 2)
-					yRot = -M_PI / 2;
-				if(yRot > M_PI / 2)
-					yRot = M_PI / 2;
-
-				glm::vec3 lookat;
-				lookat.x = sinf(xRot) * cosf(yRot);
-				lookat.y = sinf(yRot);
-				lookat.z = cosf(xRot) * cosf(yRot);
-
-				camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
-
-				if(key == SDLK_UP)
-					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, 1.1f, 1.f) );
-				if(key == SDLK_DOWN)
-					objs[0].transform = glm::scale( objs[0].transform, glm::vec3(1.f, .9f, 1.f) );
-
+				xRot -= event.motion.xrel * 0.001;
+				yRot -= event.motion.yrel * 0.001;
 				break;
 		}
+
 	}
+
+
+
+	if(xRot < -M_PI)
+		xRot += M_PI * 2;
+
+	else if(xRot > M_PI)
+		xRot -= M_PI * 2;
+
+	if(yRot < -M_PI / 2)
+		yRot = -M_PI / 2;
+	if(yRot > M_PI / 2)
+		yRot = M_PI / 2;
+
+	lookat.x = sinf(xRot) * cosf(yRot);
+	lookat.y = sinf(yRot);
+	lookat.z = cosf(xRot) * cosf(yRot);
+
+	camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
 }
 
 void Base::quit()
@@ -655,6 +646,7 @@ void Base::physics()
 		objs[i].translate( objs[i].velocity * physT );
 
 		glm::vec3 planetPos = objs[i].position();
+		//Iterate over planes
 		for(j = 0; j < 6; j++)
 		{
 			//We multiply our distance with 2 since it needs to be scaled
@@ -662,11 +654,19 @@ void Base::physics()
 			d = cubePlanes[j].distanceFromPlane( planetPos ) * 2.0f;
 			if(abs(d) < sphereRadius)
 			{
-				printf("[d=%f] Planet %i is colliding with plane %i!\n", d, i, j);
+				//printf("[d=%f] Planet %i is colliding with plane %i!\n", d, i, j);
 				handlePlaneCollision(&objs[i], cubePlanes[j]);
 			}
 		}
 	}
+
+	if( checkForSphereCollision(objs[0], objs[1] ) )
+	{
+		handleSphereCollision(&objs[0], &objs[1], 1.0);
+		//printf("BOOM!\n");
+	}
+	
+
 }
 
 void Base::handlePlaneCollision(object* s, plane p)
@@ -682,14 +682,24 @@ void Base::handlePlaneCollision(object* s, plane p)
 
 }
 
+
+float Base::checkForSphereCollision(object s1, object s2)
+{
+	glm::vec3 d = s1.position() - s2.position();
+	float distanceDot = glm::dot(d, d);
+
+	return distanceDot <= pow(sphereRadius*2, 2);
+}
+
 void Base::toggleFullScreen()
 {
-	//if(mainWindow->flags == SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN )
+	int w, h;
 	if(!isFullscreen)
 	{
-		SDL_SetWindowSize( mainWindow, 1920, 1080);
 		SDL_SetWindowFullscreen(mainWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
 		projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f);
+		SDL_GetWindowSize(mainWindow, &w, &h);
+		glViewport(0,0,w,h);
 		isFullscreen = true;
 	}
 	else
@@ -697,6 +707,26 @@ void Base::toggleFullScreen()
 		SDL_SetWindowFullscreen(mainWindow, 0);
 		SDL_SetWindowSize( mainWindow, 800, 600);
 		projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
+		glViewport(0,0,800,600);
 		isFullscreen = false;
 	}
+}
+
+
+void Base::handleSphereCollision(object* s1, object* s2, float e)
+{
+	glm::vec3 vAP = s1->velocity;
+	glm::vec3 vBP = s2->velocity;
+	glm::vec3 vAB = vAP - vBP;
+
+	glm::vec3 N = glm::normalize( s1->position() - s2->position() );
+
+	//Our balls both have mass=1, okay? 
+	float j = - (1.0f + e) * glm::dot(vAB, N)
+		/ 
+		  (glm::dot(N,N) * (1/s1->mass + 1/s2->mass));
+
+	s1->velocity = s1->velocity + j * N;
+	s2->velocity = s2->velocity - j * N;
+
 }
