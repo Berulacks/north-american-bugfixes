@@ -2,6 +2,7 @@
 
 bool Base::init()
 {
+	srand (time(NULL));
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		quit();
@@ -98,8 +99,8 @@ bool Base::init()
 	}
 
         objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
-	objs[0].velocity = glm::vec3(3.0f, 1.1f, 3.5f);
-	objs[1].velocity = glm::vec3(-3.0f, 3.1f, -2.5f);
+	objs[0].velocity = glm::vec3(rand()%6-3, rand()%6-3, rand()%6-3);
+	objs[1].velocity = glm::vec3(rand()%6-3, rand()%6-3, rand()%6-3);
         objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
 
 	if (GLEW_OK != err)
