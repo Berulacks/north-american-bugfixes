@@ -47,6 +47,7 @@ bool Base::init()
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
 	files.push_back( "./models/rungholt/rungholt.obj");
+	//files.push_back( "./models/sibenik.obj" );
 	//files.push_back( "./models/suzanne.obj");
 	//files.push_back("./models/sphere/sphere.obj");
 
@@ -94,6 +95,7 @@ bool Base::init()
 	else
 	{
 		hasTexture = true;
+		//hasTexture = false; //REMOVE THIS
 		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
@@ -332,9 +334,12 @@ void Base::initBuffers()
 	//But SOIL, for some odd reason, won't accept char* variables
 	if(hasTexture)
 	{
+		char* texpath = new char[ objs[0].shapes[0].material.diffuse_texname.length() + 1 ];
+		std::strcpy ( texpath, objs[0].shapes[0].material.diffuse_texname.c_str() );
+		printf("Loading texture ./%s ... \n", texpath);
 		GLuint tex = SOIL_load_OGL_texture
 		(
-			"rungholt-RGB.png",
+			texpath,
 			SOIL_LOAD_AUTO,
 			SOIL_CREATE_NEW_ID,
 			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
@@ -582,12 +587,6 @@ void Base::generateNormals(tinyobj::mesh_t *mesh)
 			p3.z = mesh->positions[iP3+2];
 
 			n = glm::cross( (p2-p1), (p3-p1) );
-			/*u = p2 - p1;
-			v = p3 - p1;	
-
-			n.x = u.y * v.z - u.z * v.y;
-			n.y = u.z * v.x - u.x * v.z;
-			n.z = u.x * v.y - u.y * v.x;*/
 
 			n = glm::normalize(n);
 

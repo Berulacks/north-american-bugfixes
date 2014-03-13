@@ -22,7 +22,6 @@ void main()
 {
 
 	//col = 10.0 * vec4(theV, 0);
-	//col = 10.0 * vec4(theN, 0);
 	tex = tex_in;
 
 	// Convert normal and position to eye coords
@@ -33,7 +32,6 @@ void main()
 	
 	// The diffuse shading equation
 	col = vec4( Ld * Kd * max( dot( s, tnorm ), 0.0 ) , 1.0);
-	//col = vec4(theN, 1.0);
 	
 	gl_Position = mvp * vec4(theV,1.0);
 }
