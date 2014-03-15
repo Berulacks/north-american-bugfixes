@@ -47,16 +47,18 @@ struct object
 
 		matrix = glm::scale( glm::mat4(), scale);
 
+		matrix = glm::translate( matrix, position );
+
 		matrix = glm::rotate( matrix, orientation.x, {1.0f,0.0f,0.0f} );
 		matrix = glm::rotate( matrix, orientation.y, {0.0f,1.0f,0.0f} );
 		matrix = glm::rotate( matrix, orientation.z, {0.0f,0.0f,1.0f} );
 
-		matrix = glm::translate( matrix, position );
 
 		return matrix;
 	}
 
-	float mass;
+	float mass = 1.0f;
+	float radius = 1.0f;
 
 };
 
@@ -105,22 +107,22 @@ class Base
 	//space coordinates are 1/2)
 	glm::mat4 cubeMatrix;
 	glm::vec3 cube[16] =
-	{ { 2.0f, -2.0f, 2.0f },
-	  { -2.0f, -2.0f, 2.0f },
-	  { -2.0f, 2.0f, 2.0f },
-	  { 2.0f, 2.0f, 2.0f },
-	  { 2.0f, -2.0f, 2.0f },
-	  { 2.0f, -2.0f, -2.0f},
-	  { -2.0f, -2.0f, -2.0f},
-	  { -2.0f, -2.0f, 2.0f},
-	  { -2.0f, 2.0f, 2.0f},
-	  { -2.0f, 2.0f, -2.0f},
-	  { -2.0f, -2.0f, -2.0f},
-	  { -2.0f, 2.0f, -2.0f},
-	  { 2.0f, 2.0f, -2.0f},
-	  { 2.0f, 2.0f, 2.0f},
-	  { 2.0f, 2.0f, -2.0f},
-	  { 2.0f, -2.0f, -2.0f} };
+	{ { 4.0f, -4.0f, 4.0f },
+	  { -4.0f, -4.0f, 4.0f },
+	  { -4.0f, 4.0f, 4.0f },
+	  { 4.0f, 4.0f, 4.0f },
+	  { 4.0f, -4.0f, 4.0f },
+	  { 4.0f, -4.0f, -4.0f},
+	  { -4.0f, -4.0f, -4.0f},
+	  { -4.0f, -4.0f, 4.0f},
+	  { -4.0f, 4.0f, 4.0f},
+	  { -4.0f, 4.0f, -4.0f},
+	  { -4.0f, -4.0f, -4.0f},
+	  { -4.0f, 4.0f, -4.0f},
+	  { 4.0f, 4.0f, -4.0f},
+	  { 4.0f, 4.0f, 4.0f},
+	  { 4.0f, 4.0f, -4.0f},
+	  { 4.0f, -4.0f, -4.0f} };
 
 	//Camera values
 	float xRot = 0.0f;

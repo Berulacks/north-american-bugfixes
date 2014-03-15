@@ -109,13 +109,14 @@ bool Base::init()
         //objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
         //objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
 	
-	objs[0].scale *= 0.5f;
-	objs[1].scale *= 0.5f;
+	//objs[0].scale *= 0.5f;
+	//objs[1].scale *= 0.5f;
 
-	//objs[0].velocity = {0.01,0,0};
+	objs[0].velocity = {0.01,0,0};
 	objs[0].velocity = glm::vec3(getRandom(-2,2), getRandom(-2,2), getRandom(-2,2) );
-	//printf("Velocity is %f, %f, %f\n", objs[0].velocity.x, objs[0].velocity.y, objs[1].velocity.z );
+	printf("obj[0]'s velocity is %f, %f, %f\n", objs[0].velocity.x, objs[0].velocity.y, objs[0].velocity.z );
 	objs[1].velocity = glm::vec3(getRandom(-2,2), getRandom(-2,2), getRandom(-2,2) );
+	printf("obj[1]'s velocity is %f, %f, %f\n", objs[1].velocity.x, objs[1].velocity.y, objs[1].velocity.z );
 
 	objs[0].rotVelocity = glm::vec3(0.1f,0.0f,0.0f);
 	objs[1].rotVelocity = glm::vec3(0.0f, 0.1f, 0.0f);
@@ -136,9 +137,9 @@ bool Base::init()
 
 	SDL_GL_SetSwapInterval(1);
 
-	glm::vec3 vertical = glm::vec3(0.0f, 2.0f, 0.0f);
-	glm::vec3 horizontal = glm::vec3(2.0f, 0.0f, 0.0f);
-	glm::vec3 theotherthing = glm::vec3(0.0f,0.0f,2.0f);
+	glm::vec3 vertical = glm::vec3(0.0f, 4.0f, 0.0f);
+	glm::vec3 horizontal = glm::vec3(4.0f, 0.0f, 0.0f);
+	glm::vec3 theotherthing = glm::vec3(0.0f,0.0f,4.0f);
 
 	cubePlanes[0] = { vertical, glm::normalize(-vertical)  };//top
 	cubePlanes[1] = { -vertical, glm::normalize(vertical) };//bottom
@@ -715,7 +716,9 @@ float Base::checkForSphereCollision(object s1, object s2)
 	glm::vec3 d = s1.position - s2.position;
 	float distanceDot = glm::dot(d, d);
 
-	return distanceDot <= pow(sphereRadius, 2);
+	float radiusSum = s1.radius * s1.scale.x + s2.radius * s2.scale.x;
+
+	return distanceDot <= pow(radiusSum, 2);
 }
 
 void Base::toggleFullScreen()
@@ -760,5 +763,8 @@ void Base::handleSphereCollision(object* s1, object* s2, float e)
 
 float Base::getRandom(float low, float high)
 {
-	return (rand() % (int)(high + abs(low)) - abs(low));
+	int intComponent = (rand() % (int)(high + abs(low)) - abs(low));
+	float floatComponent = 1.0f / (rand() % 100);
+
+	return (float)(intComponent + floatComponent);
 }
