@@ -749,6 +749,32 @@ void Base::handleSphereCollision(object* s1, object* s2, float e)
 	glm::vec3 vBP = s2->velocity;
 	glm::vec3 vAB = vAP - vBP;
 
+	glm::vec3 cAB = s2->position - s1->position;
+	glm::vec3 P, rAP, rBP;
+
+	//This is more accurate, since our collision detector
+	//reports collisions a few seconds after they happened
+	//e.g. if we can do it, it makes more sense to assume the 
+	//spheres aren't actually overlapping, which they almost always
+	//will, because of the inherent nature of our collision
+	//detection code
+	if(s1->radius == s2->radius)
+	{
+		rAP = cAB / 2.0f;
+		rBP = s2->position - rAP;
+	}
+	else
+	{
+		//Normal vector from s1.center to s2.center
+		glm::vec3 nAB = glm::normalize( cAB );
+		
+		rAP = nAB * s1->radius;
+		rBP = nAB * -1.0f * s2->radius;
+	}
+
+
+	P = s1->position + rAP;
+
 	glm::vec3 N = glm::normalize( s1->position - s2->position );
 
 	//Our balls both have mass=1, okay? 
