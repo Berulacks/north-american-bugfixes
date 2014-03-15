@@ -57,6 +57,11 @@ struct object
 		return matrix;
 	}
 
+	float momentOfInertia()
+	{
+		return ( 2.0f * mass * pow( radius, 2.0f ) ) / 5.0f;
+	}
+
 	float mass = 1.0f;
 	float radius = 1.0f;
 
