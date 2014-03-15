@@ -33,19 +33,31 @@
 struct object
 {
 	std::vector<tinyobj::shape_t> shapes;
-	glm::mat4 transform;
+	glm::vec3 position;
 	glm::vec3 velocity;
+
+	glm::vec3 scale;
+
+	glm::vec3 orientation;
+	glm::vec3 rotVelocity;
+
+	glm::mat4 transform()
+	{
+		glm::mat4 matrix;
+
+		matrix = glm::scale( glm::mat4(), scale);
+
+		matrix = glm::rotate( matrix, orientation.x, {1.0f,0.0f,0.0f} );
+		matrix = glm::rotate( matrix, orientation.y, {0.0f,1.0f,0.0f} );
+		matrix = glm::rotate( matrix, orientation.z, {0.0f,0.0f,1.0f} );
+
+		matrix = glm::translate( matrix, position );
+
+		return matrix;
+	}
+
 	float mass;
 
-	glm::vec3 position()
-	{
-		return glm::vec3(transform[3][0], transform[3][1], transform[3][2]);
-	}
-
-	void translate( glm::vec3 translateBy )
-	{
-		transform = glm::translate( transform, translateBy );
-	}
 };
 
 struct plane
@@ -80,8 +92,8 @@ class Base
 	std::vector< object > objs;
 
 	//Everything is scaled down.
-	float sphereRadius = 0.5f;
-	float velocity = 0.1f;
+	float sphereRadius = 1.0f;
+	float velocity = 0.05f;
 
 	// #justcubethings
 	// (the actual cube we use
@@ -140,6 +152,8 @@ class Base
 		bool init(void);
 		void quit(void);
 		bool readFile(std::string filename, std::string* target);
+
+		static float getRandom(float low=0.0f, float high=1.0f);
 
 	private:
 		void render(void);

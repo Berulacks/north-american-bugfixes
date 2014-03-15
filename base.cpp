@@ -70,7 +70,11 @@ bool Base::init()
 			}
 
 		tempObj.shapes = tempMesh;
-		tempObj.transform = glm::mat4();
+		tempObj.position = glm::vec3(0,0,0);
+		tempObj.velocity = glm::vec3(0,0,0);
+		tempObj.orientation = glm::vec3(0,0,0);
+		tempObj.rotVelocity = glm::vec3(0,0,0);
+		tempObj.scale = glm::vec3(1,1,1);
 
 		objs.push_back( tempObj );
 		
@@ -102,14 +106,25 @@ bool Base::init()
 		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
-        objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
-        objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
-
-	objs[0].velocity = glm::vec3(rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3));
-	objs[1].velocity = glm::vec3(rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3), rand()%6-3 * (1/rand()%3));
+        //objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
+        //objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
 	
-	objs[0].translate( glm::vec3(2,0,0) );
-	objs[1].translate( glm::vec3(-2,0,0) );
+	objs[0].scale *= 0.5f;
+	objs[1].scale *= 0.5f;
+
+	//objs[0].velocity = {0.01,0,0};
+	objs[0].velocity = glm::vec3(getRandom(-2,2), getRandom(-2,2), getRandom(-2,2) );
+	//printf("Velocity is %f, %f, %f\n", objs[0].velocity.x, objs[0].velocity.y, objs[1].velocity.z );
+	objs[1].velocity = glm::vec3(getRandom(-2,2), getRandom(-2,2), getRandom(-2,2) );
+
+	objs[0].rotVelocity = glm::vec3(0.1f,0.0f,0.0f);
+	objs[1].rotVelocity = glm::vec3(0.0f, 0.1f, 0.0f);
+	
+	//objs[0].translate( glm::vec3(2,0,0) );
+	//objs[1].translate( glm::vec3(-2,0,0) );
+	objs[0].position = glm::vec3(2,0,0);
+	objs[1].position = glm::vec3(-2,0,0);
+
 	//objs[0].velocity = glm::vec3(0.1,0,0);
 	//objs[1].velocity = glm::vec3(-0.1,0,0);;
 
@@ -121,16 +136,16 @@ bool Base::init()
 
 	SDL_GL_SetSwapInterval(1);
 
-	glm::vec3 vertical = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 horizontal = glm::vec3(1.0f, 0.0f, 0.0f);
-	glm::vec3 theotherthing = glm::vec3(0.0f,0.0f,1.0f);
+	glm::vec3 vertical = glm::vec3(0.0f, 2.0f, 0.0f);
+	glm::vec3 horizontal = glm::vec3(2.0f, 0.0f, 0.0f);
+	glm::vec3 theotherthing = glm::vec3(0.0f,0.0f,2.0f);
 
-	cubePlanes[0] = { vertical * 2.0f, -vertical  };//top
-	cubePlanes[1] = { vertical * -2.0f, vertical };//bottom
-	cubePlanes[2] = { horizontal * 2.0f, -horizontal };//right
-	cubePlanes[3] = { horizontal * -2.0f, horizontal };//left
-	cubePlanes[4] = { theotherthing * 2.0f, -theotherthing };//top
-	cubePlanes[5] = { theotherthing * -2.0f, theotherthing };//bottom
+	cubePlanes[0] = { vertical, glm::normalize(-vertical)  };//top
+	cubePlanes[1] = { -vertical, glm::normalize(vertical) };//bottom
+	cubePlanes[2] = { horizontal, glm::normalize(-horizontal) };//right
+	cubePlanes[3] = { -horizontal, glm::normalize(horizontal) };//left
+	cubePlanes[4] = { theotherthing, glm::normalize(-theotherthing) };//top
+	cubePlanes[5] = { -theotherthing, glm::normalize(theotherthing) };//bottom
 
 	initGL();
 
@@ -442,7 +457,7 @@ void Base::render()
 	for(int i = 0; i < objs.size(); i++)
 	{
 		//Uniforms
-		mv = camera * objs[i].transform;
+		mv = camera * objs[i].transform();
 		mvp = projection * mv;
 		rot = (glm::mat3)mv;
 		normal = glm::inverseTranspose(rot);
@@ -529,6 +544,11 @@ void Base::processEvents()
 
 				if(key == SDLK_d)
 					cameraPos += glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(camera) * physT;
+				
+				if(key == SDLK_z)
+					objs[0].velocity = {-0.1,0,0};
+				if(key == SDLK_x)
+					objs[0].velocity = {0.1,0,0};
 
 				if(key == SDLK_f)
 					toggleFullScreen();
@@ -645,16 +665,21 @@ void Base::physics()
 	
 	for(i = 0; i < numObjects; i++)
 	{
-		objs[i].translate( objs[i].velocity * physT );
+		//objs[i].rotate( objs[i].rotVelocity * physT );
+		//objs[i].translate( objs[i].velocity * physT );
 
-		glm::vec3 planetPos = objs[i].position();
+		objs[i].position += objs[i].velocity * physT;
+		objs[i].orientation += objs[i].rotVelocity * physT;
+
+		glm::vec3 planetPos = objs[i].position;
 		//Iterate over planes
 		for(j = 0; j < 6; j++)
 		{
 			//We multiply our distance with 2 since it needs to be scaled
 			//up for the sphere
-			d = cubePlanes[j].distanceFromPlane( planetPos ) * 2.0f;
-			if(abs(d) < sphereRadius)
+			d = cubePlanes[j].distanceFromPlane( planetPos * objs[i].scale);
+
+			if(abs(d) < sphereRadius * objs[i].scale.x)
 			{
 				//printf("[d=%f] Planet %i is colliding with plane %i!\n", d, i, j);
 				handlePlaneCollision(&objs[i], cubePlanes[j]);
@@ -687,10 +712,10 @@ void Base::handlePlaneCollision(object* s, plane p)
 
 float Base::checkForSphereCollision(object s1, object s2)
 {
-	glm::vec3 d = s1.position() - s2.position();
+	glm::vec3 d = s1.position - s2.position;
 	float distanceDot = glm::dot(d, d);
 
-	return distanceDot <= pow(sphereRadius*2, 2);
+	return distanceDot <= pow(sphereRadius, 2);
 }
 
 void Base::toggleFullScreen()
@@ -721,7 +746,7 @@ void Base::handleSphereCollision(object* s1, object* s2, float e)
 	glm::vec3 vBP = s2->velocity;
 	glm::vec3 vAB = vAP - vBP;
 
-	glm::vec3 N = glm::normalize( s1->position() - s2->position() );
+	glm::vec3 N = glm::normalize( s1->position - s2->position );
 
 	//Our balls both have mass=1, okay? 
 	float j = - (1.0f + e) * glm::dot(vAB, N)
@@ -731,4 +756,9 @@ void Base::handleSphereCollision(object* s1, object* s2, float e)
 	s1->velocity = s1->velocity + j * N;
 	s2->velocity = s2->velocity - j * N;
 
+}
+
+float Base::getRandom(float low, float high)
+{
+	return (rand() % (int)(high + abs(low)) - abs(low));
 }
