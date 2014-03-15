@@ -508,6 +508,12 @@ void Base::render()
 	glVertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 	glDrawArrays(GL_LINE_STRIP, 0, 16);
 
+	//Render collision line
+	glBufferData( GL_ARRAY_BUFFER, 2 * sizeof(glm::vec3), &collisionLine[0], GL_STATIC_DRAW );
+	glVertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, GL_FLOAT, 0, 0, 0 );
+	glDrawArrays(GL_LINES, 0, 2);
+	
+
 	checkGLErrors("Post render");
 
 	SDL_GL_SwapWindow(mainWindow);
@@ -693,6 +699,8 @@ void Base::physics()
 		handleSphereCollision(&objs[0], &objs[1], E_CONSTANT);
 		//printf("BOOM!\n");
 	}
+	else
+		collisionLine[1] = {0,0,0};
 	
 
 }
@@ -769,6 +777,7 @@ void Base::handleSphereCollision(object* s1, object* s2, float e)
 		rBP = N * -1.0f * s2->radius;
 
 	P = s1->position + rAP;
+	collisionLine[1] = P;
 
 	/*float j = - (1.0f + e) * glm::dot(vAB, N)
 		/ 
@@ -782,10 +791,10 @@ void Base::handleSphereCollision(object* s1, object* s2, float e)
 		  );
 
 	s1->velocity = s1->velocity + ( j / s1->mass ) * N;
-	s2->velocity = s2->velocity - ( j / s2->mass ) * N;
+	s2->velocity = s2->velocity + ( -j / s2->mass ) * N;
 
-	//s1->rotVelocity = s1->rotVelocity + ( glm::dot( rAP, j * N ) / s1->momentOfInertia() );
-	//s2->rotVelocity = s2->rotVelocity + ( glm::dot( rBP, j * N ) / s2->momentOfInertia() );
+	s1->rotVelocity = s1->rotVelocity + ( glm::dot( rAP, j * N ) / s1->momentOfInertia() );
+	s2->rotVelocity = s2->rotVelocity + ( glm::dot( rBP, -j * N ) / s2->momentOfInertia() );
 
 }
 

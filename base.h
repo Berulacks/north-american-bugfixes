@@ -59,7 +59,8 @@ struct object
 
 	float momentOfInertia()
 	{
-		return ( 2.0f * mass * pow( radius, 2.0f ) ) / 5.0f;
+		//return ( 2.0f * mass * pow( radius, 2.0f ) ) / 5.0f;
+		return 1.0f;
 	}
 
 	float mass = 1.0f;
@@ -128,6 +129,9 @@ class Base
 	  { 4.0f, 4.0f, 4.0f},
 	  { 4.0f, 4.0f, -4.0f},
 	  { 4.0f, -4.0f, -4.0f} };
+
+	glm::vec3 collisionLine[2] = 
+	{ {0,0,0}, {0,0,0} };
 
 	//Camera values
 	float xRot = 0.0f;
