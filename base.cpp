@@ -566,7 +566,7 @@ void Base::generateNormals(tinyobj::mesh_t *mesh)
 
 	for(int i = 0; i < mesh->indices.size(); i += 3)
 	{
-			glm::vec3 p1, p2, p3, u, v, n;
+			glm::vec3 p1, p2, p3, n;
 			int iP1, iP2, iP3;
 
 			iP1 = mesh->indices[i];
@@ -587,6 +587,7 @@ void Base::generateNormals(tinyobj::mesh_t *mesh)
 			p3.z = mesh->positions[iP3+2];
 
 			n = glm::cross( (p2-p1), (p3-p1) );
+			n = glm::cross( (p3-p1), (p2-p1) );
 
 			n = glm::normalize(n);
 
