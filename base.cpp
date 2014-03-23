@@ -106,13 +106,6 @@ bool Base::init()
 		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
-        //objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.5, 0.5, 0.5) );
-        //objs[1].transform = glm::scale( objs[1].transform, glm::vec3(0.5, 0.5, 0.5) );
-	
-	//objs[0].scale *= 0.5f;
-	//objs[1].scale *= 0.5f;
-
-	objs[0].velocity = {0.01,0,0};
 	objs[0].velocity = glm::vec3(getRandom(-2,2), getRandom(-2,2), getRandom(-2,2) );
 	printf("obj[0]'s velocity is %f, %f, %f\n", objs[0].velocity.x, objs[0].velocity.y, objs[0].velocity.z );
 	objs[1].velocity = glm::vec3(getRandom(-2,2), getRandom(-2,2), getRandom(-2,2) );
@@ -121,13 +114,9 @@ bool Base::init()
 	objs[0].rotVelocity = glm::vec3(0.4f,0.2f,0.0f);
 	objs[1].rotVelocity = glm::vec3(0.0f, 0.4f, 0.2f);
 	
-	//objs[0].translate( glm::vec3(2,0,0) );
-	//objs[1].translate( glm::vec3(-2,0,0) );
 	objs[0].position = glm::vec3(2,0,0);
 	objs[1].position = glm::vec3(-2,0,0);
 
-	//objs[0].velocity = glm::vec3(0.1,0,0);
-	//objs[1].velocity = glm::vec3(-0.1,0,0);;
 
 	if (GLEW_OK != err)
 	{
