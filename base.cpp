@@ -118,8 +118,8 @@ bool Base::init()
 	objs[1].velocity = glm::vec3(getRandom(-2,2), getRandom(-2,2), getRandom(-2,2) );
 	printf("obj[1]'s velocity is %f, %f, %f\n", objs[1].velocity.x, objs[1].velocity.y, objs[1].velocity.z );
 
-	objs[0].rotVelocity = glm::vec3(0.1f,0.0f,0.0f);
-	objs[1].rotVelocity = glm::vec3(0.0f, 0.1f, 0.0f);
+	objs[0].rotVelocity = glm::vec3(0.4f,0.2f,0.0f);
+	objs[1].rotVelocity = glm::vec3(0.0f, 0.4f, 0.2f);
 	
 	//objs[0].translate( glm::vec3(2,0,0) );
 	//objs[1].translate( glm::vec3(-2,0,0) );
@@ -783,18 +783,33 @@ void Base::handleSphereCollision(object* s1, object* s2, float e)
 		/ 
 		  (glm::dot(N,N) * (1/s1->mass + 1/s2->mass));*/
 
-	float j = - (1.0f + e) * glm::dot(vAB, N)
+	/*float j = - (1.0f + e) * glm::dot(vAB, N)
 		/ 
 		  ( ( glm::dot(N,N) * (1/s1->mass + 1/s2->mass) )
 		  + ( pow( glm::dot( rAP, N ), 2 ) / s1->momentOfInertia() )
 		  + ( pow( glm::dot( rBP, N ), 2 ) / s2->momentOfInertia() ) 
-		  );
+		  );*/
+
+	float j = - (1.0f + e) * glm::dot(vAB, N)
+		/ 
+		  glm::dot( 
+		    ( (1/s1->mass + 1/s2->mass)*N 
+		      + 
+		    ( glm::cross( 
+		    ( glm::cross(rAP,N) / s1->momentOfInertia() ) ,
+		      rAP) ) 
+		      +
+		    glm::cross( (glm::cross(rBP, N) / s2->momentOfInertia() ),
+			    rBP)
+		  ) , N);
 
 	s1->velocity = s1->velocity + ( j / s1->mass ) * N;
 	s2->velocity = s2->velocity + ( -j / s2->mass ) * N;
 
-	s1->rotVelocity = s1->rotVelocity + ( glm::dot( rAP, j * N ) / s1->momentOfInertia() );
-	s2->rotVelocity = s2->rotVelocity + ( glm::dot( rBP, -j * N ) / s2->momentOfInertia() );
+	//s1->rotVelocity = s1->rotVelocity + ( glm::dot( rAP, j * N ) / s1->momentOfInertia() );
+	//s2->rotVelocity = s2->rotVelocity + ( glm::dot( rBP, -j * N ) / s2->momentOfInertia() );
+	s1->rotVelocity = s1->rotVelocity + ( glm::cross( rAP, j * N ) / s1->momentOfInertia() );
+	s2->rotVelocity = s2->rotVelocity + ( glm::cross( rBP, -j * N ) / s2->momentOfInertia() );
 
 }
 
