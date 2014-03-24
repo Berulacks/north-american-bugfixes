@@ -292,6 +292,19 @@ bool Base::checkGLErrors(const char* description)
 void Base::initBuffers()
 {
 
+	// create array with faces
+	// have to convert from Assimp format to array
+	unsigned int *faceArray;
+	faceArray = (unsigned int *)malloc(sizeof(unsigned int) * objs[0].scene->mMeshes[0]->mNumFaces * 3);
+	unsigned int faceIndex = 0;
+
+	for (unsigned int t = 0; t <  objs[0].scene->mMeshes[0]->mNumFaces; ++t) {
+		const aiFace* face =  &objs[0].scene->mMeshes[0]->mFaces[t];
+
+		memcpy(&faceArray[faceIndex], face->mIndices,3 * sizeof(unsigned int));
+		faceIndex += 3;
+	}
+
 	GLuint vbo;
         GLuint ibo;
 	GLuint vao;
@@ -306,7 +319,7 @@ void Base::initBuffers()
 	glBindBuffer( GL_ARRAY_BUFFER, nbo );
 	checkGLErrors("NBO binding");
 
-	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumFaces * sizeof(float), objs[0].scene->mMeshes[0]->mNormals, GL_STATIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * sizeof(float), objs[0].scene->mMeshes[0]->mNormals, GL_STATIC_DRAW);
 	checkGLErrors("NBO buffer data");
 	glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 	checkGLErrors("NBO creation");
@@ -318,7 +331,7 @@ void Base::initBuffers()
 		glGenBuffers( 1, &tbo );
 		glBindBuffer( GL_ARRAY_BUFFER, tbo );
 		checkGLErrors("TBO binding");
-		glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.texcoords.size() * sizeof(float), &objs[0].shapes[0].mesh.texcoords[0], GL_STATIC_DRAW);
+		glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumFaces * sizeof(float), objs[0].scene->mMeshes[0]->mFaces, GL_STATIC_DRAW);
 		checkGLErrors("TBO buffer data");
 		gpuLocations.insert( std::pair<const char*, GLuint>("tbo", tbo) );
 		glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
@@ -329,7 +342,7 @@ void Base::initBuffers()
 
 	glGenBuffers( 1, &vbo );
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-	glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.positions.size() * sizeof(float), &objs[0].shapes[0].mesh.positions[0], GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * sizeof(aiVector3D), objs[0].scene->mMeshes[0]->mVertices, GL_STATIC_DRAW );
 	checkGLErrors("VBO Creation");
 	gpuLocations.insert( std::pair<const char*, GLuint>("vbo", vbo) );
 
@@ -338,7 +351,7 @@ void Base::initBuffers()
 
 	glGenBuffers( 1, &ibo );
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[0].shapes[0].mesh.indices.size() * sizeof(unsigned int), &objs[0].shapes[0].mesh.indices[0], GL_STATIC_DRAW );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_STATIC_DRAW );
 	checkGLErrors("IBO creation");
 
 	glEnableVertexAttribArray(gpuLocations.at("vertex_attrib"));
@@ -353,8 +366,8 @@ void Base::initBuffers()
 	//But SOIL, for some odd reason, won't accept char* variables
 	if(hasTexture)
 	{
-		char* texpath = new char[ objs[0].shapes[0].material.diffuse_texname.length() + 1 ];
-		std::strcpy ( texpath, objs[0].shapes[0].material.diffuse_texname.c_str() );
+		//char* texpath = new char[ objs[0].shapes[0].material.diffuse_texname.length() + 1 ];
+		//std::strcpy ( texpath, objs[0].shapes[0].material.diffuse_texname.c_str() );
 
 		GLuint tex = 0;
 		int width, height, channels;
@@ -378,8 +391,8 @@ void Base::initBuffers()
 		glBindTexture(GL_TEXTURE_2D, tex);
 		checkGLErrors("Binding texture");
 
-		printf("Loading texture ./%s ... \n", texpath);
-		unsigned char* pixels = SOIL_load_image(texpath, &width, &height, &channels, SOIL_LOAD_AUTO);
+		printf("Loading texture ./%s ... \n", "./earthmap1k.jpg");
+		unsigned char* pixels = SOIL_load_image("./earthmap1k.jpg", &width, &height, &channels, SOIL_LOAD_AUTO);
 		const int size = width* 3 * height;
 		unsigned char* finalPixels = new unsigned char[size];
 
@@ -491,30 +504,43 @@ void Base::render()
 		glUniformMatrix4fv(gpuLocations.at("mv"), 1, GL_FALSE, glm::value_ptr(mv) );
 		glUniformMatrix3fv(gpuLocations.at("normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal) );
 
-		for(int j = 0; j < objs[i].shapes.size(); j++)
+		for(int j = 0; j < objs[i].scene->mNumMeshes; j++)
 		{
+
+			unsigned int *faceArray;
+			faceArray = (unsigned int *)malloc(sizeof(unsigned int) * objs[0].scene->mMeshes[0]->mNumFaces * 3);
+			unsigned int faceIndex = 0;
+
+			for (unsigned int t = 0; t <  objs[0].scene->mMeshes[0]->mNumFaces; ++t) {
+				const aiFace* face =  &objs[0].scene->mMeshes[0]->mFaces[t];
+
+				memcpy(&faceArray[faceIndex], face->mIndices,3 * sizeof(unsigned int));
+				faceIndex += 3;
+			}
+
 			//Normals
 			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("nbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.normals.size() * sizeof(float), &objs[i].shapes[j].mesh.normals[0], GL_STATIC_DRAW);
+			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices * sizeof(float), objs[i].scene->mMeshes[j]->mNormals, GL_STATIC_DRAW);
 			glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 
 			if(hasTexture)
 			{
 				//Texture Coords
 				glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("tbo") );
-				glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.texcoords.size() * sizeof(float), &objs[i].shapes[j].mesh.texcoords[0], GL_STATIC_DRAW);
+				glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumFaces * sizeof(float), objs[i].scene->mMeshes[j]->mFaces, GL_STATIC_DRAW);
 				glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
 			}
 
 			//Vertices
 			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("vbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.positions.size() * sizeof(float), &objs[i].shapes[j].mesh.positions[0], GL_STATIC_DRAW );
+			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices * sizeof(aiVector3D), objs[i].scene->mMeshes[j]->mVertices, GL_STATIC_DRAW );
 			glVertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 
 			//Indices
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[i].shapes[j].mesh.indices.size() * sizeof(unsigned int), &objs[i].shapes[j].mesh.indices[0], GL_STATIC_DRAW );
+			//glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[i].shapes[j].mesh.indices.size() * sizeof(unsigned int), &objs[i].shapes[j].mesh.indices[0], GL_STATIC_DRAW );
+			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_STATIC_DRAW );
 
-			glDrawElements(GL_TRIANGLES, objs[i].shapes[j].mesh.indices.size(), GL_UNSIGNED_INT, NULL); 
+			glDrawElements(GL_TRIANGLES, objs[i].scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
 		}
 	}
 	checkGLErrors("Post render");
