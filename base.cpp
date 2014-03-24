@@ -328,10 +328,17 @@ void Base::initBuffers()
 
 	if(hasTexture)
 	{
+		float *texCoords = (float *)malloc(sizeof(float)*2*objs[0].scene->mMeshes[0]->mNumVertices);
+		for (unsigned int k = 0; k < objs[0].scene->mMeshes[0]->mNumVertices; ++k) {
+
+			texCoords[k*2]   = objs[0].scene->mMeshes[0]->mTextureCoords[0][k].x;
+			texCoords[k*2+1] = objs[0].scene->mMeshes[0]->mTextureCoords[0][k].y; 
+
+		}
 		glGenBuffers( 1, &tbo );
 		glBindBuffer( GL_ARRAY_BUFFER, tbo );
 		checkGLErrors("TBO binding");
-		glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumFaces * sizeof(float), objs[0].scene->mMeshes[0]->mFaces, GL_STATIC_DRAW);
+		glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
 		checkGLErrors("TBO buffer data");
 		gpuLocations.insert( std::pair<const char*, GLuint>("tbo", tbo) );
 		glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
@@ -525,9 +532,16 @@ void Base::render()
 
 			if(hasTexture)
 			{
+				float *texCoords = (float *)malloc(sizeof(float)*2*objs[0].scene->mMeshes[0]->mNumVertices);
+				for (unsigned int k = 0; k < objs[0].scene->mMeshes[0]->mNumVertices; ++k) {
+
+					texCoords[k*2]   = objs[0].scene->mMeshes[0]->mTextureCoords[0][k].x;
+					texCoords[k*2+1] = objs[0].scene->mMeshes[0]->mTextureCoords[0][k].y; 
+
+				}
 				//Texture Coords
 				glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("tbo") );
-				glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumFaces * sizeof(float), objs[i].scene->mMeshes[j]->mFaces, GL_STATIC_DRAW);
+				glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
 				glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
 			}
 
