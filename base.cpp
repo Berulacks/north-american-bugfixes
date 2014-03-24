@@ -55,37 +55,46 @@ bool Base::init()
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
-	files.push_back( "./models/rungholt/rungholt.obj");
+	//files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/sibenik.obj" );
-	//files.push_back( "./models/suzanne.obj");
+	files.push_back( "./models/suzanne.obj");
 	//files.push_back("./models/sphere/sphere.obj");
-
+	
+	// Create an instance of the Importer class
+	Assimp::Importer importer;
+	const aiScene* tempScene;
 	object tempObj;
-	std::vector<tinyobj::shape_t> tempMesh;
+	//std::vector<tinyobj::shape_t> tempMesh;
+	
+	/*const aiScene* scene = 	importer.ReadFile( files[0],
+			aiProcess_CalcTangentSpace |
+			aiProcess_Triangulate |
+			aiProcess_JoinIdenticalVertices |
+			aiProcess_SortByPType
+			| aiProcess_GenSmoothNormals);*/
+
 
 	for(int i = 0; i < files.size(); i++)
 	{
-		std::string error = tinyobj::LoadObj(tempMesh, files[i]);
+		//std::string error = tinyobj::LoadObj(tempMesh, files[i]);
+		tempScene = importer.ReadFile( files[0],
+			aiProcess_CalcTangentSpace |
+			aiProcess_Triangulate |
+			aiProcess_JoinIdenticalVertices |
+			aiProcess_SortByPType
+			| aiProcess_GenSmoothNormals);
+
 		printf("Loaded file %s.\n", files[i]);
-		if(error.size() > 0)
-			printf("Error: %s", error.c_str() );
 
-		for(int j = 0; j < tempMesh.size(); j++)
-			if(tempMesh[j].mesh.normals.size() <= 0 )
-			{
-				printf("No normals found for shape %i. Generating our own...\n", j);
-				generateNormals(&tempMesh[j].mesh);
-			}
-
-		tempObj.shapes = tempMesh;
+		tempObj.scene = tempScene;
 		tempObj.transform = glm::mat4();
 
 		objs.push_back( tempObj );
 		
 
-		printf("Object %i (%s) has %lu shapes:\n", i, files[i], objs[i].shapes.size() );
-		for(int j = 0; j < objs[i].shapes.size(); j++ )
-			printf("Shape %i has %lu vertices, %lu indices, %lu texture coordinates, and %lu normals.\n", j, objs[i].shapes[j].mesh.positions.size(), objs[i].shapes[j].mesh.indices.size(), objs[i].shapes[j].mesh.texcoords.size(), objs[i].shapes[j].mesh.normals.size() );
+		printf("Object %i (%s) has %i shapes:\n", i, files[i], objs[i].scene->mNumMeshes );
+		for(int j = 0; j < objs[i].scene->mNumMeshes ; j++ )
+			printf("Shape %i has %i vertices, and %i indices\n", j, objs[i].scene->mMeshes[i]->mNumVertices, objs[i].scene->mMeshes[i]->mNumFaces);
 
 
 	}
@@ -96,7 +105,7 @@ bool Base::init()
 	//texturecoords, things are going to break
 	//so we might as well assume that either all 
 	//your models have textures, or none do
-	if(objs[0].shapes[0].mesh.texcoords.size() <= 0)
+	if(!objs[0].scene->HasTextures())
 	{
 		hasTexture = false;
 		printf("[NOTICE]: No texcoords found in object 0. Textures will not be loaded.\n");
@@ -296,7 +305,8 @@ void Base::initBuffers()
 	glGenBuffers( 1, &nbo );
 	glBindBuffer( GL_ARRAY_BUFFER, nbo );
 	checkGLErrors("NBO binding");
-	glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.normals.size() * sizeof(float), &objs[0].shapes[0].mesh.normals[0], GL_STATIC_DRAW);
+
+	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumFaces * sizeof(float), objs[0].scene->mMeshes[0]->mNormals, GL_STATIC_DRAW);
 	checkGLErrors("NBO buffer data");
 	glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 	checkGLErrors("NBO creation");
@@ -606,7 +616,7 @@ bool Base::readFile(std::string filename, std::string* target)
 
 }
 
-void Base::generateNormals(tinyobj::mesh_t *mesh)
+/*void Base::generateNormals(tinyobj::mesh_t *mesh)
 {
 
 	for(int i = 0; i < mesh->indices.size(); i += 3)
@@ -645,7 +655,7 @@ void Base::generateNormals(tinyobj::mesh_t *mesh)
 			
 	}
 
-}
+}*/
 
 void Base::toggleFullScreen()
 {

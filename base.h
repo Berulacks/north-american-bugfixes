@@ -7,6 +7,10 @@
 //#include <SOIL/SOIL.h>
 #include <SOIL2/SOIL2.h>
 
+#include <assimp/Importer.hpp> 
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
 #endif
@@ -21,7 +25,7 @@
 #include <fstream>
 #include <map>
 
-#include "tiny_obj_loader.h"
+//#include "tiny_obj_loader.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -29,7 +33,8 @@
 
 struct object
 {
-	std::vector<tinyobj::shape_t> shapes;
+	//std::vector<tinyobj::shape_t> shapes;
+	const aiScene* scene;
 	glm::mat4 transform;
 
 	glm::vec3 position()
@@ -101,7 +106,7 @@ class Base
 		bool checkGLErrors(const char* description="");
 
 		//For when our .obj's don't have normals
-		void generateNormals(tinyobj::mesh_t *mesh);
+		//void generateNormals(tinyobj::mesh_t *mesh);
 		void initBuffers(void);
 
 		void toggleFullScreen(void);
