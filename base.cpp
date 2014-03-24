@@ -12,7 +12,7 @@ bool Base::init()
 	//So, being a Linux user with an Intel CPU (and mesa)
 	//I'm going to have to stick with OpenGL 3.3
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -34,21 +34,33 @@ bool Base::init()
 	glContext = SDL_GL_CreateContext(mainWindow);
 	printf("Done.\n");
 
-	glewExperimental = GL_TRUE; 
-	printf("Initializing GLEW... ");
-	glewInit();
+	//glewExperimental = gl::TRUE; 
+	//printf("Initializing GLEW... ");
+	//glewInit();
 	printf("Done.\n");
-	printf("GLSL version is %s\n",  glGetString(GL_SHADING_LANGUAGE_VERSION));
+	//printf("OpenGL version is %s\n", gl::GetString(gl::VERSION) );
+	//printf("GLSL version is %s\n",  gl::GetString(gl::SHADING_LANGUAGE_VERSION));
 
-	GLenum err = glewInit();
+	//GLenum err = glewInit();
+
+	printf("Loading functions!\n");
+	gl::exts::LoadTest didLoad = gl::sys::LoadFunctions();
+	if(!didLoad)
+	{
+		printf("Could not load!\n");
+		exit(1);
+	}
+	printf("Functions loaded!\n");
+
+	printf("Number of functions that failed to load: %i.\n", didLoad.GetNumMissing());
 
 	printf("Loading main object... ");
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
-	files.push_back( "./models/rungholt/rungholt.obj");
+	//files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/sibenik.obj" );
-	//files.push_back( "./models/suzanne.obj");
+	files.push_back( "./models/suzanne.obj");
 	//files.push_back("./models/sphere/sphere.obj");
 
 	object tempObj;
@@ -106,11 +118,11 @@ bool Base::init()
 	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,0,1) ); 
 	//objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0, -20, 0) );
 
-	if (GLEW_OK != err)
+	/*if (GLEW_OK != err)
 	{
-		  /* Problem: glewInit failed, something is seriously wrong. */
+		  Problem: glewInit failed, something is seriously wrong.
 		  printf("\nError: %s\n", glewGetErrorString(err));
-	}
+	}*/
 
 	SDL_GL_SetSwapInterval(1);
 
@@ -166,40 +178,40 @@ void Base::loop(int lastFrame)
 bool Base::initGL()
 {
 	printf("Initializing openGL...\n");
-	glEnable(GL_DEPTH_TEST);
-	glShadeModel(GL_FLAT);
+	gl::Enable(gl::DEPTH_TEST);
+	//glShadeModel(gl::FLAT);
 
-	program = glCreateProgram();
+	program = gl::CreateProgram();
 
-	initShader( GL_VERTEX_SHADER, "./shaders/vertex.vs" );
+	initShader( gl::VERTEX_SHADER, "./shaders/vertex.vs" );
 	checkGLErrors("End of Vertex shader init");
 	printf("Vertex shader, done...\n");
 
 	if(hasTexture)
-		initShader( GL_FRAGMENT_SHADER, "./shaders/fragment.fs" );
+		initShader( gl::FRAGMENT_SHADER, "./shaders/fragment.fs" );
 	else
-		initShader( GL_FRAGMENT_SHADER, "./shaders/fragment.notex.fs" );
+		initShader( gl::FRAGMENT_SHADER, "./shaders/fragment.notex.fs" );
 	checkGLErrors("End of fragment shader init");
 	printf("Fragment shader, done...\n");
 	printf("Loaded and initialized shaders...\n");
 
 	
 
-	glLinkProgram( program );
+	gl::LinkProgram( program );
 
 	int maxAt;
-	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAt);
+	gl::GetIntegerv(gl::MAX_VERTEX_ATTRIBS, &maxAt);
 
-	gpuLocations.insert( std::pair<const char*, GLuint>("vertex_attrib", glGetAttribLocation(program, "theV") ) );
-	gpuLocations.insert( std::pair<const char*, GLuint>("normals_attrib", glGetAttribLocation(program, "theN") ) );
-	gpuLocations.insert( std::pair<const char*, GLuint>("textures_attrib", glGetAttribLocation(program, "tex_in") ) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("vertex_attrib", gl::GetAttribLocation(program, "theV") ) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("normals_attrib", gl::GetAttribLocation(program, "theN") ) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("textures_attrib", gl::GetAttribLocation(program, "tex_in") ) );
 
 
 	printf("Setting up initial buffers... \n");
 	initBuffers();
 	printf("Done.\n");
 
-	glUseProgram( program );
+	gl::UseProgram( program );
 	checkGLErrors("Use program");
 
 	//Initialize the actual matrices
@@ -228,43 +240,43 @@ bool Base::initGL()
 
 	camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
 
-	gpuLocations.insert( std::pair<const char*, GLuint>("mvp", glGetUniformLocation(program, "mvp")) );
-	gpuLocations.insert( std::pair<const char*, GLuint>("mv", glGetUniformLocation(program, "mv")) );
-	gpuLocations.insert( std::pair<const char*, GLuint>("normal_matrix", glGetUniformLocation(program, "normal_matrix")) );
-	gpuLocations.insert( std::pair<const char*, GLuint>("LightPosition", glGetUniformLocation(program, "LightPosition")) );
-	gpuLocations.insert( std::pair<const char*, GLuint>("Kd", glGetUniformLocation(program, "Kd")) );
-	gpuLocations.insert( std::pair<const char*, GLuint>("Ld", glGetUniformLocation(program, "Ld")) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("mvp", gl::GetUniformLocation(program, "mvp")) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("mv", gl::GetUniformLocation(program, "mv")) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("normal_matrix", gl::GetUniformLocation(program, "normal_matrix")) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("LightPosition", gl::GetUniformLocation(program, "LightPosition")) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("Kd", gl::GetUniformLocation(program, "Kd")) );
+	gpuLocations.insert( std::pair<const char*, GLuint>("Ld", gl::GetUniformLocation(program, "Ld")) );
 	
 	//Position of light
-	glUniform4fv(gpuLocations.at("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
+	gl::Uniform4fv(gpuLocations.at("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
 	checkGLErrors("Init LP uniform");
 	//Light constant
-	glUniform3fv(gpuLocations.at("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
+	gl::Uniform3fv(gpuLocations.at("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
 	checkGLErrors("Init Kd uniform");
 	//Light intensity
-	glUniform3fv(gpuLocations.at("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
+	gl::Uniform3fv(gpuLocations.at("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
 	checkGLErrors("Init Ld uniform");
 
-	glUniform1i(glGetUniformLocation(program, "texSampler"), 0);
+	gl::Uniform1i(gl::GetUniformLocation(program, "texSampler"), 0);
 
 	
 	printf("OpenGL initialized!\n");
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glEnable(GL_CULL_FACE);
+	gl::PolygonMode(gl::FRONT_AND_BACK, gl::FILL);
+	//gl::Enable(gl::CULL_FACE);
 
 	return checkGLErrors("End of initGL");;
 }
 
 bool Base::checkGLErrors(const char* description)
 {
-	GLenum error = glGetError();
+	GLenum error = gl::GetError();
 	bool hadError = false;
 
-	while(error != GL_NO_ERROR)
+	while(error != gl::NO_ERROR_)
 	{
 		printf("[ERROR]@[%s]: %s\n", description, gluErrorString(error));
-		error = glGetError();
+		error = gl::GetError();
 		hadError = true;
 	}
 
@@ -280,54 +292,54 @@ void Base::initBuffers()
 	GLuint nbo;
 	GLuint tbo;
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	gl::GenVertexArrays(1, &vao);
+	gl::BindVertexArray(vao);
 	checkGLErrors("VAO creation");
 
-	glGenBuffers( 1, &nbo );
-	glBindBuffer( GL_ARRAY_BUFFER, nbo );
+	gl::GenBuffers( 1, &nbo );
+	gl::BindBuffer( gl::ARRAY_BUFFER, nbo );
 	checkGLErrors("NBO binding");
-	glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.normals.size() * sizeof(float), &objs[0].shapes[0].mesh.normals[0], GL_STATIC_DRAW);
+	gl::BufferData( gl::ARRAY_BUFFER, objs[0].shapes[0].mesh.normals.size() * sizeof(float), &objs[0].shapes[0].mesh.normals[0], gl::STATIC_DRAW);
 	checkGLErrors("NBO buffer data");
-	glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
+	gl::VertexAttribPointer( gpuLocations.at("normals_attrib"), 3, gl::FLOAT, 0, 0, 0 );
 	checkGLErrors("NBO creation");
 	gpuLocations.insert( std::pair<const char*, GLuint>("nbo", nbo) );
 
 
 	if(hasTexture)
 	{
-		glGenBuffers( 1, &tbo );
-		glBindBuffer( GL_ARRAY_BUFFER, tbo );
+		gl::GenBuffers( 1, &tbo );
+		gl::BindBuffer( gl::ARRAY_BUFFER, tbo );
 		checkGLErrors("TBO binding");
-		glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.texcoords.size() * sizeof(float), &objs[0].shapes[0].mesh.texcoords[0], GL_STATIC_DRAW);
+		gl::BufferData( gl::ARRAY_BUFFER, objs[0].shapes[0].mesh.texcoords.size() * sizeof(float), &objs[0].shapes[0].mesh.texcoords[0], gl::STATIC_DRAW);
 		checkGLErrors("TBO buffer data");
 		gpuLocations.insert( std::pair<const char*, GLuint>("tbo", tbo) );
-		glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
+		gl::VertexAttribPointer( gpuLocations.at("textures_attrib"), 2, gl::FLOAT, 0, 0, 0);
 		checkGLErrors("Describe texture vertex attrib");
-		glEnableVertexAttribArray( gpuLocations.at("textures_attrib") );
+		gl::EnableVertexAttribArray( gpuLocations.at("textures_attrib") );
 		checkGLErrors("Enable texture vertex attrib array");
 	}
 
-	glGenBuffers( 1, &vbo );
-	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-	glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.positions.size() * sizeof(float), &objs[0].shapes[0].mesh.positions[0], GL_STATIC_DRAW );
+	gl::GenBuffers( 1, &vbo );
+	gl::BindBuffer( gl::ARRAY_BUFFER, vbo );
+	gl::BufferData( gl::ARRAY_BUFFER, objs[0].shapes[0].mesh.positions.size() * sizeof(float), &objs[0].shapes[0].mesh.positions[0], gl::STATIC_DRAW );
 	checkGLErrors("VBO Creation");
 	gpuLocations.insert( std::pair<const char*, GLuint>("vbo", vbo) );
 
-	glVertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, GL_FLOAT, 0, 0, 0 );
+	gl::VertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, gl::FLOAT, 0, 0, 0 );
 	checkGLErrors("Configured vbo attribpointer");
 
-	glGenBuffers( 1, &ibo );
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[0].shapes[0].mesh.indices.size() * sizeof(unsigned int), &objs[0].shapes[0].mesh.indices[0], GL_STATIC_DRAW );
+	gl::GenBuffers( 1, &ibo );
+	gl::BindBuffer( gl::ELEMENT_ARRAY_BUFFER, ibo );
+	gl::BufferData( gl::ELEMENT_ARRAY_BUFFER, objs[0].shapes[0].mesh.indices.size() * sizeof(unsigned int), &objs[0].shapes[0].mesh.indices[0], gl::STATIC_DRAW );
 	checkGLErrors("IBO creation");
 
-	glEnableVertexAttribArray(gpuLocations.at("vertex_attrib"));
-	glEnableVertexAttribArray(gpuLocations.at("normals_attrib"));
+	gl::EnableVertexAttribArray(gpuLocations.at("vertex_attrib"));
+	gl::EnableVertexAttribArray(gpuLocations.at("normals_attrib"));
 	checkGLErrors("Enabled ibo attrib array");
 
 	//GLuint tex;
-	//glGenTextures(1, &tex);
+	//gl::GenTextures(1, &tex);
 
 	//Normally, here, we'd want to read the diffuse_texname
 	//of our loaded object
@@ -345,26 +357,25 @@ void Base::initBuffers()
 			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 		);
 
-
 		checkGLErrors("Generating texture");
-		glBindTexture(GL_TEXTURE_2D, tex);
+		gl::BindTexture(gl::TEXTURE_2D, tex);
 		checkGLErrors("Binding texture");
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT);
+		gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT);
 		checkGLErrors("Setting texture wrap mode");
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR);
+		gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR);
 		checkGLErrors("Setting texture filtering mode");
 	}
 
-	glBindVertexArray(vao);
+	gl::BindVertexArray(vao);
 	checkGLErrors("Binding vertex array");
 }
 
 bool Base::initShader(GLenum type, std::string file)
 {
-	GLuint shader = glCreateShader( type );
+	GLuint shader = gl::CreateShader( type );
 	checkGLErrors("initShader: created shader");
 
 	std::string source;
@@ -375,35 +386,35 @@ bool Base::initShader(GLenum type, std::string file)
 		quit();
 	}
 
-	glShaderSource( shader, 1, (const GLchar**)&source, NULL );
+	gl::ShaderSource( shader, 1, (const GLchar**)&source, NULL );
 	checkGLErrors("initShader: set shader source");
 	
 
-	glCompileShader( shader );
+	gl::CompileShader( shader );
 	checkGLErrors("initShader: compiled shader");
 
-	GLint shaderCompiled = GL_FALSE;
-	glGetShaderiv( shader, GL_COMPILE_STATUS, &shaderCompiled ); 
-	if( shaderCompiled != GL_TRUE ) 
+	GLint shaderCompiled = gl::FALSE_;
+	gl::GetShaderiv( shader, gl::COMPILE_STATUS, &shaderCompiled ); 
+	if( shaderCompiled != gl::TRUE_ ) 
 	{ 
 		printf( "ERROR: Unable to compile shader %d!\n\nSource:\n%s\n", shader, source.c_str() );
 		int infoLength = 0;
 		int maxL = infoLength;
 
-		glGetShaderiv(program, GL_INFO_LOG_LENGTH, &maxL);
+		gl::GetShaderiv(program, gl::INFO_LOG_LENGTH, &maxL);
 		char* infoLog = new char[maxL];
 
-		glGetShaderInfoLog(program, maxL, &infoLength, infoLog);
+		gl::GetShaderInfoLog(program, maxL, &infoLength, infoLog);
 		//if (infoLength > 0)
 			printf("GLSHADERIV:%s\n", infoLog);
 
-		glDeleteShader( shader );
+		gl::DeleteShader( shader );
 		shader = 0;
 
 		quit();
 	}
 
-	glAttachShader( program, shader );
+	gl::AttachShader( program, shader );
 	checkGLErrors("initShader: attached shader");
 
 	return true;
@@ -417,8 +428,8 @@ void Base::physics()
 
 void Base::render()
 {
-	glClearColor(1.0f,0.8f,0.8f,1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	gl::ClearColor(1.0f,0.8f,0.8f,1.0f);
+	gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
 
 	glm::mat4 mv, mvp;
@@ -432,34 +443,34 @@ void Base::render()
 		rot = (glm::mat3)mv;
 		normal = glm::inverseTranspose(rot);
 
-		glUniformMatrix4fv(gpuLocations.at("mvp"), 1, GL_FALSE, glm::value_ptr(mvp) );
-		glUniformMatrix4fv(gpuLocations.at("mv"), 1, GL_FALSE, glm::value_ptr(mv) );
-		glUniformMatrix3fv(gpuLocations.at("normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal) );
+		gl::UniformMatrix4fv(gpuLocations.at("mvp"), 1, gl::FALSE_, glm::value_ptr(mvp) );
+		gl::UniformMatrix4fv(gpuLocations.at("mv"), 1, gl::FALSE_, glm::value_ptr(mv) );
+		gl::UniformMatrix3fv(gpuLocations.at("normal_matrix"), 1, gl::FALSE_, glm::value_ptr(normal) );
 
 		for(int j = 0; j < objs[i].shapes.size(); j++)
 		{
 			//Normals
-			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("nbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.normals.size() * sizeof(float), &objs[i].shapes[j].mesh.normals[0], GL_STATIC_DRAW);
-			glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
+			gl::BindBuffer( gl::ARRAY_BUFFER, gpuLocations.at("nbo") );
+			gl::BufferData( gl::ARRAY_BUFFER, objs[i].shapes[j].mesh.normals.size() * sizeof(float), &objs[i].shapes[j].mesh.normals[0], gl::STATIC_DRAW);
+			gl::VertexAttribPointer( gpuLocations.at("normals_attrib"), 3, gl::FLOAT, 0, 0, 0 );
 
 			if(hasTexture)
 			{
 				//Texture Coords
-				glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("tbo") );
-				glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.texcoords.size() * sizeof(float), &objs[i].shapes[j].mesh.texcoords[0], GL_STATIC_DRAW);
-				glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
+				gl::BindBuffer( gl::ARRAY_BUFFER, gpuLocations.at("tbo") );
+				gl::BufferData( gl::ARRAY_BUFFER, objs[i].shapes[j].mesh.texcoords.size() * sizeof(float), &objs[i].shapes[j].mesh.texcoords[0], gl::STATIC_DRAW);
+				gl::VertexAttribPointer( gpuLocations.at("textures_attrib"), 2, gl::FLOAT, 0, 0, 0);
 			}
 
 			//Vertices
-			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("vbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.positions.size() * sizeof(float), &objs[i].shapes[j].mesh.positions[0], GL_STATIC_DRAW );
-			glVertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, GL_FLOAT, 0, 0, 0 );
+			gl::BindBuffer( gl::ARRAY_BUFFER, gpuLocations.at("vbo") );
+			gl::BufferData( gl::ARRAY_BUFFER, objs[i].shapes[j].mesh.positions.size() * sizeof(float), &objs[i].shapes[j].mesh.positions[0], gl::STATIC_DRAW );
+			gl::VertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, gl::FLOAT, 0, 0, 0 );
 
 			//Indices
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[i].shapes[j].mesh.indices.size() * sizeof(unsigned int), &objs[i].shapes[j].mesh.indices[0], GL_STATIC_DRAW );
+			gl::BufferData( gl::ELEMENT_ARRAY_BUFFER, objs[i].shapes[j].mesh.indices.size() * sizeof(unsigned int), &objs[i].shapes[j].mesh.indices[0], gl::STATIC_DRAW );
 
-			glDrawElements(GL_TRIANGLES, objs[i].shapes[j].mesh.indices.size(), GL_UNSIGNED_INT, NULL); 
+			gl::DrawElements(gl::TRIANGLES, objs[i].shapes[j].mesh.indices.size(), gl::UNSIGNED_INT, NULL); 
 		}
 	}
 	checkGLErrors("Post render");
@@ -610,7 +621,7 @@ void Base::toggleFullScreen()
 		SDL_SetWindowFullscreen(mainWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
 		projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f);
 		SDL_GetWindowSize(mainWindow, &w, &h);
-		glViewport(0,0,w,h);
+		gl::Viewport(0,0,w,h);
 		isFullscreen = true;
 	}
 	else
@@ -618,7 +629,7 @@ void Base::toggleFullScreen()
 		SDL_SetWindowFullscreen(mainWindow, 0);
 		SDL_SetWindowSize( mainWindow, 800, 600);
 		projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
-		glViewport(0,0,800,600);
+		gl::Viewport(0,0,800,600);
 		isFullscreen = false;
 	}
 }
