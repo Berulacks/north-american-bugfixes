@@ -57,8 +57,8 @@ bool Base::init()
 	std::vector<const char*> files;
 	//files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/sibenik.obj" );
-	files.push_back( "./models/suzanne.obj");
-	//files.push_back("./models/sphere/sphere.obj");
+	//files.push_back( "./models/suzanne.obj");
+	files.push_back("./models/sphere/sphere.obj");
 	
 	// Create an instance of the Importer class
 	Assimp::Importer importer;
@@ -105,7 +105,7 @@ bool Base::init()
 	//texturecoords, things are going to break
 	//so we might as well assume that either all 
 	//your models have textures, or none do
-	if(!objs[0].scene->HasTextures())
+	if(!objs[0].scene->mMeshes[0]->HasTextureCoords(0))
 	{
 		hasTexture = false;
 		printf("[NOTICE]: No texcoords found in object 0. Textures will not be loaded.\n");
@@ -319,7 +319,7 @@ void Base::initBuffers()
 	glBindBuffer( GL_ARRAY_BUFFER, nbo );
 	checkGLErrors("NBO binding");
 
-	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * sizeof(float), objs[0].scene->mMeshes[0]->mNormals, GL_STATIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * 3  * sizeof(float), objs[0].scene->mMeshes[0]->mNormals, GL_STATIC_DRAW);
 	checkGLErrors("NBO buffer data");
 	glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 	checkGLErrors("NBO creation");
@@ -342,7 +342,7 @@ void Base::initBuffers()
 
 	glGenBuffers( 1, &vbo );
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * sizeof(aiVector3D), objs[0].scene->mMeshes[0]->mVertices, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * sizeof(float) * 3, objs[0].scene->mMeshes[0]->mVertices, GL_STATIC_DRAW );
 	checkGLErrors("VBO Creation");
 	gpuLocations.insert( std::pair<const char*, GLuint>("vbo", vbo) );
 
@@ -520,7 +520,7 @@ void Base::render()
 
 			//Normals
 			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("nbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices * sizeof(float), objs[i].scene->mMeshes[j]->mNormals, GL_STATIC_DRAW);
+			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices * 3 * sizeof(float), objs[i].scene->mMeshes[j]->mNormals, GL_STATIC_DRAW);
 			glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 
 			if(hasTexture)
@@ -533,7 +533,7 @@ void Base::render()
 
 			//Vertices
 			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("vbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices * sizeof(aiVector3D), objs[i].scene->mMeshes[j]->mVertices, GL_STATIC_DRAW );
+			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices * sizeof(float) * 3, objs[i].scene->mMeshes[j]->mVertices, GL_STATIC_DRAW );
 			glVertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 
 			//Indices
