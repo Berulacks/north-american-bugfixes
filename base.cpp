@@ -34,16 +34,7 @@ bool Base::init()
 	glContext = SDL_GL_CreateContext(mainWindow);
 	printf("Done.\n");
 
-	//glewExperimental = gl::TRUE; 
-	//printf("Initializing GLEW... ");
-	//glewInit();
-	printf("Done.\n");
-	//printf("OpenGL version is %s\n", gl::GetString(gl::VERSION) );
-	//printf("GLSL version is %s\n",  gl::GetString(gl::SHADING_LANGUAGE_VERSION));
-
-	//GLenum err = glewInit();
-
-	printf("Loading functions!\n");
+	printf("Loading functions... ");
 	gl::exts::LoadTest didLoad = gl::sys::LoadFunctions();
 	if(!didLoad)
 	{
@@ -51,10 +42,12 @@ bool Base::init()
 		exit(1);
 	}
 	printf("Functions loaded!\n");
+	printf("OpenGL version is %s\n", gl::GetString(gl::VERSION) );
+	printf("GLSL version is %s\n",  gl::GetString(gl::SHADING_LANGUAGE_VERSION));
 
 	printf("Number of functions that failed to load: %i.\n", didLoad.GetNumMissing());
 
-	printf("Loading main object... ");
+	printf("Loading main object... \n");
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;

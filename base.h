@@ -1,9 +1,6 @@
-//#include <GL/glew.h>
 #include "gl_core_3_3.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
-//#include <GL/openGL.h>
-//#include <GL/gltypes.h>
 #include <GL/glu.h>
 #include <SDL2/SDL.h>
 #include <SOIL/SOIL.h>
@@ -27,8 +24,6 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 //#include <string>
-
-//#include "teapot.h"
 
 struct object
 {
