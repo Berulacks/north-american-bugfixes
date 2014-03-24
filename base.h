@@ -1,9 +1,11 @@
-#include "gl_core_3_3.hpp"
+//#include "gl_core_3_3.hpp"
+#include "gl_core_3_3.h"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
 #include <SDL2/SDL.h>
-#include <SOIL/SOIL.h>
+//#include <SOIL/SOIL.h>
+#include <SOIL2/SOIL2.h>
 
 #ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
