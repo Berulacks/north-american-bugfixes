@@ -768,17 +768,6 @@ void Base::handleSphereCollision(object* s1, object* s2, float e)
 	P = s1->position + rAP;
 	collisionLine[1] = P;
 
-	/*float j = - (1.0f + e) * glm::dot(vAB, N)
-		/ 
-		  (glm::dot(N,N) * (1/s1->mass + 1/s2->mass));*/
-
-	/*float j = - (1.0f + e) * glm::dot(vAB, N)
-		/ 
-		  ( ( glm::dot(N,N) * (1/s1->mass + 1/s2->mass) )
-		  + ( pow( glm::dot( rAP, N ), 2 ) / s1->momentOfInertia() )
-		  + ( pow( glm::dot( rBP, N ), 2 ) / s2->momentOfInertia() ) 
-		  );*/
-
 	float j = - (1.0f + e) * glm::dot(vAB, N)
 		/ 
 		  glm::dot( 
