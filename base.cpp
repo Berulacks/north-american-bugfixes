@@ -57,8 +57,9 @@ bool Base::init()
 	std::vector<const char*> files;
 	//files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/sibenik.obj" );
+	files.push_back( "./models/humpback/HUMPBACK.OBJ" );
 	//files.push_back( "./models/suzanne.obj");
-	files.push_back("./models/sphere/sphere.obj");
+	//files.push_back("./models/sphere/sphere.obj");
 	
 	// Create an instance of the Importer class
 	Assimp::Importer importer;
@@ -77,24 +78,36 @@ bool Base::init()
 	for(int i = 0; i < files.size(); i++)
 	{
 		//std::string error = tinyobj::LoadObj(tempMesh, files[i]);
-		tempScene = importer.ReadFile( files[0],
+		/*tempScene = importer.ReadFile( files[0],
 			aiProcess_CalcTangentSpace |
 			aiProcess_Triangulate |
 			aiProcess_JoinIdenticalVertices |
-			aiProcess_SortByPType
-			| aiProcess_GenSmoothNormals);
+			aiProcess_SortByPType | aiProcess_GenUVCoords
+			| aiProcess_GenNormals);*/
+		tempScene = importer.ReadFile( files[0],
+			 aiProcess_Triangulate | 
+			 aiProcess_GenSmoothNormals);
+		// If the import failed, report it
+		if( !tempScene)
+		{
+			printf("[ERROR] Could not import file %s: %s\n", files[i], importer.GetErrorString());
+			exit(1);
+		}
 
 		printf("Loaded file %s.\n", files[i]);
 
 		tempObj.scene = tempScene;
+		printf("Set scene\n");
 		tempObj.transform = glm::mat4();
+		printf("Set transform\n");
 
 		objs.push_back( tempObj );
+		printf("Added to vector\n");
 		
 
-		printf("Object %i (%s) has %i shapes:\n", i, files[i], objs[i].scene->mNumMeshes );
-		for(int j = 0; j < objs[i].scene->mNumMeshes ; j++ )
-			printf("Shape %i has %i vertices, and %i indices\n", j, objs[i].scene->mMeshes[i]->mNumVertices, objs[i].scene->mMeshes[i]->mNumFaces);
+		printf("Object %i (%s) has %i shapes:\n", i, files[i], tempScene->mNumMeshes);
+		//for(int j = 0; j < objs[i].scene->mNumMeshes ; j++ )
+			//printf("Shape %i has %i vertices, and %i indices\n", j, objs[i].scene->mMeshes[i]->mNumVertices, objs[i].scene->mMeshes[i]->mNumFaces);
 
 
 	}
@@ -113,7 +126,7 @@ bool Base::init()
 	else
 	{
 		hasTexture = true;
-		//hasTexture = false; //REMOVE THIS
+		hasTexture = false; //REMOVE THIS
 		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
@@ -269,7 +282,7 @@ bool Base::initGL()
 	printf("OpenGL initialized!\n");
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//GL_Enable(glCULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	return checkGLErrors("End of initGL");;
 }
@@ -345,6 +358,7 @@ void Base::initBuffers()
 		checkGLErrors("Describe texture vertex attrib");
 		glEnableVertexAttribArray( gpuLocations.at("textures_attrib") );
 		checkGLErrors("Enable texture vertex attrib array");
+		free(texCoords);
 	}
 
 	glGenBuffers( 1, &vbo );
@@ -360,6 +374,7 @@ void Base::initBuffers()
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_STATIC_DRAW );
 	checkGLErrors("IBO creation");
+	free(faceArray);
 
 	glEnableVertexAttribArray(gpuLocations.at("vertex_attrib"));
 	glEnableVertexAttribArray(gpuLocations.at("normals_attrib"));
@@ -381,25 +396,14 @@ void Base::initBuffers()
 		glGenTextures(1, &tex);
 		checkGLErrors("Generating texture");
 
-		printf("Loading texture!\n");
-		//GLuint tex = SOIL_load_OGL_texture("earthmap1k.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y);
-
-		/* load an image file directly as a new OpenGL texture */
-		/*tex = SOIL_load_OGL_texture
-		(
-			"earthmap1k.jpg",
-			SOIL_LOAD_AUTO,
-			SOIL_CREATE_NEW_ID,
-			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-		);*/
-
-		printf("Loaded\n");
-
 		glBindTexture(GL_TEXTURE_2D, tex);
 		checkGLErrors("Binding texture");
 
-		printf("Loading texture ./%s ... \n", "./earthmap1k.jpg");
-		unsigned char* pixels = SOIL_load_image("./earthmap1k.jpg", &width, &height, &channels, SOIL_LOAD_AUTO);
+		aiString texPath;
+		objs[0].scene->mMaterials[3]->GetTexture( aiTextureType_DIFFUSE, 0,&texPath);
+
+		printf("Loading texture %s ... \n", texPath.C_Str());
+		unsigned char* pixels = SOIL_load_image(texPath.C_Str(), &width, &height, &channels, SOIL_LOAD_AUTO);
 		const int size = width* 3 * height;
 		unsigned char* finalPixels = new unsigned char[size];
 
@@ -416,8 +420,6 @@ void Base::initBuffers()
 			}
 
 		}
-		//for(int i = 0; i < width * 4 * 4 * height; i++)
-		//	finalPixels[i] = pixels[i];
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, finalPixels);
 		SOIL_free_image_data(pixels);
@@ -527,7 +529,7 @@ void Base::render()
 
 			//Normals
 			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("nbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices * 3 * sizeof(float), objs[i].scene->mMeshes[j]->mNormals, GL_STATIC_DRAW);
+			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices* 3 * sizeof(float), objs[i].scene->mMeshes[j]->mNormals, GL_STATIC_DRAW);
 			glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 
 			if(hasTexture)
