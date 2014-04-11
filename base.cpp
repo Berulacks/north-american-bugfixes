@@ -85,8 +85,12 @@ bool Base::init()
 			aiProcess_SortByPType | aiProcess_GenUVCoords
 			| aiProcess_GenNormals);*/
 		tempScene = importer.ReadFile( files[0],
-			 aiProcess_Triangulate | 
-			 aiProcess_GenSmoothNormals);
+			aiProcessPreset_TargetRealtime_Quality |
+			aiProcess_GenSmoothNormals    | // generate smooth normal vectors if not existing
+			aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
+			aiProcess_Triangulate    | // triangulate polygons with more than 3 edges
+			aiProcess_SortByPType              | // make 'clean' meshes which consist of a single typ of primitives
+			0);
 		// If the import failed, report it
 		if( !tempScene)
 		{
