@@ -55,37 +55,63 @@ bool Base::init()
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
-	files.push_back( "./models/rungholt/rungholt.obj");
+	//files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/sibenik.obj" );
+	files.push_back( "./models/humpback/HUMPBACK.OBJ" );
 	//files.push_back( "./models/suzanne.obj");
 	//files.push_back("./models/sphere/sphere.obj");
-
+	
+	// Create an instance of the Importer class
+	Assimp::Importer importer;
+	const aiScene* tempScene;
 	object tempObj;
-	std::vector<tinyobj::shape_t> tempMesh;
+	//std::vector<tinyobj::shape_t> tempMesh;
+	
+	/*const aiScene* scene = 	importer.ReadFile( files[0],
+			aiProcess_CalcTangentSpace |
+			aiProcess_Triangulate |
+			aiProcess_JoinIdenticalVertices |
+			aiProcess_SortByPType
+			| aiProcess_GenSmoothNormals);*/
+
 
 	for(int i = 0; i < files.size(); i++)
 	{
-		std::string error = tinyobj::LoadObj(tempMesh, files[i]);
+		//std::string error = tinyobj::LoadObj(tempMesh, files[i]);
+		/*tempScene = importer.ReadFile( files[0],
+			aiProcess_CalcTangentSpace |
+			aiProcess_Triangulate |
+			aiProcess_JoinIdenticalVertices |
+			aiProcess_SortByPType | aiProcess_GenUVCoords
+			| aiProcess_GenNormals);*/
+		tempScene = importer.ReadFile( files[0],
+			aiProcessPreset_TargetRealtime_Quality |
+			aiProcess_GenSmoothNormals    | // generate smooth normal vectors if not existing
+			aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
+			aiProcess_Triangulate    | // triangulate polygons with more than 3 edges
+			aiProcess_SortByPType              | // make 'clean' meshes which consist of a single typ of primitives
+			0);
+		// If the import failed, report it
+		if( !tempScene)
+		{
+			printf("[ERROR] Could not import file %s: %s\n", files[i], importer.GetErrorString());
+			exit(1);
+		}
+
 		printf("Loaded file %s.\n", files[i]);
-		if(error.size() > 0)
-			printf("Error: %s", error.c_str() );
 
-		for(int j = 0; j < tempMesh.size(); j++)
-			if(tempMesh[j].mesh.normals.size() <= 0 )
-			{
-				printf("No normals found for shape %i. Generating our own...\n", j);
-				generateNormals(&tempMesh[j].mesh);
-			}
-
-		tempObj.shapes = tempMesh;
+		tempObj.scene = tempScene;
+		printf("Set scene\n");
 		tempObj.transform = glm::mat4();
+		printf("Set transform\n");
 
 		objs.push_back( tempObj );
+		printf("Added to vector\n");
 		
 
-		printf("Object %i (%s) has %lu shapes:\n", i, files[i], objs[i].shapes.size() );
-		for(int j = 0; j < objs[i].shapes.size(); j++ )
-			printf("Shape %i has %lu vertices, %lu indices, %lu texture coordinates, and %lu normals.\n", j, objs[i].shapes[j].mesh.positions.size(), objs[i].shapes[j].mesh.indices.size(), objs[i].shapes[j].mesh.texcoords.size(), objs[i].shapes[j].mesh.normals.size() );
+		printf("Object %i (%s) has %i shapes:\n", i, files[i], tempScene->mNumMeshes);
+		//for(int j = 0; j < objs[i].scene->mNumMeshes ; j++ )
+			//printf("Shape %i has %i vertices, and %i indices\n", j, objs[i].scene->mMeshes[i]->mNumVertices, objs[i].scene->mMeshes[i]->mNumFaces);
 
 
 	}
@@ -96,7 +122,7 @@ bool Base::init()
 	//texturecoords, things are going to break
 	//so we might as well assume that either all 
 	//your models have textures, or none do
-	if(objs[0].shapes[0].mesh.texcoords.size() <= 0)
+	if(!objs[0].scene->mMeshes[0]->HasTextureCoords(0))
 	{
 		hasTexture = false;
 		printf("[NOTICE]: No texcoords found in object 0. Textures will not be loaded.\n");
@@ -104,7 +130,7 @@ bool Base::init()
 	else
 	{
 		hasTexture = true;
-		//hasTexture = false; //REMOVE THIS
+		hasTexture = false; //REMOVE THIS
 		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
 	}
 
@@ -260,7 +286,7 @@ bool Base::initGL()
 	printf("OpenGL initialized!\n");
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//GL_Enable(glCULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	return checkGLErrors("End of initGL");;
 }
@@ -283,6 +309,19 @@ bool Base::checkGLErrors(const char* description)
 void Base::initBuffers()
 {
 
+	// create array with faces
+	// have to convert from Assimp format to array
+	unsigned int *faceArray;
+	faceArray = (unsigned int *)malloc(sizeof(unsigned int) * objs[0].scene->mMeshes[0]->mNumFaces * 3);
+	unsigned int faceIndex = 0;
+
+	for (unsigned int t = 0; t <  objs[0].scene->mMeshes[0]->mNumFaces; ++t) {
+		const aiFace* face =  &objs[0].scene->mMeshes[0]->mFaces[t];
+
+		memcpy(&faceArray[faceIndex], face->mIndices,3 * sizeof(unsigned int));
+		faceIndex += 3;
+	}
+
 	GLuint vbo;
         GLuint ibo;
 	GLuint vao;
@@ -296,7 +335,8 @@ void Base::initBuffers()
 	glGenBuffers( 1, &nbo );
 	glBindBuffer( GL_ARRAY_BUFFER, nbo );
 	checkGLErrors("NBO binding");
-	glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.normals.size() * sizeof(float), &objs[0].shapes[0].mesh.normals[0], GL_STATIC_DRAW);
+
+	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * 3  * sizeof(float), objs[0].scene->mMeshes[0]->mNormals, GL_STATIC_DRAW);
 	checkGLErrors("NBO buffer data");
 	glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 	checkGLErrors("NBO creation");
@@ -305,21 +345,29 @@ void Base::initBuffers()
 
 	if(hasTexture)
 	{
+		float *texCoords = (float *)malloc(sizeof(float)*2*objs[0].scene->mMeshes[0]->mNumVertices);
+		for (unsigned int k = 0; k < objs[0].scene->mMeshes[0]->mNumVertices; ++k) {
+
+			texCoords[k*2]   = objs[0].scene->mMeshes[0]->mTextureCoords[0][k].x;
+			texCoords[k*2+1] = objs[0].scene->mMeshes[0]->mTextureCoords[0][k].y; 
+
+		}
 		glGenBuffers( 1, &tbo );
 		glBindBuffer( GL_ARRAY_BUFFER, tbo );
 		checkGLErrors("TBO binding");
-		glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.texcoords.size() * sizeof(float), &objs[0].shapes[0].mesh.texcoords[0], GL_STATIC_DRAW);
+		glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
 		checkGLErrors("TBO buffer data");
 		gpuLocations.insert( std::pair<const char*, GLuint>("tbo", tbo) );
 		glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
 		checkGLErrors("Describe texture vertex attrib");
 		glEnableVertexAttribArray( gpuLocations.at("textures_attrib") );
 		checkGLErrors("Enable texture vertex attrib array");
+		free(texCoords);
 	}
 
 	glGenBuffers( 1, &vbo );
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-	glBufferData( GL_ARRAY_BUFFER, objs[0].shapes[0].mesh.positions.size() * sizeof(float), &objs[0].shapes[0].mesh.positions[0], GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * sizeof(float) * 3, objs[0].scene->mMeshes[0]->mVertices, GL_STATIC_DRAW );
 	checkGLErrors("VBO Creation");
 	gpuLocations.insert( std::pair<const char*, GLuint>("vbo", vbo) );
 
@@ -328,8 +376,9 @@ void Base::initBuffers()
 
 	glGenBuffers( 1, &ibo );
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[0].shapes[0].mesh.indices.size() * sizeof(unsigned int), &objs[0].shapes[0].mesh.indices[0], GL_STATIC_DRAW );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_STATIC_DRAW );
 	checkGLErrors("IBO creation");
+	free(faceArray);
 
 	glEnableVertexAttribArray(gpuLocations.at("vertex_attrib"));
 	glEnableVertexAttribArray(gpuLocations.at("normals_attrib"));
@@ -343,33 +392,22 @@ void Base::initBuffers()
 	//But SOIL, for some odd reason, won't accept char* variables
 	if(hasTexture)
 	{
-		char* texpath = new char[ objs[0].shapes[0].material.diffuse_texname.length() + 1 ];
-		std::strcpy ( texpath, objs[0].shapes[0].material.diffuse_texname.c_str() );
+		//char* texpath = new char[ objs[0].shapes[0].material.diffuse_texname.length() + 1 ];
+		//std::strcpy ( texpath, objs[0].shapes[0].material.diffuse_texname.c_str() );
 
 		GLuint tex = 0;
 		int width, height, channels;
 		glGenTextures(1, &tex);
 		checkGLErrors("Generating texture");
 
-		printf("Loading texture!\n");
-		//GLuint tex = SOIL_load_OGL_texture("earthmap1k.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y);
-
-		/* load an image file directly as a new OpenGL texture */
-		/*tex = SOIL_load_OGL_texture
-		(
-			"earthmap1k.jpg",
-			SOIL_LOAD_AUTO,
-			SOIL_CREATE_NEW_ID,
-			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-		);*/
-
-		printf("Loaded\n");
-
 		glBindTexture(GL_TEXTURE_2D, tex);
 		checkGLErrors("Binding texture");
 
-		printf("Loading texture ./%s ... \n", texpath);
-		unsigned char* pixels = SOIL_load_image(texpath, &width, &height, &channels, SOIL_LOAD_AUTO);
+		aiString texPath;
+		objs[0].scene->mMaterials[3]->GetTexture( aiTextureType_DIFFUSE, 0,&texPath);
+
+		printf("Loading texture %s ... \n", texPath.C_Str());
+		unsigned char* pixels = SOIL_load_image(texPath.C_Str(), &width, &height, &channels, SOIL_LOAD_AUTO);
 		const int size = width* 3 * height;
 		unsigned char* finalPixels = new unsigned char[size];
 
@@ -386,8 +424,6 @@ void Base::initBuffers()
 			}
 
 		}
-		//for(int i = 0; i < width * 4 * 4 * height; i++)
-		//	finalPixels[i] = pixels[i];
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, finalPixels);
 		SOIL_free_image_data(pixels);
@@ -481,30 +517,50 @@ void Base::render()
 		glUniformMatrix4fv(gpuLocations.at("mv"), 1, GL_FALSE, glm::value_ptr(mv) );
 		glUniformMatrix3fv(gpuLocations.at("normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal) );
 
-		for(int j = 0; j < objs[i].shapes.size(); j++)
+		for(int j = 0; j < objs[i].scene->mNumMeshes; j++)
 		{
+
+			unsigned int *faceArray;
+			faceArray = (unsigned int *)malloc(sizeof(unsigned int) * objs[0].scene->mMeshes[0]->mNumFaces * 3);
+			unsigned int faceIndex = 0;
+
+			for (unsigned int t = 0; t <  objs[0].scene->mMeshes[0]->mNumFaces; ++t) {
+				const aiFace* face =  &objs[0].scene->mMeshes[0]->mFaces[t];
+
+				memcpy(&faceArray[faceIndex], face->mIndices,3 * sizeof(unsigned int));
+				faceIndex += 3;
+			}
+
 			//Normals
 			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("nbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.normals.size() * sizeof(float), &objs[i].shapes[j].mesh.normals[0], GL_STATIC_DRAW);
+			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices* 3 * sizeof(float), objs[i].scene->mMeshes[j]->mNormals, GL_STATIC_DRAW);
 			glVertexAttribPointer( gpuLocations.at("normals_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 
 			if(hasTexture)
 			{
+				float *texCoords = (float *)malloc(sizeof(float)*2*objs[0].scene->mMeshes[0]->mNumVertices);
+				for (unsigned int k = 0; k < objs[0].scene->mMeshes[0]->mNumVertices; ++k) {
+
+					texCoords[k*2]   = objs[0].scene->mMeshes[0]->mTextureCoords[0][k].x;
+					texCoords[k*2+1] = objs[0].scene->mMeshes[0]->mTextureCoords[0][k].y; 
+
+				}
 				//Texture Coords
 				glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("tbo") );
-				glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.texcoords.size() * sizeof(float), &objs[i].shapes[j].mesh.texcoords[0], GL_STATIC_DRAW);
+				glBufferData( GL_ARRAY_BUFFER, objs[0].scene->mMeshes[0]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
 				glVertexAttribPointer( gpuLocations.at("textures_attrib"), 2, GL_FLOAT, 0, 0, 0);
 			}
 
 			//Vertices
 			glBindBuffer( GL_ARRAY_BUFFER, gpuLocations.at("vbo") );
-			glBufferData( GL_ARRAY_BUFFER, objs[i].shapes[j].mesh.positions.size() * sizeof(float), &objs[i].shapes[j].mesh.positions[0], GL_STATIC_DRAW );
+			glBufferData( GL_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumVertices * sizeof(float) * 3, objs[i].scene->mMeshes[j]->mVertices, GL_STATIC_DRAW );
 			glVertexAttribPointer( gpuLocations.at("vertex_attrib"), 3, GL_FLOAT, 0, 0, 0 );
 
 			//Indices
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[i].shapes[j].mesh.indices.size() * sizeof(unsigned int), &objs[i].shapes[j].mesh.indices[0], GL_STATIC_DRAW );
+			//glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[i].shapes[j].mesh.indices.size() * sizeof(unsigned int), &objs[i].shapes[j].mesh.indices[0], GL_STATIC_DRAW );
+			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[i].scene->mMeshes[j]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_STATIC_DRAW );
 
-			glDrawElements(GL_TRIANGLES, objs[i].shapes[j].mesh.indices.size(), GL_UNSIGNED_INT, NULL); 
+			glDrawElements(GL_TRIANGLES, objs[i].scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
 		}
 	}
 	checkGLErrors("Post render");
@@ -606,7 +662,7 @@ bool Base::readFile(std::string filename, std::string* target)
 
 }
 
-void Base::generateNormals(tinyobj::mesh_t *mesh)
+/*void Base::generateNormals(tinyobj::mesh_t *mesh)
 {
 
 	for(int i = 0; i < mesh->indices.size(); i += 3)
@@ -645,7 +701,7 @@ void Base::generateNormals(tinyobj::mesh_t *mesh)
 			
 	}
 
-}
+}*/
 
 void Base::toggleFullScreen()
 {
