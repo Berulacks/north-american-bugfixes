@@ -1,10 +1,8 @@
-//#include "gl_core_3_3.hpp"
-#include "gl_core_3_3.h"
+#include "libs/gl_core_3_3.h"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
 #include <SDL2/SDL.h>
-//#include <SOIL/SOIL.h>
 #include <SOIL2/SOIL2.h>
 
 #include <assimp/Importer.hpp> 
@@ -25,15 +23,10 @@
 #include <fstream>
 #include <map>
 
-//#include "tiny_obj_loader.h"
-
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-//#include <string>
 
 struct object
 {
-	//std::vector<tinyobj::shape_t> shapes;
 	const aiScene* scene;
 	glm::mat4 transform;
 
@@ -62,7 +55,6 @@ class Base
 	glm::mat4 projection;
 	glm::mat4 model;
 
-	//std::vector<tinyobj::shape_t> shapes;
 	std::vector< object > objs;
 
 
