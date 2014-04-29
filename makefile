@@ -4,6 +4,6 @@ all:
 		-ggdb\
 		-Wwrite-strings\
 		-std=c++11\
-		-lGLEW -lGL -lGLU -lSDL2 -lSOIL\
+		-lGLEW -lGL -lGLU -lSDL2 -lSOIL -lassimp\
 		-o runfile \
 	&& ./runfile 
