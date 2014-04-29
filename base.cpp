@@ -55,9 +55,9 @@ bool Base::init()
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
-	files.push_back( "./models/rungholt/rungholt.obj");
+	//files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/sibenik.obj" );
-	//files.push_back( "./models/suzanne.obj");
+	files.push_back( "./models/suzanne.obj");
 	//files.push_back("./models/sphere/sphere.obj");
 
 	object tempObj;
@@ -343,6 +343,7 @@ void Base::initBuffers()
 	//But SOIL, for some odd reason, won't accept char* variables
 	if(hasTexture)
 	{
+		std::string basePath = "./models/";
 		char* texpath = new char[ objs[0].shapes[0].material.diffuse_texname.length() + 1 ];
 		std::strcpy ( texpath, objs[0].shapes[0].material.diffuse_texname.c_str() );
 
