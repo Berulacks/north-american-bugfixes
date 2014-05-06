@@ -86,6 +86,7 @@ bool Renderer::initGL()
 	//GL_ShadeModel(GL_FLAT);
 
 	Program* defaultProgram = new Program("./shaders/vertex.vs", "./shaders/fragment.notex.fs",{"mvp", "mv", "normal_matrix", "LightPosition", "Ld", "Kd"}, {"theV", "theN", "tex_in"});
+	Program* texProgram = new Program("./shaders/vertex.vs", "./shaders/fragment.fs",{"mvp", "mv", "normal_matrix", "LightPosition", "Ld", "Kd"}, {"theV", "theN", "tex_in"});
 	//printf("What is the location of our uniforms? LightPosition: %i, Kd: %i, Ld: %i\n", defaultProgram.getUniform("LightPosition"),  defaultProgram.getUniform("Kd"),  defaultProgram.getUniform("Ld"));
 
 
@@ -117,6 +118,8 @@ bool Renderer::initGL()
 	printf("Done.\n");
 
 	setActiveProgram( defaultProgram );
+	programs.push_back( defaultProgram );
+	programs.push_back( texProgram );
 	checkGLErrors("Use program");
 	
 
@@ -124,18 +127,23 @@ bool Renderer::initGL()
 	printf("Setting uniforms... \n");
 	//Position of light
 	glUniform4fv(defaultProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
+	glUniform4fv(texProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
 	checkGLErrors("Init LP uniform");
 	//Light constant
 	glUniform3fv(defaultProgram->getUniform("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
+	glUniform3fv(texProgram->getUniform("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
 	checkGLErrors("Init Kd uniform");
 	//Light intensity
 	glUniform3fv(defaultProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
+	glUniform3fv(texProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
 	checkGLErrors("Init Ld uniform");
 
 	printf("Done.\n");
 
 	glEnableVertexAttribArray(activeProgram->getAttrib("theV"));
+	glEnableVertexAttribArray(texProgram->getAttrib("theV"));
 	glEnableVertexAttribArray(activeProgram->getAttrib("theN"));
+	glEnableVertexAttribArray(texProgram->getAttrib("theN"));
 
 	// **
 	

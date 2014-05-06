@@ -44,6 +44,8 @@ bool Base::init()
 	printf("OpenGL version is %s\n", glGetString(GL_VERSION) );
 	printf("GLSL version is %s\n",  glGetString(GL_SHADING_LANGUAGE_VERSION));
 
+	renderer.initGL();
+
 	printf("Loading main object... \n");
 
 	//Filenames for the shapes to load
@@ -51,8 +53,8 @@ bool Base::init()
 	//files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/sibenik.obj" );
 	//files.push_back( "./models/humpback/HUMPBACK.OBJ" );
-	files.push_back( "./models/suzanne.obj");
-	//files.push_back("./models/sphere/sphere.obj");
+	//files.push_back( "./models/suzanne.obj");
+	files.push_back("./models/sphere/sphere.obj");
 	
 	// Create an instance of the Importer class
 	Assimp::Importer importer;
@@ -84,6 +86,17 @@ bool Base::init()
 		printf("Set transform\n");
 		tempObj.translate( {0,0,-5} );
 
+		if(tempObj.scene->mMaterials[0]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+		{
+			printf("Textures present in object %i, attempting to load...\n", i);
+
+			aiString texPath;
+			tempObj.scene->mMaterials[0]->GetTexture( aiTextureType_DIFFUSE, 0,&texPath);
+			renderer.loadTexture( texPath.C_Str(), "earthmap" );
+		}
+		else
+			printf("No textures found in object %i\n", i);
+
 		objs.push_back( tempObj );
 		printf("Added to vector\n");
 		
@@ -96,8 +109,6 @@ bool Base::init()
 	}
 
 	SDL_GL_SetSwapInterval(1);
-
-	renderer.initGL();
 
 	printf("Completed initialization!\n");
 

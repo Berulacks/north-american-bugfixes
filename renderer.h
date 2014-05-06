@@ -68,7 +68,7 @@ class Renderer
 		glm::mat4 projection;
 
 		Program* activeProgram;
-		std::vector<Program> programs;
+		std::vector<Program*> programs;
 		std::map<const char*, GLuint> textures;
 		std::map<const char*, GLuint> bufferObjects;
 		bool readFile(std::string filename, std::string* target);
