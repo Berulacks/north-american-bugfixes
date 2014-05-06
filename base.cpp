@@ -57,8 +57,8 @@ bool Base::init()
 	std::vector<const char*> files;
 	//files.push_back( "./models/rungholt/rungholt.obj");
 	//files.push_back( "./models/sibenik.obj" );
-	files.push_back( "./models/humpback/HUMPBACK.OBJ" );
-	//files.push_back( "./models/suzanne.obj");
+	//files.push_back( "./models/humpback/HUMPBACK.OBJ" );
+	files.push_back( "./models/suzanne.obj");
 	//files.push_back("./models/sphere/sphere.obj");
 	
 	// Create an instance of the Importer class

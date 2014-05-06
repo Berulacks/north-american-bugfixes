@@ -3,7 +3,7 @@
 #include <GL/glext.h>
 #include <GL/glu.h>
 #include <SDL2/SDL.h>
-#include <SOIL2/SOIL2.h>
+#include <SOIL/SOIL.h>
 
 #include <assimp/Importer.hpp> 
 #include <assimp/scene.h>
