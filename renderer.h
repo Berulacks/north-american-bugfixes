@@ -45,14 +45,26 @@ class Renderer
 {
 	public:
 		Renderer();
-		void render(void);
+		void render(std::vector<object> objects);
 
 		bool initGL(void);
 		bool initShader(GLenum type, std::string file, GLuint program);
 		void initBuffers(void);
 		void toggleFullScreen(void);
+
+		GLuint loadTexture(const char* filePath, const char* name);
+
+		static unsigned int* generateFaces(aiFace* assimpFaceArray, int numFaces);
+
+		void setActiveProgram(Program toSet);
 	private:
+		glm::mat4 camera;
+		glm::mat4 projection;
+
+		Program* activeProgram;
 		std::vector<Program> programs;
+		std::map<const char*, GLuint> textures;
+		std::map<const char*, GLuint> bufferObjects;
 		bool readFile(std::string filename, std::string* target);
 		static bool checkGLErrors(const char* description="");
 
