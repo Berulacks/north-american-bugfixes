@@ -1,4 +1,8 @@
 #include "renderer.h"
+Renderer::Renderer()
+{
+	printf("Renderer created!\n");
+}
 
 void Renderer::render(std::vector<object> objects)
 {
@@ -21,6 +25,9 @@ void Renderer::render(std::vector<object> objects)
 		glUniformMatrix4fv(activeProgram->getUniform("mv"), 1, GL_FALSE, glm::value_ptr(mv) );
 		glUniformMatrix3fv(activeProgram->getUniform("normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal) );
 
+		if(checkGLErrors("Getting uniforms..."))
+			exit(1);
+
 		for(int j = 0; j < objects[i].scene->mNumMeshes; j++)
 		{
 
@@ -33,6 +40,7 @@ void Renderer::render(std::vector<object> objects)
 
 			if(objects[i].scene->HasTextures())
 			{
+				printf("WE HAVE TEXTURES\n");
 				float *texCoords = (float *)malloc(sizeof(float)*2*objects[0].scene->mMeshes[0]->mNumVertices);
 				for (unsigned int k = 0; k < objects[0].scene->mMeshes[0]->mNumVertices; ++k) {
 
@@ -66,10 +74,10 @@ void Renderer::render(std::vector<object> objects)
 
 }
 
-void Renderer::setActiveProgram(Program toSet)
+void Renderer::setActiveProgram(Program *toSet)
 {
-	glUseProgram( toSet.getID() );
-	activeProgram = &toSet;
+	glUseProgram( toSet->getID() );
+	activeProgram = toSet;
 }
 bool Renderer::initGL()
 {
@@ -77,34 +85,65 @@ bool Renderer::initGL()
 	glEnable(GL_DEPTH_TEST);
 	//GL_ShadeModel(GL_FLAT);
 
-	Program defaultProgram = Program("./shaders/vertex.vs", "./shaders/fragment.notex.fs",{"mvp", "mv", "normal_matrix", "LightPosition", "Ld", "Kd"}, {"theV", "theN", "tex_in"});
+	Program* defaultProgram = new Program("./shaders/vertex.vs", "./shaders/fragment.notex.fs",{"mvp", "mv", "normal_matrix", "LightPosition", "Ld", "Kd"}, {"theV", "theN", "tex_in"});
+	//printf("What is the location of our uniforms? LightPosition: %i, Kd: %i, Ld: %i\n", defaultProgram.getUniform("LightPosition"),  defaultProgram.getUniform("Kd"),  defaultProgram.getUniform("Ld"));
 
 
 	printf("Setting up initial buffers... \n");
 	initBuffers();
 	printf("Done.\n");
-
-	// **THESE NEED TO BE ABSTRACTED, LATER**
-	//Position of light
-	glUniform4fv(activeProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
-	checkGLErrors("Init LP uniform");
-	//Light constant
-	glUniform3fv(activeProgram->getUniform("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
-	checkGLErrors("Init Kd uniform");
-	//Light intensity
-	glUniform3fv(activeProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
-	checkGLErrors("Init Ld uniform");
-
-	glUniform1i(glGetUniformLocation(activeProgram->getID(), "texSampler"), 0);
-	// **
 	
+	printf("Setting up matrices... \n");
+	projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
+	cameraPos = glm::vec3(0.0f, 1.0f, -1.0f);
+
+	if(xRot < -M_PI)
+		xRot += M_PI * 2;
+
+	else if(xRot > M_PI)
+		xRot -= M_PI * 2;
+
+	if(yRot < -M_PI / 2)
+		yRot = -M_PI / 2;
+	if(yRot > M_PI / 2)
+		yRot = M_PI / 2;
+
+	glm::vec3 lookat;
+	lookat.x = sinf(xRot) * cosf(yRot);
+	lookat.y = sinf(yRot);
+	lookat.z = cosf(xRot) * cosf(yRot);
+
+	camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
+	printf("Done.\n");
+
 	setActiveProgram( defaultProgram );
 	checkGLErrors("Use program");
 	
-	printf("OpenGL initialized!\n");
+
+	// **THESE NEED TO BE ABSTRACTED, LATER**
+	printf("Setting uniforms... \n");
+	//Position of light
+	glUniform4fv(defaultProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
+	checkGLErrors("Init LP uniform");
+	//Light constant
+	glUniform3fv(defaultProgram->getUniform("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
+	checkGLErrors("Init Kd uniform");
+	//Light intensity
+	glUniform3fv(defaultProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
+	checkGLErrors("Init Ld uniform");
+
+	printf("Done.\n");
+
+	glEnableVertexAttribArray(activeProgram->getAttrib("theV"));
+	glEnableVertexAttribArray(activeProgram->getAttrib("theN"));
+
+	// **
+	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
+
+	printf("OpenGL initialized!\n");
 
 	return checkGLErrors("End of initGL");;
 }
@@ -214,4 +253,19 @@ unsigned int* Renderer::generateFaces(aiFace* assimpFaceArray, int numFaces)
 
 	return faceArray;
 
+}
+
+bool Renderer::checkGLErrors(const char* description)
+{
+	GLenum error = glGetError();
+	bool hadError = false;
+
+	while(error != GL_NO_ERROR)
+	{
+		printf("[ERROR]@[%s]: %s\n", description, gluErrorString(error));
+		error = glGetError();
+		hadError = true;
+	}
+
+	return hadError;
 }

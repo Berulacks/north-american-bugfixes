@@ -35,12 +35,7 @@ bool Base::init()
 	printf("Done.\n");
 
 	printf("Loading functions... ");
-	/*glexts::LoadTest didLoad = glsys::LoadFunctions();
-	if(!didLoad)
-	{
-		printf("Could not load!\n");
-		exit(1);
-	}*/
+
 	if(ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
 		exit(1);
@@ -48,8 +43,6 @@ bool Base::init()
 	printf("Functions loaded!\n");
 	printf("OpenGL version is %s\n", glGetString(GL_VERSION) );
 	printf("GLSL version is %s\n",  glGetString(GL_SHADING_LANGUAGE_VERSION));
-
-	//printf("Number of functions that failed to load: %i.\n", didLoad.GetNumMissing());
 
 	printf("Loading main object... \n");
 
@@ -65,25 +58,9 @@ bool Base::init()
 	Assimp::Importer importer;
 	const aiScene* tempScene;
 	object tempObj;
-	//std::vector<tinyobj::shape_t> tempMesh;
-	
-	/*const aiScene* scene = 	importer.ReadFile( files[0],
-			aiProcess_CalcTangentSpace |
-			aiProcess_Triangulate |
-			aiProcess_JoinIdenticalVertices |
-			aiProcess_SortByPType
-			| aiProcess_GenSmoothNormals);*/
-
 
 	for(int i = 0; i < files.size(); i++)
 	{
-		//std::string error = tinyobj::LoadObj(tempMesh, files[i]);
-		/*tempScene = importer.ReadFile( files[0],
-			aiProcess_CalcTangentSpace |
-			aiProcess_Triangulate |
-			aiProcess_JoinIdenticalVertices |
-			aiProcess_SortByPType | aiProcess_GenUVCoords
-			| aiProcess_GenNormals);*/
 		tempScene = importer.ReadFile( files[0],
 			aiProcessPreset_TargetRealtime_Quality |
 			aiProcess_GenSmoothNormals    | // generate smooth normal vectors if not existing
@@ -91,6 +68,7 @@ bool Base::init()
 			aiProcess_Triangulate    | // triangulate polygons with more than 3 edges
 			aiProcess_SortByPType              | // make 'clean' meshes which consist of a single typ of primitives
 			0);
+		//
 		// If the import failed, report it
 		if( !tempScene)
 		{
@@ -104,52 +82,22 @@ bool Base::init()
 		printf("Set scene\n");
 		tempObj.transform = glm::mat4();
 		printf("Set transform\n");
+		tempObj.translate( {0,0,-5} );
 
 		objs.push_back( tempObj );
 		printf("Added to vector\n");
 		
 
 		printf("Object %i (%s) has %i shapes:\n", i, files[i], tempScene->mNumMeshes);
-		//for(int j = 0; j < objs[i].scene->mNumMeshes ; j++ )
-			//printf("Shape %i has %i vertices, and %i indices\n", j, objs[i].scene->mMeshes[i]->mNumVertices, objs[i].scene->mMeshes[i]->mNumFaces);
+		for(int j = 0; j < objs[i].scene->mNumMeshes ; j++ )
+			printf("Shape %i has %i vertices, and %i indices\n", j, objs[i].scene->mMeshes[i]->mNumVertices, objs[i].scene->mMeshes[i]->mNumFaces);
 
 
 	}
-
-
-	//Does our initial model have texturecoords?
-	//I mean, if you're loading a model in without 
-	//texturecoords, things are going to break
-	//so we might as well assume that either all 
-	//your models have textures, or none do
-	if(!objs[0].scene->mMeshes[0]->HasTextureCoords(0))
-	{
-		hasTexture = false;
-		printf("[NOTICE]: No texcoords found in object 0. Textures will not be loaded.\n");
-	}
-	else
-	{
-		hasTexture = true;
-		hasTexture = false; //REMOVE THIS
-		printf("[NOTICE]: Found texturecoords; textures are enabled.\n");
-	}
-
-        //objs[0].transform = glm::scale( objs[0].transform, glm::vec3(0.05, 0.05, 0.05) );
-	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,1,0) ); 
-	//objs[0].transform = glm::rotate( objs[0].transform, 0.5f, glm::vec3(0,1,0) ); 
-	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(1,0,0) ); 
-	//objs[0].transform = glm::rotate( objs[0].transform, 0.8f, glm::vec3(0,0,1) ); 
-	//objs[0].transform = glm::translate( objs[0].transform, glm::vec3(0, -20, 0) );
-
-	/*if (GLEW_OK != err)
-	{
-		  Problem: glewInit failed, something is seriously wrong.
-		  printf("\nError: %s\n", glewGetErrorString(err));
-	}*/
 
 	SDL_GL_SetSwapInterval(1);
 
-	initGL();
+	renderer.initGL();
 
 	printf("Completed initialization!\n");
 
@@ -188,7 +136,9 @@ void Base::loop(int lastFrame)
 
 	}
 
-	render();
+	//printf("Rendering...\n");
+	renderer.render(objs);
+	SDL_GL_SwapWindow(mainWindow);
 
 
 	if(active)
@@ -590,16 +540,16 @@ void Base::processEvents()
 					active = false;
 
 				if(key == SDLK_w)
-					cameraPos -= glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(camera) * physT;
+					renderer.cameraPos -= glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(renderer.camera) * physT;
 
 				if(key == SDLK_s)
-					cameraPos += glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(camera) * physT;
+					renderer.cameraPos += glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(renderer.camera) * physT;
 
 				if(key == SDLK_a)
-					cameraPos -= glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(camera) * physT;
+					renderer.cameraPos -= glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(renderer.camera) * physT;
 
 				if(key == SDLK_d)
-					cameraPos += glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(camera) * physT;
+					renderer.cameraPos += glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(renderer.camera) * physT;
 
 				if(key == SDLK_f)
 					toggleFullScreen();
@@ -608,8 +558,8 @@ void Base::processEvents()
 
 			case SDL_MOUSEMOTION:
 
-				xRot -= event.motion.xrel * 0.001;
-				yRot -= event.motion.yrel * 0.001;
+				renderer.xRot -= event.motion.xrel * 0.001;
+				renderer.yRot -= event.motion.yrel * 0.001;
 				break;
 		}
 
@@ -617,22 +567,22 @@ void Base::processEvents()
 
 
 
-	if(xRot < -M_PI)
-		xRot += M_PI * 2;
+	if(renderer.xRot < -M_PI)
+		renderer.xRot += M_PI * 2;
 
-	else if(xRot > M_PI)
-		xRot -= M_PI * 2;
+	else if(renderer.xRot > M_PI)
+		renderer.xRot -= M_PI * 2;
 
-	if(yRot < -M_PI / 2)
-		yRot = -M_PI / 2;
-	if(yRot > M_PI / 2)
-		yRot = M_PI / 2;
+	if(renderer.yRot < -M_PI / 2)
+		renderer.yRot = -M_PI / 2;
+	if(renderer.yRot > M_PI / 2)
+		renderer.yRot = M_PI / 2;
 
-	lookat.x = sinf(xRot) * cosf(yRot);
-	lookat.y = sinf(yRot);
-	lookat.z = cosf(xRot) * cosf(yRot);
+	lookat.x = sinf(renderer.xRot) * cosf(renderer.yRot);
+	lookat.y = sinf(renderer.yRot);
+	lookat.z = cosf(renderer.xRot) * cosf(renderer.yRot);
 
-	camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
+	renderer.camera = glm::lookAt(renderer.cameraPos, renderer.cameraPos + lookat, glm::vec3(0, 1, 0));
 }
 
 void Base::quit()

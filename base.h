@@ -23,26 +23,13 @@
 #include <fstream>
 #include <map>
 
+#include "renderer.h"
+
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-struct object
-{
-	const aiScene* scene;
-	glm::mat4 transform;
-
-	glm::vec3 position()
-	{
-		return glm::vec3(transform[3][0], transform[3][1], transform[3][2]);
-	}
-
-	void translate( glm::vec3 translateBy )
-	{
-		glm::translate( transform, translateBy );
-	}
-};
 
 class Base
 {
+	Renderer renderer;
 
 	SDL_GLContext glContext;
 	SDL_Window* mainWindow;

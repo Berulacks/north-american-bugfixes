@@ -44,6 +44,12 @@ struct object
 class Renderer
 {
 	public:
+		//Camera values
+		float xRot = 0.0f;
+		float yRot = 0.0f;
+		glm::vec3 cameraPos = glm::vec3();
+		glm::mat4 camera;
+
 		Renderer();
 		void render(std::vector<object> objects);
 
@@ -56,9 +62,9 @@ class Renderer
 
 		static unsigned int* generateFaces(aiFace* assimpFaceArray, int numFaces);
 
-		void setActiveProgram(Program toSet);
+		void setActiveProgram(Program* toSet);
 	private:
-		glm::mat4 camera;
+
 		glm::mat4 projection;
 
 		Program* activeProgram;
