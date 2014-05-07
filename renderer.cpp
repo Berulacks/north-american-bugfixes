@@ -15,6 +15,24 @@ void Renderer::render(std::vector<object> objects)
 
 	for(int i = 0; i < objects.size(); i++)
 	{
+		printf("Switching programs...\n");
+		if(objects[i].scene->mMaterials[1]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+		{
+			printf("Using texture program\n");
+			setActiveProgram( programs[1] );
+			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
+			//This will obviously need to be abstracted in the future
+			updateUniforms();
+			glEnableVertexAttribArray( activeProgram->getAttrib( "tex_in" ) );
+		}
+		else
+		{
+			printf("Using textureless program\n");
+			setActiveProgram( programs[0] );
+			updateUniforms();
+			//glDisableVertexAttribArray( activeProgram->getAttrib( "tex_in" ) );
+		}
+			
 		//Uniforms
 		mv = camera * objects[i].transform;
 		mvp = projection * mv;
@@ -28,32 +46,40 @@ void Renderer::render(std::vector<object> objects)
 		if(checkGLErrors("Getting uniforms..."))
 			exit(1);
 
+		printf("Entering main loop...\n");
 		for(int j = 0; j < objects[i].scene->mNumMeshes; j++)
 		{
 
-			unsigned int *faceArray = generateFaces(objects[i].scene[0].mMeshes[0]->mFaces, objects[i].scene->mMeshes[j]->mNumFaces);
+			unsigned int *faceArray = generateFaces(objects[i].scene->mMeshes[j]->mFaces, objects[i].scene->mMeshes[j]->mNumFaces);
 
 			//Normals
+			printf("Doing normals\n");
 			glBindBuffer( GL_ARRAY_BUFFER, bufferObjects.at("nbo") );
 			glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices* 3 * sizeof(float), objects[i].scene->mMeshes[j]->mNormals, GL_STATIC_DRAW);
 			glVertexAttribPointer( activeProgram->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
+			printf("Done with normals\n");
 
-			if(objects[i].scene->HasTextures())
+			if(objects[i].scene->mMaterials[1]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 			{
 				printf("WE HAVE TEXTURES\n");
-				float *texCoords = (float *)malloc(sizeof(float)*2*objects[0].scene->mMeshes[0]->mNumVertices);
-				for (unsigned int k = 0; k < objects[0].scene->mMeshes[0]->mNumVertices; ++k) {
+				float *texCoords = (float *)malloc(sizeof(float)*2*objects[i].scene->mMeshes[j]->mNumVertices);
+				for (unsigned int k = 0; k < objects[i].scene->mMeshes[j]->mNumVertices; ++k) {
 
-					texCoords[k*2]   = objects[0].scene->mMeshes[0]->mTextureCoords[0][k].x;
-					texCoords[k*2+1] = objects[0].scene->mMeshes[0]->mTextureCoords[0][k].y; 
+					texCoords[k*2]   = objects[i].scene->mMeshes[j]->mTextureCoords[0][k].x;
+					texCoords[k*2+1] = objects[i].scene->mMeshes[j]->mTextureCoords[0][k].y; 
 
 				}
 				//Texture Coords
 				glBindBuffer( GL_ARRAY_BUFFER, bufferObjects.at("tbo") );
-				glBufferData( GL_ARRAY_BUFFER, objects[0].scene->mMeshes[0]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
+				checkGLErrors("Binding tbo");
+				glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
+				checkGLErrors("Uploading data to tbo");
 				glVertexAttribPointer( activeProgram->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
+				checkGLErrors("Describing vertex attrib");
 				free(texCoords);	
 			}
+			else
+				printf("NO TEXTURES!\n");
 
 			//Vertices
 			glBindBuffer( GL_ARRAY_BUFFER, bufferObjects.at("vbo") );
@@ -61,16 +87,14 @@ void Renderer::render(std::vector<object> objects)
 			glVertexAttribPointer( activeProgram->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
 
 			//Indices
-			//glBufferData( GL_ELEMENT_ARRAY_BUFFER, objs[i].shapes[j].mesh.indices.size() * sizeof(unsigned int), &objs[i].shapes[j].mesh.indices[0], GL_STATIC_DRAW );
 			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_STATIC_DRAW );
 			free(faceArray);
 
+			printf("Drawing...\n");
 			glDrawElements(GL_TRIANGLES, objects[i].scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
 		}
 	}
 	checkGLErrors("Post render");
-
-	//SDL_GL_SwapWindow(mainWindow);
 
 }
 
@@ -83,11 +107,10 @@ bool Renderer::initGL()
 {
 	printf("Initializing openGL...\n");
 	glEnable(GL_DEPTH_TEST);
-	//GL_ShadeModel(GL_FLAT);
+	//glshademo(GL_FLAT);
 
-	Program* defaultProgram = new Program("./shaders/vertex.vs", "./shaders/fragment.notex.fs",{"mvp", "mv", "normal_matrix", "LightPosition", "Ld", "Kd"}, {"theV", "theN", "tex_in"});
 	Program* texProgram = new Program("./shaders/vertex.vs", "./shaders/fragment.fs",{"mvp", "mv", "normal_matrix", "LightPosition", "Ld", "Kd"}, {"theV", "theN", "tex_in"});
-	//printf("What is the location of our uniforms? LightPosition: %i, Kd: %i, Ld: %i\n", defaultProgram.getUniform("LightPosition"),  defaultProgram.getUniform("Kd"),  defaultProgram.getUniform("Ld"));
+	Program* defaultProgram = new Program("./shaders/vertex.vs", "./shaders/fragment.notex.fs",{"mvp", "mv", "normal_matrix", "LightPosition", "Ld", "Kd"}, {"theV", "theN", "tex_in"});
 
 
 	printf("Setting up initial buffers... \n");
@@ -117,36 +140,9 @@ bool Renderer::initGL()
 	camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
 	printf("Done.\n");
 
-	setActiveProgram( defaultProgram );
 	programs.push_back( defaultProgram );
 	programs.push_back( texProgram );
 	checkGLErrors("Use program");
-	
-
-	// **THESE NEED TO BE ABSTRACTED, LATER**
-	printf("Setting uniforms... \n");
-	//Position of light
-	glUniform4fv(defaultProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
-	glUniform4fv(texProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
-	checkGLErrors("Init LP uniform");
-	//Light constant
-	glUniform3fv(defaultProgram->getUniform("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
-	glUniform3fv(texProgram->getUniform("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
-	checkGLErrors("Init Kd uniform");
-	//Light intensity
-	glUniform3fv(defaultProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
-	glUniform3fv(texProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
-	checkGLErrors("Init Ld uniform");
-
-	printf("Done.\n");
-
-	glEnableVertexAttribArray(activeProgram->getAttrib("theV"));
-	glEnableVertexAttribArray(texProgram->getAttrib("theV"));
-	glEnableVertexAttribArray(activeProgram->getAttrib("theN"));
-	glEnableVertexAttribArray(texProgram->getAttrib("theN"));
-
-	// **
-	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
@@ -156,6 +152,22 @@ bool Renderer::initGL()
 	return checkGLErrors("End of initGL");;
 }
 
+void Renderer::updateUniforms()
+{
+	// **THESE NEED TO BE ABSTRACTED, LATER**
+	//Position of light
+	glUniform4fv(activeProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) ); 
+	checkGLErrors("Init LP uniform");
+	//Light constant
+	glUniform3fv(activeProgram->getUniform("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
+	checkGLErrors("Init Kd uniform");
+	//Light intensity
+	glUniform3fv(activeProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
+	checkGLErrors("Init Ld uniform");
+
+	glEnableVertexAttribArray(activeProgram->getAttrib("theV"));
+	glEnableVertexAttribArray(activeProgram->getAttrib("theN"));
+}
 
 void Renderer::initBuffers()
 {
@@ -227,6 +239,7 @@ GLuint Renderer::loadTexture( const char* filePath, const char* name )
 	}
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, finalPixels);
+	checkGLErrors("Setting TexImage2d\n");
 	SOIL_free_image_data(pixels);
 	printf("Loaded!\n");
 

@@ -63,7 +63,7 @@ bool Base::init()
 
 	for(int i = 0; i < files.size(); i++)
 	{
-		tempScene = importer.ReadFile( files[0],
+		tempScene = importer.ReadFile( files[i],
 			aiProcessPreset_TargetRealtime_Quality |
 			aiProcess_GenSmoothNormals    | // generate smooth normal vectors if not existing
 			aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
@@ -86,12 +86,15 @@ bool Base::init()
 		printf("Set transform\n");
 		tempObj.translate( {0,0,-5} );
 
-		if(tempObj.scene->mMaterials[0]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+		printf("Material count : %i\n", tempObj.scene->mNumMaterials);
+
+		if(tempObj.scene->mMaterials[1]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 		{
 			printf("Textures present in object %i, attempting to load...\n", i);
 
 			aiString texPath;
-			tempObj.scene->mMaterials[0]->GetTexture( aiTextureType_DIFFUSE, 0,&texPath);
+			tempObj.scene->mMaterials[1]->GetTexture( aiTextureType_DIFFUSE, 0,&texPath);
+			printf("This is supposed to be the texture's path: %s\n", texPath.C_Str() );
 			renderer.loadTexture( texPath.C_Str(), "earthmap" );
 		}
 		else
@@ -273,47 +276,6 @@ bool Base::readFile(std::string filename, std::string* target)
 	return false;
 
 }
-
-/*void Base::generateNormals(tinyobj::mesh_t *mesh)
-{
-
-	for(int i = 0; i < mesh->indices.size(); i += 3)
-	{
-			glm::vec3 p1, p2, p3, n;
-			int iP1, iP2, iP3;
-
-			iP1 = mesh->indices[i];
-			iP2 = mesh->indices[i+1];
-			iP3 = mesh->indices[i+2];
-
-
-			p1.x = mesh->positions[iP1];
-			p1.y = mesh->positions[iP1+1];
-			p1.z = mesh->positions[iP1+2];
-
-			p2.x = mesh->positions[iP2];
-			p2.y = mesh->positions[iP2+1];
-			p2.z = mesh->positions[iP2+2];
-
-			p3.x = mesh->positions[iP3];
-			p3.y = mesh->positions[iP3+1];
-			p3.z = mesh->positions[iP3+2];
-
-			n = glm::cross( (p2-p1), (p3-p1) );
-			n = glm::cross( (p3-p1), (p2-p1) );
-
-			n = glm::normalize(n);
-
-			for(int m = 0; m < 3; m++)
-			{
-				mesh->normals.push_back(n.x);
-				mesh->normals.push_back(n.y);
-				mesh->normals.push_back(n.z);
-			}
-			
-	}
-
-}*/
 
 void Base::toggleFullScreen()
 {

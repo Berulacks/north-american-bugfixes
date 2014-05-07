@@ -74,4 +74,6 @@ class Renderer
 		bool readFile(std::string filename, std::string* target);
 		static bool checkGLErrors(const char* description="");
 
+		void updateUniforms(void);
+
 };
