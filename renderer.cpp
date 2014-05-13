@@ -283,3 +283,8 @@ bool Renderer::checkGLErrors(const char* description)
 
 	return hadError;
 }
+
+void Renderer::updateProjection(glm::mat4 projection)
+{
+	this->projection = projection;
+}

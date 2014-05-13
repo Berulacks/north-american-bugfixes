@@ -50,10 +50,11 @@ bool Base::init()
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
-	files.push_back( "./models/suzanne.obj");
+	//files.push_back( "./models/suzanne.obj");
 	//files.push_back("./models/sphere/sphere.obj");
-	files.push_back("./models/dragon_recon/dragon_vrip.ply");
-	//files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
+	//files.push_back("./models/dragon_recon/dragon_vrip.ply");
+	files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
+	//files.push_back( "./models/dabrovic/sponza.obj");
 	
 	// Create an instance of the Importer class
 	Assimp::Importer importer;
@@ -282,8 +283,9 @@ void Base::toggleFullScreen()
 	if(!isFullscreen)
 	{
 		SDL_SetWindowFullscreen(mainWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-		projection = glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f);
+		renderer.updateProjection( glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f) );
 		SDL_GetWindowSize(mainWindow, &w, &h);
+		printf("Going fullscreen: %ix%i\n", w, h);
 		glViewport(0,0,w,h);
 		isFullscreen = true;
 	}
@@ -291,7 +293,7 @@ void Base::toggleFullScreen()
 	{
 		SDL_SetWindowFullscreen(mainWindow, 0);
 		SDL_SetWindowSize( mainWindow, 800, 600);
-		projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
+		renderer.updateProjection( glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f)) ;
 		glViewport(0,0,800,600);
 		isFullscreen = false;
 	}
