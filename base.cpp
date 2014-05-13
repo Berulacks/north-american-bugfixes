@@ -50,11 +50,10 @@ bool Base::init()
 
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
-	//files.push_back( "./models/rungholt/rungholt.obj");
-	//files.push_back( "./models/sibenik.obj" );
-	//files.push_back( "./models/humpback/HUMPBACK.OBJ" );
-	//files.push_back( "./models/suzanne.obj");
-	files.push_back("./models/sphere/sphere.obj");
+	files.push_back( "./models/suzanne.obj");
+	//files.push_back("./models/sphere/sphere.obj");
+	files.push_back("./models/dragon_recon/dragon_vrip.ply");
+	//files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
 	
 	// Create an instance of the Importer class
 	Assimp::Importer importer;
@@ -88,7 +87,7 @@ bool Base::init()
 
 		printf("Material count : %i\n", tempObj.scene->mNumMaterials);
 
-		if(tempObj.scene->mMaterials[1]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+		if(tempObj.scene->mMaterials[0]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 		{
 			printf("Textures present in object %i, attempting to load...\n", i);
 

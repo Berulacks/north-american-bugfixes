@@ -15,10 +15,8 @@ void Renderer::render(std::vector<object> objects)
 
 	for(int i = 0; i < objects.size(); i++)
 	{
-		printf("Switching programs...\n");
-		if(objects[i].scene->mMaterials[1]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+		if(objects[i].scene->mMaterials[0]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 		{
-			printf("Using texture program\n");
 			setActiveProgram( programs[1] );
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
 			//This will obviously need to be abstracted in the future
@@ -27,10 +25,12 @@ void Renderer::render(std::vector<object> objects)
 		}
 		else
 		{
-			printf("Using textureless program\n");
-			setActiveProgram( programs[0] );
-			updateUniforms();
-			//glDisableVertexAttribArray( activeProgram->getAttrib( "tex_in" ) );
+			if(activeProgram != programs[0])
+			{
+				setActiveProgram( programs[0] );
+				updateUniforms();
+				//glDisableVertexAttribArray( activeProgram->getAttrib( "tex_in" ) );
+			}
 		}
 			
 		//Uniforms
@@ -46,22 +46,18 @@ void Renderer::render(std::vector<object> objects)
 		if(checkGLErrors("Getting uniforms..."))
 			exit(1);
 
-		printf("Entering main loop...\n");
 		for(int j = 0; j < objects[i].scene->mNumMeshes; j++)
 		{
 
 			unsigned int *faceArray = generateFaces(objects[i].scene->mMeshes[j]->mFaces, objects[i].scene->mMeshes[j]->mNumFaces);
 
 			//Normals
-			printf("Doing normals\n");
 			glBindBuffer( GL_ARRAY_BUFFER, bufferObjects.at("nbo") );
-			glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices* 3 * sizeof(float), objects[i].scene->mMeshes[j]->mNormals, GL_STATIC_DRAW);
+			glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices* 3 * sizeof(float), objects[i].scene->mMeshes[j]->mNormals, GL_DYNAMIC_DRAW);
 			glVertexAttribPointer( activeProgram->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
-			printf("Done with normals\n");
 
-			if(objects[i].scene->mMaterials[1]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+			if(objects[i].scene->mMaterials[0]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 			{
-				printf("WE HAVE TEXTURES\n");
 				float *texCoords = (float *)malloc(sizeof(float)*2*objects[i].scene->mMeshes[j]->mNumVertices);
 				for (unsigned int k = 0; k < objects[i].scene->mMeshes[j]->mNumVertices; ++k) {
 
@@ -78,19 +74,16 @@ void Renderer::render(std::vector<object> objects)
 				checkGLErrors("Describing vertex attrib");
 				free(texCoords);	
 			}
-			else
-				printf("NO TEXTURES!\n");
 
 			//Vertices
 			glBindBuffer( GL_ARRAY_BUFFER, bufferObjects.at("vbo") );
-			glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices * sizeof(float) * 3, objects[i].scene->mMeshes[j]->mVertices, GL_STATIC_DRAW );
+			glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices * sizeof(float) * 3, objects[i].scene->mMeshes[j]->mVertices, GL_DYNAMIC_DRAW );
 			glVertexAttribPointer( activeProgram->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
 
 			//Indices
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_STATIC_DRAW );
+			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_DYNAMIC_DRAW );
 			free(faceArray);
 
-			printf("Drawing...\n");
 			glDrawElements(GL_TRIANGLES, objects[i].scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
 		}
 	}
