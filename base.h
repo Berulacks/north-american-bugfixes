@@ -69,7 +69,7 @@ class Base
 
 	public:
 		Base();
-		bool init(void);
+		bool init( int argc, const char* argv[] );
 		void quit(void);
 		bool readFile(std::string filename, std::string* target);
 

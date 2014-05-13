@@ -1,6 +1,6 @@
 #include "base.h"
 
-bool Base::init()
+bool Base::init( int argc, const char* argv[] )
 {
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
@@ -53,9 +53,18 @@ bool Base::init()
 	//files.push_back( "./models/suzanne.obj");
 	//files.push_back("./models/sphere/sphere.obj");
 	//files.push_back("./models/dragon_recon/dragon_vrip.ply");
-	files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
+	//files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
 	//files.push_back( "./models/dabrovic/sponza.obj");
 	
+	if(argc >= 2)
+	{
+		files.push_back(argv[1]);
+	}
+	else
+	{
+		printf("[ERROR] Incorrect number of arguments! (%i)\n", argc);
+		exit(1);
+	}
 	// Create an instance of the Importer class
 	Assimp::Importer importer;
 	const aiScene* tempScene;
