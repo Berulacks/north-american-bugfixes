@@ -22,10 +22,14 @@
 #include <map>
 #include <vector>
 
+#include "materials/material.h"
+
 struct object
 {
 	const aiScene* scene;
+	int vao;
 	glm::mat4 transform;
+	Material mat;
 
 	glm::vec3 position()
 	{

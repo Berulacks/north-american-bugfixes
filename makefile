@@ -14,4 +14,4 @@ test:
 		-std=c++11\
 		-lGLEW -lGL -lGLU -lSDL2 -lSOIL -lassimp\
 		-o runfile\
-	&& ./runfile models/bunny/reconstruction/bun_zipper.ply; rm -f runfile 
+	&& ./runfile models/sibenik/sibenik.obj; rm -f runfile 

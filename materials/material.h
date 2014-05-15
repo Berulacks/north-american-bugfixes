@@ -19,6 +19,8 @@ class Material
 		//and toggles vertex attrib's on or off
 		virtual void toggleBuffers();
 		//Update the uniforms in our shader object
+		//Each material should be able to extract the required
+		//information from each object for updating each uniform.
 		virtual void updateUniforms(object* dataStore);
 
 };

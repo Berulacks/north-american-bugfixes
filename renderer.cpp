@@ -155,7 +155,7 @@ void Renderer::updateUniforms()
 	glUniform3fv(activeProgram->getUniform("Kd"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.7) ) ); 
 	checkGLErrors("Init Kd uniform");
 	//Light intensity
-	glUniform3fv(activeProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.9, 0.9, 0.9) ) ); 
+	glUniform3fv(activeProgram->getUniform("Ld"), 1, glm::value_ptr( glm::vec3(0.7, 0.6, 0.6) ) ); 
 	checkGLErrors("Init Ld uniform");
 
 	glEnableVertexAttribArray(activeProgram->getAttrib("theV"));
