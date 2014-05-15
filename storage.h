@@ -17,6 +17,8 @@
 #include "materials/material.h"
 
 
+//Stores actual mesh information
+//and handles file IO
 class Storage
 {
 

@@ -87,7 +87,7 @@ bool Storage::loadModel( const char* filePath )
 	if( !tempScene)
 	{
 		printf("[ERROR] Could not import file %s: %s\n", filePath, importer.GetErrorString());
-		exit(1);
+		return false;
 	}
 
 	printf("Loaded file %s.\n", filePath);
@@ -114,6 +114,8 @@ bool Storage::loadModel( const char* filePath )
 	printf("File %s has %i shapes:\n", filePath, tempScene->mNumMeshes);
 	for(int j = 0; j < tempScene->mNumMeshes ; j++ )
 		printf("Shape %i has %i vertices, and %i indices\n", j, tempScene->mMeshes[j]->mNumVertices, tempScene->mMeshes[j]->mNumFaces);
+
+	delete[] tempScene;
 
 
 	return true;
