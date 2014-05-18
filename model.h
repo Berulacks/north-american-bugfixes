@@ -1,5 +1,10 @@
 #include "storage.h"
 
+struct BufferCombo
+{
+	const char* name;
+	GLuint vao, vertices, indices, normals, texturecoords;
+};
 //Models are scenes that have their
 //corresponding buffers already filled
 //out. So, if something has a model, it
@@ -20,14 +25,14 @@ class Model
 	//The vertex array object to be loaded
 	//on render. This assumes all our buffers
 	//are already set up
-	GLuint vao;
+	//GLuint vao;
 	//IDs for buffers. For internal use only,
 	//I guess
-	std::map<const char *, GLuint> bufferIDs;
+	std::vector<BufferCombo> bufferIDs;
 
 	public:
 		Model();
-		GLuint getVao(void) { return vao; };
+		//GLuint getVao(void) { return vao; };
 
 	private:
 		//Create necessary buffer objects
