@@ -7,7 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#ifndef GLM_FORCE_RADIANS
+/*#ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
 #endif
 
@@ -15,32 +15,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtc/matrix_access.hpp>
+#include <glm/gtc/matrix_access.hpp>*/
 
 #include <iostream>
 #include <fstream>
 #include <map>
 #include <vector>
 
-#include "materials/material.h"
-
-struct object
-{
-	const aiScene* scene;
-	int vao;
-	glm::mat4 transform;
-	Material mat;
-
-	glm::vec3 position()
-	{
-		return glm::vec3(transform[3][0], transform[3][1], transform[3][2]);
-	}
-
-	void translate( glm::vec3 translateBy )
-	{
-		glm::translate( transform, translateBy );
-	}
-};
+//#include "materials/material.h"
+//#include "storage.h"
+#include "object.h"
 
 class Program
 {
@@ -54,7 +38,7 @@ class Program
 		GLuint getID(void);
 		bool isReady(void);
 
-		void updateUniforms(object* model);
+		void updateUniforms(Object* model);
 
 	private:
 		GLuint id;

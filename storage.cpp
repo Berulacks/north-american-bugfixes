@@ -136,3 +136,13 @@ bool Storage::checkGLErrors(const char* description)
 
 	return hadError;
 }
+
+bool Storage::storeProgram( Program toAdd )
+{
+	for(int i = 0; i < programs.size(); i++)
+		if(programs[i].getID() == toAdd.getID())
+			return false;
+
+	programs.push_back( toAdd );
+	return true;
+}
