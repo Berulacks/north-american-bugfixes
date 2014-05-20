@@ -52,10 +52,14 @@ class Storage
 
 		bool loadModel(const char* filePath);
 		bool loadTexture(const char* filePath, const char* name);
+
+		bool initMaterial(aiMaterial* material, Program* shader);
+
+		Material getMaterial(const char* name);
 	private:
 		std::vector<const aiScene*> rawModels;
 		std::vector<const char*> textures;
-		std::map<const char*, int> textureIDs;
+		std::map<const char*, GLuint> textureIDs;
 		std::map<const char*, Material> materials;
 		std::vector<Program> programs;
 

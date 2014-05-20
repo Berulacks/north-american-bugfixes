@@ -1,5 +1,12 @@
 #include "model.h"
 
+Model::Model(aiScene* _scene, Material* mat )
+{
+	scene = _scene;
+	material = mat;
+	setUpBuffers();
+}
+
 
 void Model::setUpBuffers()
 {

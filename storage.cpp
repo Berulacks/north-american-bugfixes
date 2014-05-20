@@ -95,17 +95,23 @@ bool Storage::loadModel( const char* filePath )
 
 	printf("Material count : %i\n", tempScene->mNumMaterials);
 
-	/*if(tempObj.scene->mMaterials[0]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+	//TODO: REMOVE THIS IF/ELSE BLOCK
+	//AND ABSTRACT AWAY SHADER STUFF
+	Program* shader;
+	if(programs.size() == 0)
 	{
-		printf("Textures present in file %s, attempting to load...\n", filePath);
-
-		aiString texPath;
-		tempObj.scene->mMaterials[1]->GetTexture( aiTextureType_DIFFUSE, 0,&texPath);
-		printf("This is supposed to be the texture's path: %s\n", texPath.C_Str() );
-		//renderer.loadTexture( texPath.C_Str(), "earthmap" );
-	}
+		printf("No shaders found, creating one for materials...\n");
+		shader = new Program("./shaders/vertex.vs", "./shaders/fragment.fs");
+		storeProgram ( *shader );
+	}	
 	else
-		printf("No textures found in object %s\n", filePath);*/
+		shader = &programs[0];
+
+	for(int i = 0; i < tempScene->mNumMaterials; i++)
+	{
+		printf("Initializing material %i...\n", i);
+		initMaterial( tempScene->mMaterials[i], shader );
+	}
 
 	rawModels.push_back( tempScene );
 	printf("Added to vector\n");
@@ -121,6 +127,10 @@ bool Storage::loadModel( const char* filePath )
 	return true;
 }
 
+Material Storage::getMaterial ( const char* name )
+{
+	return materials[name];
+}
 
 bool Storage::checkGLErrors(const char* description)
 {
@@ -145,4 +155,27 @@ bool Storage::storeProgram( Program toAdd )
 
 	programs.push_back( toAdd );
 	return true;
+}
+
+bool Storage::initMaterial( aiMaterial* material, Program* shader )
+{
+	Material mat(shader);
+	mat.updateVariables( material, textureIDs );
+
+	if(std::find( textures.begin(), textures.end(), mat.texDiffuse_name ) == textures.end())
+	{
+		printf("Texture %s for material %s not already loaded, loading...\n", mat.texDiffuse_name, mat.name);
+		loadTexture( mat.texDiffuse_name, mat.texDiffuse_name );
+	}
+	materials.insert( std::pair< const char *, Material >(mat.name, mat) );
+	printf("Material %s loaded, and ready!\n", mat.name);
+
+	return true;
+}
+void Storage::initMaterials()
+{
+	Program* prog = new Program("./shaders/vertex.vs", "./shaders/fragment.fs");
+	storeProgram( *prog );
+	Material mat(prog);
+	//mat.updateVariables( 
 }

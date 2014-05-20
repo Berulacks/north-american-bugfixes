@@ -31,7 +31,7 @@ class Model
 	std::vector<BufferCombo> bufferIDs;
 
 	public:
-		Model();
+		Model(aiScene* _scene, Material* mat = NULL);
 		aiScene* getScene(void) { return scene; };
 		Material* getMaterial(void) { return material; };
 		BufferCombo getBCombo(int index) { return bufferIDs[index]; };
