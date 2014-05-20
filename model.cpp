@@ -71,7 +71,13 @@ void Model::setUpBuffers()
 
 		bufferIDs.push_back( buffers );
 
-		/* glVertexAttribPointer stuff should go here, according to current mtl */
+		glVertexAttribPointer( material->shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
+		glVertexAttribPointer( material->shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
+		glVertexAttribPointer( material->shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
+
+		glEnableVertexAttribArray(material->shader->getAttrib("theV"));
+		glEnableVertexAttribArray(material->shader->getAttrib("theN"));
+		glEnableVertexAttribArray(material->shader->getAttrib("tex_in"));
 
 		glBindVertexArray( 0 );
 

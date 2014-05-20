@@ -33,7 +33,10 @@ class Model
 	public:
 		Model();
 		aiScene* getScene(void) { return scene; };
-		Material* getMaterial(void) { return materal; };
+		Material* getMaterial(void) { return material; };
+		BufferCombo getBCombo(int index) { return bufferIDs[index]; };
+		GLuint getVAO(int index) { return bufferIDs[index].vao; };
+		unsigned int numMeshes(void)  { return bufferIDs.size(); };
 		//GLuint getVao(void) { return vao; };
 
 	private:

@@ -28,50 +28,24 @@ void Renderer::render(std::vector<Object> objects)
 		shader = mat->shader;
 
 		setActiveProgram( shader );
-		//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
-		//This will obviously need to be abstracted in the future
-		updateUniforms( objects[i] );
-			
 
-		for(int j = 0; j < scene->mNumMeshes; j++)
+
+		for(int j = 0; j < model->numMeshes(); j++)
 		{
 
-			unsigned int *faceArray = generateFaces(objects[i].scene->mMeshes[j]->mFaces, objects[i].scene->mMeshes[j]->mNumFaces);
+			glBindVertexArray( model->getVAO( i ) );
+			glBindTexture( GL_TEXTURE_2D, mat->texDiffuse );
 
-			//Normals
-			glBindBuffer( GL_ARRAY_BUFFER, bufferObjects.at("nbo") );
-			glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices* 3 * sizeof(float), objects[i].scene->mMeshes[j]->mNormals, GL_DYNAMIC_DRAW);
-			glVertexAttribPointer( activeProgram->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
+			/* Could be necessary....
+			glEnableVertexAttribArray(material->shader->getAttrib("theV"));
+			glEnableVertexAttribArray(material->shader->getAttrib("theN"));
+			glEnableVertexAttribArray(material->shader->getAttrib("tex_in"));*/
 
-			if(objects[i].scene->mMaterials[0]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
-			{
-				float *texCoords = (float *)malloc(sizeof(float)*2*objects[i].scene->mMeshes[j]->mNumVertices);
-				for (unsigned int k = 0; k < objects[i].scene->mMeshes[j]->mNumVertices; ++k) {
-
-					texCoords[k*2]   = objects[i].scene->mMeshes[j]->mTextureCoords[0][k].x;
-					texCoords[k*2+1] = objects[i].scene->mMeshes[j]->mTextureCoords[0][k].y; 
-
-				}
-				//Texture Coords
-				glBindBuffer( GL_ARRAY_BUFFER, bufferObjects.at("tbo") );
-				Storage::checkGLErrors("Binding tbo");
-				glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
-				Storage::checkGLErrors("Uploading data to tbo");
-				glVertexAttribPointer( activeProgram->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
-				Storage::checkGLErrors("Describing vertex attrib");
-				free(texCoords);	
-			}
-
-			//Vertices
-			glBindBuffer( GL_ARRAY_BUFFER, bufferObjects.at("vbo") );
-			glBufferData( GL_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumVertices * sizeof(float) * 3, objects[i].scene->mMeshes[j]->mVertices, GL_DYNAMIC_DRAW );
-			glVertexAttribPointer( activeProgram->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
-
-			//Indices
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, objects[i].scene->mMeshes[j]->mNumFaces * 3 * sizeof(unsigned int), faceArray, GL_DYNAMIC_DRAW );
-			free(faceArray);
-
-			glDrawElements(GL_TRIANGLES, objects[i].scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
+			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
+			//This will obviously need to be abstracted in the future
+			updateUniforms( objects[i] );
+			
+			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
 		}
 	}
 	Storage::checkGLErrors("Post render");

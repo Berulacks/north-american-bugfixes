@@ -35,7 +35,7 @@ class Renderer
 		bool isFullScreen;
 
 		Renderer();
-		void render(std::vector<Model> objects);
+		void render(std::vector<Object> objects);
 
 		bool initGL(void);
 		bool initSDL(void);

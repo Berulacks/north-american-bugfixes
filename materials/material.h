@@ -15,6 +15,9 @@ class Material
 		glm::vec3 transparent;
 		glm::vec3 emissive;
 
+		GLuint texDiffuse;
+		GLuint texSpecular;
+
 		Material(Program* _shader)
 		{
 			shader = _shader;
@@ -24,7 +27,5 @@ class Material
 		//Each material should be able to extract the required
 		//information from each object for updating each uniform.
 		//virtual void updateUniforms(Object dataStore);
-		
-
 
 };
