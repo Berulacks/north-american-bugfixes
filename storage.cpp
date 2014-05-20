@@ -107,7 +107,7 @@ bool Storage::loadModel( const char* filePath )
 	else
 		printf("No textures found in object %s\n", filePath);*/
 
-	rawModels.push_back( *tempScene );
+	rawModels.push_back( tempScene );
 	printf("Added to vector\n");
 	
 
