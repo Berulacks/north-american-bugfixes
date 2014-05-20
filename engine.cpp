@@ -1,6 +1,6 @@
-#include "base.h"
+#include "engine.h"
 
-bool Base::init( int argc, const char* argv[] )
+bool Engine::init( int argc, const char* argv[] )
 {
 	initSDL();
 	renderer.initGL();
@@ -37,7 +37,7 @@ bool Base::init( int argc, const char* argv[] )
 	return 1;
 }
 
-void Base::initSDL()
+void Engine::initSDL()
 {
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
@@ -81,7 +81,7 @@ void Base::initSDL()
 
 }
 
-void Base::loop(int lastFrame)
+void Engine::loop(int lastFrame)
 {
 	//Lets process our events, first
 	processEvents();
@@ -120,7 +120,7 @@ void Base::loop(int lastFrame)
 
 }
 
-void Base::processEvents()
+void Engine::processEvents()
 {
 	SDL_Event event;
 	SDL_Keycode key;
@@ -186,7 +186,7 @@ void Base::processEvents()
 	renderer.camera = glm::lookAt(renderer.cameraPos, renderer.cameraPos + lookat, glm::vec3(0, 1, 0));
 }
 
-void Base::quit()
+void Engine::quit()
 {
 	printf("\nQuitting!\n");
 	SDL_GL_DeleteContext(glContext);
@@ -195,6 +195,6 @@ void Base::quit()
 
 }
 
-Base::Base()
+Engine::Engine()
 {
 }

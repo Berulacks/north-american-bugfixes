@@ -2,7 +2,7 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-class Base
+class Engine
 {
 	Renderer renderer;
 	Storage storage;
@@ -32,7 +32,7 @@ class Base
 	int timeStepsToProcess = 0;
 
 	public:
-		Base();
+		Engine();
 		bool init( int argc, const char* argv[] );
 		void quit(void);
 

@@ -1,8 +1,8 @@
-#include "base.h"
+#include "engine.h"
 
 int main( int argc, const char* argv[] )
 {
-	Base program;
+	Engine program;
 	if( program.init(argc, argv) )
 		return 0;
 	return 1;
