@@ -24,7 +24,7 @@
 
 //#include "materials/material.h"
 //#include "storage.h"
-#include "object.h"
+//#include "object.h"
 
 class Program
 {
@@ -38,7 +38,7 @@ class Program
 		GLuint getID(void);
 		bool isReady(void);
 
-		void updateUniforms(Object* model);
+		//void updateUniforms(glm::mat4 camera, glm::mat4 projection, Object obj);
 
 	private:
 		GLuint id;

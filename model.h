@@ -32,6 +32,8 @@ class Model
 
 	public:
 		Model();
+		aiScene* getScene(void) { return scene; };
+		Material* getMaterial(void) { return materal; };
 		//GLuint getVao(void) { return vao; };
 
 	private:

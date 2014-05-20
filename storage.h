@@ -24,6 +24,7 @@
 #include <glm/gtc/matrix_access.hpp>
 
 #include "program.h"
+
 #include "materials/material.h"
 
 //Stores actual mesh information

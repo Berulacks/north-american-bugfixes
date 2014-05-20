@@ -17,9 +17,7 @@ class Material
 
 		Material(Program* _shader)
 		{
-
 			shader = _shader;
-
 		};
 
 		//Update the uniforms in our shader object

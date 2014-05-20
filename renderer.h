@@ -5,13 +5,24 @@
 #include <SDL2/SDL.h>
 #include <SOIL/SOIL.h>
 
+#ifndef GLM_FORCE_RADIANS
+#define GLM_FORCE_RADIANS
+#endif
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/matrix_access.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <map>
 
-#include "program.h"
+#include "storage.h"
+#include "object.h"
 
-
+//A renderer object stores necessary scene data, such as camera
 class Renderer
 {
 	public:
@@ -21,17 +32,14 @@ class Renderer
 		glm::vec3 cameraPos = glm::vec3();
 		glm::mat4 camera;
 
+		bool isFullScreen;
+
 		Renderer();
-		void render(std::vector<object> objects);
+		void render(std::vector<Model> objects);
 
 		bool initGL(void);
-		bool initShader(GLenum type, std::string file, GLuint program);
-		void initBuffers(void);
+		bool initSDL(void);
 		void toggleFullScreen(void);
-
-		GLuint loadTexture(const char* filePath, const char* name);
-
-		static unsigned int* generateFaces(aiFace* assimpFaceArray, int numFaces);
 
 		void setActiveProgram(Program* toSet);
 		void updateProjection(glm::mat4 projection);
@@ -39,13 +47,12 @@ class Renderer
 
 		glm::mat4 projection;
 
+		SDL_GLContext glContext;
+		SDL_Window* mainWindow;
+
 		Program* activeProgram;
-		std::vector<Program*> programs;
-		std::map<const char*, GLuint> textures;
-		std::map<const char*, GLuint> bufferObjects;
-		bool readFile(std::string filename, std::string* target);
-		static bool checkGLErrors(const char* description="");
 
-		void updateUniforms(void);
+		void updateUniforms(Object obj, Program* program = NULL);
 
+		void updateCamera();
 };

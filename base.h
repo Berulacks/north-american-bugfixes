@@ -43,15 +43,6 @@ class Base
 	glm::mat4 projection;
 	glm::mat4 model;
 
-	std::vector< object > objs;
-
-
-	//Camera values
-	float xRot = 0.0f;
-	float yRot = 0.0f;
-	glm::vec3 cameraPos = glm::vec3();
-
-
 	int active = 1;
 	//60 fps (in milliseconds)
 	//(techincally 16.667, but
@@ -65,32 +56,13 @@ class Base
 
 	int timeStepsToProcess = 0;
 
-	bool hasTexture;
-	bool isFullscreen;
-
 	public:
 		Base();
 		bool init( int argc, const char* argv[] );
 		void quit(void);
-		bool readFile(std::string filename, std::string* target);
 
 	private:
 		void render(void);
 		void processEvents(void);
 		void loop(int lastFrame);
-		void physics(void);
-
-		bool initGL(void);
-		bool initShader(GLenum type, std::string file);
-
-		bool checkGLErrors(const char* description="");
-
-		//For when our .obj's don't have normals
-		//void generateNormals(tinyobj::mesh_t *mesh);
-		void initBuffers(void);
-
-		void toggleFullScreen(void);
-
-
-
 };

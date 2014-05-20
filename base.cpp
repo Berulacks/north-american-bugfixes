@@ -21,8 +21,6 @@ bool Base::init( int argc, const char* argv[] )
 
 	SDL_SetRelativeMouseMode( SDL_TRUE );
 
-	isFullscreen = false;
-
 	if(!mainWindow)
 	{
 		printf("Woops, couldn't create the main window.");
@@ -66,7 +64,7 @@ bool Base::init( int argc, const char* argv[] )
 		exit(1);
 	}
 	// Create an instance of the Importer class
-	Assimp::Importer importer;
+	/*Assimp::Importer importer;
 	const aiScene* tempScene;
 	object tempObj;
 
@@ -118,7 +116,7 @@ bool Base::init( int argc, const char* argv[] )
 			printf("Shape %i has %i vertices, and %i indices\n", j, objs[i].scene->mMeshes[i]->mNumVertices, objs[i].scene->mMeshes[i]->mNumFaces);
 
 
-	}
+	}*/
 
 	SDL_GL_SetSwapInterval(1);
 
@@ -154,13 +152,10 @@ void Base::loop(int lastFrame)
 		//a constant deltaT declared
 		//in the header file, we're
 		//not passing dT as an argument
-		physics();
 		timeStepsToProcess -= deltaT;
 
 	}
 
-	//printf("Rendering...\n");
-	renderer.render(objs);
 	SDL_GL_SwapWindow(mainWindow);
 
 
@@ -168,28 +163,6 @@ void Base::loop(int lastFrame)
 		loop(currentTime);
 	else
 		quit();
-
-}
-
-bool Base::checkGLErrors(const char* description)
-{
-	GLenum error = glGetError();
-	bool hadError = false;
-
-	while(error != GL_NO_ERROR)
-	{
-		printf("[ERROR]@[%s]: %s\n", description, gluErrorString(error));
-		error = glGetError();
-		hadError = true;
-	}
-
-	return hadError;
-}
-
-
-void Base::physics()
-{
-
 
 }
 
@@ -226,7 +199,7 @@ void Base::processEvents()
 					renderer.cameraPos += glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(renderer.camera) * physT;
 
 				if(key == SDLK_f)
-					toggleFullScreen();
+					renderer.toggleFullScreen();
 
 				break;
 
@@ -271,40 +244,3 @@ void Base::quit()
 Base::Base()
 {
 }
-
-
-bool Base::readFile(std::string filename, std::string* target)
-{
-
-	std::ifstream shaderSource(filename.c_str());
-
-	target->assign( ( std::istreambuf_iterator< char >( shaderSource ) ), std::istreambuf_iterator< char >() );
-	if(target->length() > 0)
-		return true;
-
-	return false;
-
-}
-
-void Base::toggleFullScreen()
-{
-	int w, h;
-	if(!isFullscreen)
-	{
-		SDL_SetWindowFullscreen(mainWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-		renderer.updateProjection( glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f) );
-		SDL_GetWindowSize(mainWindow, &w, &h);
-		printf("Going fullscreen: %ix%i\n", w, h);
-		glViewport(0,0,w,h);
-		isFullscreen = true;
-	}
-	else
-	{
-		SDL_SetWindowFullscreen(mainWindow, 0);
-		SDL_SetWindowSize( mainWindow, 800, 600);
-		renderer.updateProjection( glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f)) ;
-		glViewport(0,0,800,600);
-		isFullscreen = false;
-	}
-}
-
