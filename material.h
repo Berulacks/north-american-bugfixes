@@ -1,6 +1,6 @@
 #include "program.h"
 #include <glm/glm.hpp>
-//#include "../storage.h"
+#include <assimp/scene.h>
 
 class Storage;
 
@@ -23,9 +23,9 @@ class Material
 			shader = _shader;
 		};
 
-		//Update the uniforms in our shader object
-		//Each material should be able to extract the required
-		//information from each object for updating each uniform.
-		//virtual void updateUniforms(Object dataStore);
+		//Update our materials variables
+		//(e.g. diffuse, specular)
+		//with data stored in our aiScene
+		void updateVariables(aiMaterial* mat);
 
 };
