@@ -115,7 +115,7 @@ bool Storage::loadModel( const char* filePath )
 	for(int j = 0; j < tempScene->mNumMeshes ; j++ )
 		printf("Shape %i has %i vertices, and %i indices\n", j, tempScene->mMeshes[j]->mNumVertices, tempScene->mMeshes[j]->mNumFaces);
 
-	delete[] tempScene;
+	//delete tempScene;
 
 
 	return true;

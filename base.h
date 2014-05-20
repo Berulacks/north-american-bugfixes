@@ -1,4 +1,4 @@
-#include "libs/gl_core_3_3.h"
+/*#include "libs/gl_core_3_3.h"
 
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -22,7 +22,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <map>
+#include <map>*/
 
 #include "renderer.h"
 

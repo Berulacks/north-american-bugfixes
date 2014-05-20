@@ -4,11 +4,19 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#ifndef OGL_LD
+#define OGL_LD
+
+#include "libs/gl_core_3_3.h"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
+
+#endif
+
 #include <SDL2/SDL.h>
 #include <SOIL/SOIL.h>
+
 
 #include <vector>
 #include <map>
