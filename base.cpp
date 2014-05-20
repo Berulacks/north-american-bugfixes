@@ -2,6 +2,43 @@
 
 bool Base::init( int argc, const char* argv[] )
 {
+	initSDL();
+	renderer.initGL();
+
+	printf("Loading main object... \n");
+
+	//Filenames for the shapes to load
+	std::vector<const char*> files;
+	//files.push_back( "./models/suzanne.obj");
+	//files.push_back("./models/sphere/sphere.obj");
+	//files.push_back("./models/dragon_recon/dragon_vrip.ply");
+	//files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
+	//files.push_back( "./models/dabrovic/sponza.obj");
+	
+	if(argc >= 2)
+	{
+		files.push_back(argv[1]);
+	}
+	else
+	{
+		printf("[ERROR] Incorrect number of arguments! (%i)\n", argc);
+		exit(1);
+	}
+
+	printf("Loading model!");
+	storage.loadModel( files[0] );
+
+	SDL_GL_SetSwapInterval(1);
+
+	printf("Completed initialization!\n");
+
+	loop( SDL_GetTicks() );
+
+	return 1;
+}
+
+void Base::initSDL()
+{
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		quit();
@@ -17,7 +54,7 @@ bool Base::init( int argc, const char* argv[] )
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-	mainWindow = SDL_CreateWindow("SDL is fun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	mainWindow = SDL_CreateWindow("Pedestal", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
 	SDL_SetRelativeMouseMode( SDL_TRUE );
 
@@ -42,89 +79,6 @@ bool Base::init( int argc, const char* argv[] )
 	printf("OpenGL version is %s\n", glGetString(GL_VERSION) );
 	printf("GLSL version is %s\n",  glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	renderer.initGL();
-
-	printf("Loading main object... \n");
-
-	//Filenames for the shapes to load
-	std::vector<const char*> files;
-	//files.push_back( "./models/suzanne.obj");
-	//files.push_back("./models/sphere/sphere.obj");
-	//files.push_back("./models/dragon_recon/dragon_vrip.ply");
-	//files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
-	//files.push_back( "./models/dabrovic/sponza.obj");
-	
-	if(argc >= 2)
-	{
-		files.push_back(argv[1]);
-	}
-	else
-	{
-		printf("[ERROR] Incorrect number of arguments! (%i)\n", argc);
-		exit(1);
-	}
-	// Create an instance of the Importer class
-	/*Assimp::Importer importer;
-	const aiScene* tempScene;
-	object tempObj;
-
-	for(int i = 0; i < files.size(); i++)
-	{
-		tempScene = importer.ReadFile( files[i],
-			aiProcessPreset_TargetRealtime_Quality |
-			aiProcess_GenSmoothNormals    | // generate smooth normal vectors if not existing
-			aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
-			aiProcess_Triangulate    | // triangulate polygons with more than 3 edges
-			aiProcess_SortByPType              | // make 'clean' meshes which consist of a single typ of primitives
-			0);
-		//
-		// If the import failed, report it
-		if( !tempScene)
-		{
-			printf("[ERROR] Could not import file %s: %s\n", files[i], importer.GetErrorString());
-			exit(1);
-		}
-
-		printf("Loaded file %s.\n", files[i]);
-
-		tempObj.scene = tempScene;
-		printf("Set scene\n");
-		tempObj.transform = glm::mat4();
-		printf("Set transform\n");
-		tempObj.translate( {0,0,-5} );
-
-		printf("Material count : %i\n", tempObj.scene->mNumMaterials);
-
-		if(tempObj.scene->mMaterials[0]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
-		{
-			printf("Textures present in object %i, attempting to load...\n", i);
-
-			aiString texPath;
-			tempObj.scene->mMaterials[1]->GetTexture( aiTextureType_DIFFUSE, 0,&texPath);
-			printf("This is supposed to be the texture's path: %s\n", texPath.C_Str() );
-			renderer.loadTexture( texPath.C_Str(), "earthmap" );
-		}
-		else
-			printf("No textures found in object %i\n", i);
-
-		objs.push_back( tempObj );
-		printf("Added to vector\n");
-		
-
-		printf("Object %i (%s) has %i shapes:\n", i, files[i], tempScene->mNumMeshes);
-		for(int j = 0; j < objs[i].scene->mNumMeshes ; j++ )
-			printf("Shape %i has %i vertices, and %i indices\n", j, objs[i].scene->mMeshes[i]->mNumVertices, objs[i].scene->mMeshes[i]->mNumFaces);
-
-
-	}*/
-
-	SDL_GL_SetSwapInterval(1);
-
-	printf("Completed initialization!\n");
-
-	loop( SDL_GetTicks() );
-
-	return 1;
 }
 
 void Base::loop(int lastFrame)

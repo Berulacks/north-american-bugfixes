@@ -1,4 +1,6 @@
-#include "libs/gl_core_3_3.h"
+#pragma once
+
+//#include "libs/gl_core_3_3.h"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>

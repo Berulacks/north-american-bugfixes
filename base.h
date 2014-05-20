@@ -1,4 +1,5 @@
 #include "libs/gl_core_3_3.h"
+
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
@@ -24,13 +25,13 @@
 #include <map>
 
 #include "renderer.h"
-//#include "storage.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 class Base
 {
 	Renderer renderer;
+	Storage storage;
 
 	SDL_GLContext glContext;
 	SDL_Window* mainWindow;
@@ -65,4 +66,5 @@ class Base
 		void render(void);
 		void processEvents(void);
 		void loop(int lastFrame);
+		void initSDL(void);
 };
