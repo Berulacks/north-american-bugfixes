@@ -15,10 +15,6 @@
 #include <map>
 #include <vector>
 
-//#include "materials/material.h"
-//#include "storage.h"
-//#include "object.h"
-
 class Program
 {
 

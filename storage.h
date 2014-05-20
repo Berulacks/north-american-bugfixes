@@ -35,7 +35,7 @@
 
 #include "program.h"
 
-#include "materials/material.h"
+#include "material.h"
 
 //Stores actual mesh information
 //and handles file IO
