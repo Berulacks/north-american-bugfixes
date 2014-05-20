@@ -160,12 +160,13 @@ bool Storage::storeProgram( Program toAdd )
 bool Storage::initMaterial( aiMaterial* material, Program* shader )
 {
 	Material mat(shader);
-	mat.updateVariables( material, textureIDs );
+	mat.updateVariables( material );
 
 	if(std::find( textures.begin(), textures.end(), mat.texDiffuse_name ) == textures.end())
 	{
 		printf("Texture %s for material %s not already loaded, loading...\n", mat.texDiffuse_name, mat.name);
 		loadTexture( mat.texDiffuse_name, mat.texDiffuse_name );
+		mat.texDiffuse = textureIDs[ mat.texDiffuse_name ];
 	}
 	materials.insert( std::pair< const char *, Material >(mat.name, mat) );
 	printf("Material %s loaded, and ready!\n", mat.name);

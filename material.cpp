@@ -1,16 +1,11 @@
 #include "material.h"
 
-void Material::updateVariables(aiMaterial* mtl, std::map<const char *, GLuint> textureMap)
+void Material::updateVariables(aiMaterial* mtl)
 {
 	aiString texPath;   //contains filename of texture
         if(AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &texPath)){
                 //bind texture
 		texDiffuse_name = texPath.data;
-		if(std::find(textureMap.begin(), textureMap.end(), texPath.data) == textureMap.end())
-		{
-			unsigned int texId = textureMap[texPath.data];
-			texDiffuse = texId;
-		}
             }
  
         aiColor4D _diffuse;

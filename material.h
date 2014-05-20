@@ -3,11 +3,10 @@
 #include <assimp/scene.h>
 #include <assimp/material.h>
 
-class Storage;
-
 class Material
 {
 	public:
+		bool ready = false;
 		Program* shader;
 		const char* name;
 
@@ -23,14 +22,15 @@ class Material
 		GLuint texSpecular;
 		const char* texSpecular_name;
 
+		//Update our materials variables
+		//(e.g. diffuse, specular)
+		//with data stored in our aiScene
+		void updateVariables(aiMaterial* mtl);
+
+		Material() {};
 		Material(Program* _shader)
 		{
 			shader = _shader;
 		};
-
-		//Update our materials variables
-		//(e.g. diffuse, specular)
-		//with data stored in our aiScene
-		void updateVariables(aiMaterial* mtl, std::map<const char*, GLuint> textureMap);
 
 };
