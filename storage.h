@@ -48,6 +48,10 @@ class Storage
 		std::map<const char*, Material> materials;
 		std::vector<Program> programs;
 
+		//Eventually this should read text files from the materials
+		//folder in order to create actual sets of materials
+		void initMaterials(void);
+
 
 
 };

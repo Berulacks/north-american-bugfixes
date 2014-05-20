@@ -4,10 +4,12 @@
 void Model::setUpBuffers()
 {
 	GLuint vao, vbo, nbo, ibo, tbo;
+	glUseProgram( material->shader->getID() );
 
 	//Lets start with meshes
 	for( int i = 0; i < scene->mNumMeshes; i++)
 	{
+
 		BufferCombo buffers;
 		buffers.name = scene->mMeshes[i]->mName.C_Str();
 
@@ -74,6 +76,7 @@ void Model::setUpBuffers()
 		glBindVertexArray( 0 );
 
 	}
+	glUseProgram( 0 );
 
 
 }
