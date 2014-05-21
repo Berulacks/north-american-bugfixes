@@ -14,6 +14,7 @@
 
 # The output of our makefile
 runfile
+pedestal
 *.pyc
 
 # Models I don't want in
