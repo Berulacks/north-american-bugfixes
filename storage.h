@@ -53,6 +53,11 @@ class Storage
 		bool loadModel(const char* filePath);
 		bool loadTexture(const char* filePath, const char* name);
 
+		//Create a solid, single colour texture
+		//(used for when an object doesn't have
+		//a texture)
+		GLuint createTexture(glm::vec3 colour);
+
 		bool initMaterial(aiMaterial* material, Program* shader);
 
 		Material getMaterial(const char* name);

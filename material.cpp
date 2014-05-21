@@ -4,9 +4,10 @@ void Material::updateVariables(aiMaterial* mtl)
 {
 	aiString texPath;   //contains filename of texture
         if(AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &texPath)){
-                //bind texture
-		texDiffuse_name = texPath.data;
+		texDiffuse_name = std::string(texPath.data);
             }
+	else
+		texDiffuse_name = std::string("NONE");
  
         aiColor4D _diffuse;
         if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _diffuse))
@@ -45,8 +46,8 @@ void Material::updateVariables(aiMaterial* mtl)
 
 	aiString _name;
 	mtl->Get( AI_MATKEY_NAME, _name );
-	name = _name.C_Str();
-	printf("Initialized material %s!\n", name);
+	name = std::string(_name.C_Str());
+	printf("Initialized material %s!\n", name.c_str());
 
         unsigned int max;
         aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);

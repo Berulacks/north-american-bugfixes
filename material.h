@@ -8,7 +8,7 @@ class Material
 	public:
 		bool ready = false;
 		Program* shader;
-		const char* name;
+		std::string name;
 
 		glm::vec3 diffuse;
 		glm::vec3 specular;
@@ -18,9 +18,9 @@ class Material
 		float shininess;
 
 		GLuint texDiffuse;
-		const char* texDiffuse_name;
+		std::string texDiffuse_name;
 		GLuint texSpecular;
-		const char* texSpecular_name;
+		std::string texSpecular_name;
 
 		//Update our materials variables
 		//(e.g. diffuse, specular)

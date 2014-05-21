@@ -4,6 +4,29 @@ Storage::Storage()
 {
 }
 
+GLuint Storage::createTexture( glm::vec3 colour )
+{
+	GLuint tex = 0;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glm::vec3 pixels[4] = {colour, colour, colour, colour};
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
+	checkGLErrors("Generating custom texture");
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	checkGLErrors("Setting custom texture wrap mode");
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	checkGLErrors("Setting custom texture filtering mode");
+
+	textureIDs.insert( std::pair<const char*, GLuint>("RGBv", tex) );
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return tex;
+}
 bool Storage::loadTexture(const char* filePath, const char* name)
 {
 
@@ -161,18 +184,33 @@ bool Storage::storeProgram( Program toAdd )
 
 bool Storage::initMaterial( aiMaterial* material, Program* shader )
 {
-	Material mat(shader);
-	mat.updateVariables( material );
+	Material *mat = new Material(shader);
+	mat->updateVariables( material );
 
-	printf("Checking texture for material %s...\n", mat.name);
-	if(std::find( textures.begin(), textures.end(), mat.texDiffuse_name ) == textures.end())
+	printf("Checking texture for material %s...\n", mat->name.c_str());
+	if(mat->texDiffuse_name.compare("NONE") == 0)
 	{
-		printf("Texture %s for material %s not already loaded, loading...\n", mat.texDiffuse_name, mat.name);
-		loadTexture( mat.texDiffuse_name, mat.texDiffuse_name );
-		mat.texDiffuse = textureIDs[ mat.texDiffuse_name ];
+		printf("No texture found!\nGenerating our own...\n");
+		mat->texDiffuse = createTexture( {0.5f,0.5f,0.5f} );
+
 	}
-	materials.insert( std::pair< const char *, Material >(mat.name, mat) );
-	printf("Material %s loaded, and ready!\n", mat.name);
+	else	
+		if(std::find( textures.begin(), textures.end(), mat->texDiffuse_name ) == textures.end())
+		{
+			printf("Texture %s for material %s not already loaded, loading...\n", mat->texDiffuse_name.c_str(), mat->name.c_str());
+			loadTexture( mat->texDiffuse_name.c_str(), mat->texDiffuse_name.c_str() );
+			mat->texDiffuse = textureIDs[ mat->texDiffuse_name.c_str() ];
+		}
+	materials.insert( std::pair< const char *, Material >(mat->name.c_str(), *mat) );
+
+	//Because Load/CreateTexture for some odd reason wipes
+	//the name of mat
+	aiString texPath;  
+        material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
+	mat->texDiffuse_name = std::string(texPath.data);
+
+	printf("Material '%s' loaded, and ready!\n", mat->name.c_str());
+	delete mat;
 
 	return true;
 }
