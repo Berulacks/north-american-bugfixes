@@ -49,6 +49,8 @@ bool Storage::loadTexture(const char* filePath, const char* name)
 
 	textureIDs.insert( std::pair<const char*, GLuint>(name, tex) );
 
+	delete[] finalPixels;
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
 	return true;
@@ -162,6 +164,7 @@ bool Storage::initMaterial( aiMaterial* material, Program* shader )
 	Material mat(shader);
 	mat.updateVariables( material );
 
+	printf("Checking texture for material %s...\n", mat.name);
 	if(std::find( textures.begin(), textures.end(), mat.texDiffuse_name ) == textures.end())
 	{
 		printf("Texture %s for material %s not already loaded, loading...\n", mat.texDiffuse_name, mat.name);
