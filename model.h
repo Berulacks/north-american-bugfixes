@@ -1,4 +1,5 @@
-#include "storage.h"
+#pragma once
+#include "material.h"
 
 struct BufferCombo
 {

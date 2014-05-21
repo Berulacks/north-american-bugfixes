@@ -12,6 +12,16 @@
 #include <GL/glext.h>
 #include <GL/glu.h>
 
+#ifndef GLM_FORCE_RADIANS
+#define GLM_FORCE_RADIANS
+#endif
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/matrix_access.hpp>
+
 #endif
 
 #include <SDL2/SDL.h>
@@ -23,18 +33,8 @@
 #include <iostream>
 #include <fstream>
 
-#ifndef GLM_FORCE_RADIANS
-#define GLM_FORCE_RADIANS
-#endif
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtc/matrix_access.hpp>
-
 #include "program.h"
-
+#include "model.h"
 #include "material.h"
 
 //Stores actual mesh information
@@ -50,7 +50,13 @@ class Storage
 
 		bool storeProgram( Program toAdd );
 
-		bool loadModel(const char* filePath);
+		//Reads model into memory
+		bool readModel(const char* filePath);
+		//TODO: figure out how to get a Model class definition in here
+		//then have a way to create models, and store them in a 
+		//vector.
+		//
+		//Model loadModel(const char* name);
 		bool loadTexture(const char* filePath, const char* name);
 
 		//Create a solid, single colour texture
@@ -62,7 +68,7 @@ class Storage
 
 		Material getMaterial(const char* name);
 	private:
-		std::vector<const aiScene*> rawModels;
+		std::map<const char*, const aiScene*> rawModels;
 		std::vector<const char*> textures;
 		std::map<const char*, GLuint> textureIDs;
 		std::map<const char*, Material> materials;

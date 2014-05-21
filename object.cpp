@@ -1,5 +1,13 @@
 #include "object.h"
 
+
+Object::Object(Model* mod, Material* mat)
+{
+	model = mod;
+	if(mat != NULL)
+		customMat = mat;
+}
+
 Material* Object::getMaterial()
 {
 	if( customMat != NULL )

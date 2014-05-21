@@ -26,7 +26,9 @@ bool Engine::init( int argc, const char* argv[] )
 	}
 
 	printf("Loading model!");
-	storage.loadModel( files[0] );
+	storage.readModel( files[0] );
+
+	//Object obj = Object(storage.get
 
 	SDL_GL_SetSwapInterval(1);
 

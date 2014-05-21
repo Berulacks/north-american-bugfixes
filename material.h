@@ -1,3 +1,5 @@
+#pragma once
+
 #include "program.h"
 #include <glm/glm.hpp>
 #include <assimp/scene.h>

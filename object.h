@@ -7,7 +7,7 @@
 class Object
 {
 	public:
-		Object();
+		Object(Model* mod, Material* mat = NULL);
 		Model* getModel(void) { return model; };
 		glm::mat4 getTransform(void);
 		Material* getMaterial(void);

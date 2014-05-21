@@ -3,7 +3,11 @@
 Model::Model(aiScene* _scene, Material* mat )
 {
 	scene = _scene;
-	material = mat;
+	if( mat != NULL )
+		material = mat;
+	//else
+	//	material = 
+	
 	setUpBuffers();
 }
 
@@ -23,7 +27,7 @@ void Model::setUpBuffers()
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 		buffers.vao = vao;
-		Storage::checkGLErrors("VAO creation");
+		//Storage::checkGLErrors("VAO creation");
 
 		//Vertices
 		glGenBuffers(1, &vbo);

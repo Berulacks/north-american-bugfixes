@@ -93,7 +93,7 @@ bool Storage::readFile(std::string filename, std::string* target)
 
 }
 
-bool Storage::loadModel( const char* filePath )
+bool Storage::readModel( const char* filePath )
 {
 
 	// Create an instance of the Importer class
@@ -138,7 +138,7 @@ bool Storage::loadModel( const char* filePath )
 		initMaterial( tempScene->mMaterials[i], shader );
 	}
 
-	rawModels.push_back( tempScene );
+	rawModels.insert( std::pair< const char * , const aiScene* > (filePath, tempScene) );
 	printf("Added to vector\n");
 	
 

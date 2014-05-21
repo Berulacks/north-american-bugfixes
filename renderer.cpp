@@ -46,7 +46,12 @@ void Renderer::render(std::vector<Object> objects)
 			updateUniforms( objects[i] );
 			
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
+
+			glBindVertexArray( 0 );
+			glBindTexture( GL_TEXTURE_2D, 0 );
 		}
+
+		setActiveProgram( 0 );
 	}
 	Storage::checkGLErrors("Post render");
 
