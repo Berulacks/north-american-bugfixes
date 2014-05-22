@@ -34,6 +34,7 @@ class Model
 	std::vector<BufferCombo> bufferIDs;
 
 	public:
+		Model(); //this is horrible and you should feel bad
 		Model(const aiScene* _scene, Material* mat = NULL);
 		const aiScene* getScene(void) { return scene; };
 		Material* getMaterial(void);

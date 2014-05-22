@@ -111,11 +111,12 @@ Model Storage::loadModel( const char* name )
 	for(int i = 0; i < scene->mNumMeshes; i++)
 	{
 		scene->mMaterials[ scene->mMeshes[i]->mMaterialIndex ]->Get( AI_MATKEY_NAME, matName );
-		if(std::find( materials.begin(), materials.end(), matName ) != materials.end() )
-			model.updateBComboMat( materials[matName], i );
+		if(materials.count(matName) != 0)
+			model.updateBComboMat( *materials[matName], i );
 	}
 
-	models.insert( std::pair< const char*, Model >( name, model ) );
+	Model* pointer = new Model(model);
+	models.insert( std::pair<const char*, Model*>( name, pointer ) );
 	
 	return model;
 
@@ -165,7 +166,7 @@ bool Storage::readModel( const char* filePath )
 		initMaterial( tempScene->mMaterials[i], shader );
 	}
 
-	rawModels.insert( std::pair< const char * , const aiScene* > (filePath, tempScene) );
+	rawModels.insert( std::pair< const char* , const aiScene* > (filePath, tempScene) );
 	printf("Added to vector\n");
 	
 
@@ -181,7 +182,7 @@ bool Storage::readModel( const char* filePath )
 
 Material Storage::getMaterial ( const char* name )
 {
-	return materials[name];
+	return *materials[name];
 }
 
 bool Storage::checkGLErrors(const char* description)
@@ -228,7 +229,8 @@ bool Storage::initMaterial( aiMaterial* material, Program* shader )
 			loadTexture( mat->texDiffuse_name.c_str(), mat->texDiffuse_name.c_str() );
 			mat->texDiffuse = textureIDs[ mat->texDiffuse_name.c_str() ];
 		}
-	materials.insert( std::pair< const char *, Material >(mat->name.c_str(), *mat) );
+
+	materials.insert( std::pair<const char*, Material*>(mat->name.c_str(), mat) );
 
 	//Because Load/CreateTexture for some odd reason wipes
 	//the name of mat
@@ -237,7 +239,7 @@ bool Storage::initMaterial( aiMaterial* material, Program* shader )
 	mat->texDiffuse_name = std::string(texPath.data);
 
 	printf("Material '%s' loaded, and ready!\n", mat->name.c_str());
-	delete mat;
+	//delete mat;
 
 	return true;
 }

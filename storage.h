@@ -28,10 +28,10 @@
 #include <SOIL/SOIL.h>
 
 
-#include <vector>
-#include <map>
-#include <iostream>
-#include <fstream>
+//#include <vector>
+//#include <map>
+//#include <iostream>
+//#include <fstream>
 
 #include "model.h"
 
@@ -67,10 +67,10 @@ class Storage
 		Material getMaterial(const char* name);
 	private:
 		std::map<const char*, const aiScene*> rawModels;
-		std::map<const char*, Model> models;
+		std::map<const char*, Model*> models;
 		std::vector<const char*> textures;
 		std::map<const char*, GLuint> textureIDs;
-		std::map<const char*, Material> materials;
+		std::map<const char*, Material*> materials;
 		std::vector<Program> programs;
 
 		//Eventually this should read text files from the materials
