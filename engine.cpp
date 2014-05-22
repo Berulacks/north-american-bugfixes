@@ -125,6 +125,10 @@ void Engine::processEvents()
 
 				if(key == SDLK_f)
 					renderer.toggleFullScreen(mainWindow);
+				if(key == SDLK_UP)
+					objs[0].setScale( {5,5,5} );
+				if(key == SDLK_DOWN)
+					objs[0].setScale( {1,1,1} );
 
 				break;
 

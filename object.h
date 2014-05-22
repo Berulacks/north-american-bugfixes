@@ -13,6 +13,7 @@ class Object
 		Material* getMaterial(void);
 
 		void translateBy(glm::vec3);
+		void setScale(glm::vec3 target){ scale = target; };
 
 	private:
 		Model* model;

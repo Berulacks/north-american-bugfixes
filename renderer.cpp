@@ -144,7 +144,8 @@ void Renderer::updateUniforms( Object obj, Program* program )
 	glUniformMatrix3fv(activeProgram->getUniform("normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal) );
 	
 	//FOR TESTING PURPOSES ONLY, REMOVE THIS LINE
-	glUniform4fv(activeProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) );
+	//glUniform4fv(activeProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) );
+	glUniform4fv(activeProgram->getUniform("LightPosition"), 1, glm::value_ptr( cameraPos ) );
 
 	//THIS NEEDS TO BE MOVED SOMEWHERE ELSE
 	//THIS NEEDS TO BE DONE ON A PER-MESH BASIS
