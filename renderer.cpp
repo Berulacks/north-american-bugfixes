@@ -27,28 +27,27 @@ void Renderer::render(std::vector<Object> objects)
 
 		for(int j = 0; j < model->numMeshes(); j++)
 		{
-			mat = model->materials[i];
+			mat = model->materials[j];
 			shader = mat.shader;
 
 			setActiveProgram( shader );
 
-			glBindVertexArray( model->getVAO( i ) );
+			glBindVertexArray( model->getVAO( j ) );
 			glBindTexture( GL_TEXTURE_2D, mat.texDiffuse );
-
+			
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
-			//This will obviously need to be abstracted in the future
 			updateUniforms( objects[i] );
 			
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
-			glFlush();
 
-			glBindVertexArray( 0 );
-			glBindTexture( GL_TEXTURE_2D, 0 );
 		}
+
+		glBindVertexArray( 0 );
+		glBindTexture( GL_TEXTURE_2D, 0 );
 
 		setActiveProgram( 0 );
 	}
-	//glFlush();
+	glFlush();
 	Storage::checkGLErrors("Post render");
 
 }

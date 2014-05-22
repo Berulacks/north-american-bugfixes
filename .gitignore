@@ -17,6 +17,9 @@ runfile
 pedestal
 *.pyc
 
+#textures
+textures/*
+
 # Models I don't want in
 # version control
 rungholt
