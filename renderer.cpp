@@ -35,16 +35,17 @@ void Renderer::render(std::vector<Object> objects)
 			glBindVertexArray( model->getVAO( i ) );
 			glBindTexture( GL_TEXTURE_2D, mat.texDiffuse );
 
-			/* Could be necessary....
-			glEnableVertexAttribArray(material->shader->getAttrib("theV"));
-			glEnableVertexAttribArray(material->shader->getAttrib("theN"));
-			glEnableVertexAttribArray(material->shader->getAttrib("tex_in"));*/
+			/* Could be necessary....*/
+			//glEnableVertexAttribArray(mat.shader->getAttrib("theV"));
+			//glEnableVertexAttribArray(mat.shader->getAttrib("theN"));
+			//glEnableVertexAttribArray(mat.shader->getAttrib("tex_in"));
 
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
 			//This will obviously need to be abstracted in the future
 			updateUniforms( objects[i] );
 			
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
+			glFlush();
 
 			glBindVertexArray( 0 );
 			glBindTexture( GL_TEXTURE_2D, 0 );
@@ -52,6 +53,7 @@ void Renderer::render(std::vector<Object> objects)
 
 		setActiveProgram( 0 );
 	}
+	//glFlush();
 	Storage::checkGLErrors("Post render");
 
 }
@@ -74,6 +76,7 @@ bool Renderer::initGL()
 {
 	printf("Initializing openGL...\n");
 	glEnable(GL_DEPTH_TEST);
+	glViewport(0,0,800,600);
 	
 	projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
 	cameraPos = glm::vec3(0.0f, 1.0f, -1.0f);
@@ -85,7 +88,7 @@ bool Renderer::initGL()
 
 	camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
 
 	printf("OpenGL initialized!\n");
@@ -116,6 +119,7 @@ void Renderer::toggleFullScreen()
 		SDL_SetWindowFullscreen(mainWindow, 0);
 		SDL_SetWindowSize( mainWindow, 800, 600);
 		updateProjection( glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f)) ;
+		printf("Leaving fullscreen!\n");
 		glViewport(0,0,800,600);
 		isFullScreen = false;
 	}

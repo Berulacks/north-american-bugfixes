@@ -30,6 +30,7 @@ void Model::setUpBuffers()
 		glBindBuffer( GL_ARRAY_BUFFER, vbo );
 		glBufferData( GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * 3 * sizeof(float), scene->mMeshes[i]->mVertices, GL_STATIC_DRAW);
 		buffers.vertices = vbo;
+		glVertexAttribPointer( materials[i].shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
 		//Indices
 		glGenBuffers(1, &ibo);
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
@@ -43,6 +44,7 @@ void Model::setUpBuffers()
 		glBindBuffer( GL_ARRAY_BUFFER, nbo );
 		glBufferData( GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * 3 * sizeof(float), scene->mMeshes[i]->mNormals, GL_STATIC_DRAW);
 		buffers.normals = nbo;
+		glVertexAttribPointer( materials[i].shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
 
 		//Texture coords
 		glGenBuffers(1, &tbo);
@@ -74,15 +76,13 @@ void Model::setUpBuffers()
 		glBufferData( GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
 
 		buffers.texturecoords = tbo;
+		glVertexAttribPointer( materials[i].shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
 		delete[] texCoords;
 
 		//buffers.matIndex = scene->mMeshes[i]->mMaterialIndex;
 
 		bufferIDs.push_back( buffers );
 
-		glVertexAttribPointer( materials[i].shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
-		glVertexAttribPointer( materials[i].shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
-		glVertexAttribPointer( materials[i].shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
 
 		glEnableVertexAttribArray(materials[i].shader->getAttrib("theV"));
 		glEnableVertexAttribArray(materials[i].shader->getAttrib("theN"));
@@ -101,8 +101,8 @@ unsigned int* Model::generateFaces(aiFace* assimpFaceArray, int numFaces)
 	// create array with faces
 	// have to convert from Assimp format to array
 	unsigned int *faceArray;
-	//faceArray = (unsigned int *)malloc(sizeof(unsigned int) * numFaces * 3);
-	faceArray = new unsigned int[ numFaces * 3 ];
+	faceArray = (unsigned int *)malloc(sizeof(unsigned int) * numFaces * 3);
+	//faceArray = new unsigned int[ numFaces * 3 ];
 	unsigned int faceIndex = 0;
 
 	for (unsigned int t = 0; t <  numFaces; ++t) {
