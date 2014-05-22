@@ -15,26 +15,25 @@ void Renderer::render(std::vector<Object> objects)
 	
 	//Eventually this will be replaced
 	//with a custom datatype
-	aiScene* scene;
+	const aiScene* scene;
 	Model* model;
-	Material* mat;
+	Material mat;
 	Program* shader;
 
 	for(int i = 0; i < objects.size(); i++)
 	{
 		model = objects[i].getModel();
 		scene = model->getScene();
-		mat = objects[i].getMaterial();
-		shader = mat->shader;
-
-		setActiveProgram( shader );
-
 
 		for(int j = 0; j < model->numMeshes(); j++)
 		{
+			mat = model->getBCombo( j ).mat;
+			shader = mat.shader;
+
+			setActiveProgram( shader );
 
 			glBindVertexArray( model->getVAO( i ) );
-			glBindTexture( GL_TEXTURE_2D, mat->texDiffuse );
+			glBindTexture( GL_TEXTURE_2D, mat.texDiffuse );
 
 			/* Could be necessary....
 			glEnableVertexAttribArray(material->shader->getAttrib("theV"));
