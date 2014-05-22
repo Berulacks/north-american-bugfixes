@@ -38,8 +38,10 @@ bool Storage::loadTexture(const char* filePath, const char* name)
 	glBindTexture(GL_TEXTURE_2D, tex);
 	checkGLErrors("Binding texture");
 
-	printf("Loading texture %s ... \n", filePath);
-	unsigned char* pixels = SOIL_load_image(filePath, &width, &height, &channels, SOIL_LOAD_AUTO);
+	std::string base = "./textures/";
+	base.append( std::string(filePath) );
+	printf("Loading texture %s ... \n", base.c_str());
+	unsigned char* pixels = SOIL_load_image(base.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
 	const int size = width* 3 * height;
 	unsigned char* finalPixels = new unsigned char[size];
 

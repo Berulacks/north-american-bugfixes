@@ -12,12 +12,12 @@ bool Engine::init( int argc, const char* argv[] )
 	//Filenames for the shapes to load
 	std::vector<const char*> files;
 	//files.push_back( "./models/suzanne.obj");
-	files.push_back("./models/sphere/sphere.obj");
+	//files.push_back("./models/sphere/sphere.obj");
 	//files.push_back("./models/dragon_recon/dragon_vrip.ply");
 	//files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
 	//files.push_back( "./models/dabrovic/sponza.obj");
 	
-	/*if(argc >= 2)
+	if(argc >= 2)
 	{
 		files.push_back(argv[1]);
 	}
@@ -25,7 +25,7 @@ bool Engine::init( int argc, const char* argv[] )
 	{
 		printf("[ERROR] Incorrect number of arguments! (%i)\n", argc);
 		exit(1);
-	}*/
+	}
 
 	printf("Loading model!\n");
 	storage.readModel( files[0] );
