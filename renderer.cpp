@@ -58,8 +58,16 @@ void Renderer::render(std::vector<Object> objects)
 
 void Renderer::setActiveProgram(Program *toSet)
 {
-	glUseProgram( toSet->getID() );
-	activeProgram = toSet;
+	if(toSet != 0)
+	{
+		glUseProgram( toSet->getID() );
+		activeProgram = toSet;
+	}
+	else
+	{
+		glUseProgram( 0 );
+		activeProgram = NULL;
+	}
 }
 
 bool Renderer::initGL()
@@ -140,7 +148,9 @@ void Renderer::updateUniforms( Object obj, Program* program )
 	//FOR TESTING PURPOSES ONLY, REMOVE THIS LINE
 	glUniform4fv(activeProgram->getUniform("LightPosition"), 1, glm::value_ptr( glm::column(-camera, 3) ) );
 
-	glm::vec3 kD = obj.getMaterial()->diffuse;
+	//THIS NEEDS TO BE MOVED SOMEWHERE ELSE
+	//THIS NEEDS TO BE DONE ON A PER-MESH BASIS
+	glm::vec3 kD = obj.getModel()->materials[0].diffuse;
 	//Light constant
 	glUniform3fv(activeProgram->getUniform("Kd"), 1, glm::value_ptr( kD ) );
 	//Light intensity

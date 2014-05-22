@@ -24,3 +24,8 @@ glm::mat4 Object::getTransform(void)
 
 	return trans;
 }
+
+void Object::translateBy(glm::vec3 vec)
+{
+	position += vec; 
+}

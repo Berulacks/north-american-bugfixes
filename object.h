@@ -12,6 +12,8 @@ class Object
 		glm::mat4 getTransform(void);
 		Material* getMaterial(void);
 
+		void translateBy(glm::vec3);
+
 	private:
 		Model* model;
 		glm::vec3 position;

@@ -1,5 +1,7 @@
 #include "engine.h"
 
+std::vector<Object> objs;
+
 bool Engine::init( int argc, const char* argv[] )
 {
 	initSDL();
@@ -25,9 +27,12 @@ bool Engine::init( int argc, const char* argv[] )
 		exit(1);
 	}
 
-	printf("Loading model!");
+	printf("Loading model!\n");
 	storage.readModel( files[0] );
 	Model mod = storage.loadModel( files[0] );
+	Object sphere = Object(&mod);
+	sphere.translateBy( {0.0f,0.0f,-5.0f} );
+	objs.push_back( sphere );
 	//Model mod = storage.getModel(files[0]);
 	
 	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
@@ -35,7 +40,7 @@ bool Engine::init( int argc, const char* argv[] )
 	printf("The first mesh of our model is called %s\n", mod.getBCombo(0).name.c_str());
 	printf("...and its material is called %s\n", mod.materials[0].name.c_str());
 
-	//Object obj = Object(storage.get
+	printf("\nOkay! Let's give rendering this mother a shot!\n");
 
 	SDL_GL_SetSwapInterval(1);
 
@@ -119,6 +124,7 @@ void Engine::loop(int lastFrame)
 
 	}
 
+	renderer.render(objs);
 	SDL_GL_SwapWindow(mainWindow);
 
 
