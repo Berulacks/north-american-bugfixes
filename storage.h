@@ -33,9 +33,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "program.h"
 #include "model.h"
-#include "material.h"
 
 //Stores actual mesh information
 //and handles file IO

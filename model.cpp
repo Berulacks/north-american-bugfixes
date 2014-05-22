@@ -80,7 +80,7 @@ void Model::setUpBuffers()
 		buffers.texturecoords = tbo;
 		delete[] texCoords;
 
-		buffers.matIndex = scene->mMeshes[i]->mMaterialIndex;
+		//buffers.matIndex = scene->mMeshes[i]->mMaterialIndex;
 
 		bufferIDs.push_back( buffers );
 
