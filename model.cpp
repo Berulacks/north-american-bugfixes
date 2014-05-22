@@ -1,6 +1,6 @@
 #include "model.h"
 
-Model::Model(aiScene* _scene, Material* mat )
+Model::Model(const aiScene* _scene, Material* mat )
 {
 	scene = _scene;
 	if( mat != NULL )
@@ -80,6 +80,8 @@ void Model::setUpBuffers()
 		buffers.texturecoords = tbo;
 		delete[] texCoords;
 
+		buffers.matIndex = scene->mMeshes[i]->mMaterialIndex;
+
 		bufferIDs.push_back( buffers );
 
 		glVertexAttribPointer( material->shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
@@ -96,6 +98,11 @@ void Model::setUpBuffers()
 	//glUseProgram( 0 );
 
 
+}
+
+Material* Model::getMaterial()
+{
+	return material;
 }
 
 

@@ -5,6 +5,8 @@ struct BufferCombo
 {
 	const char* name;
 	GLuint vao, vertices, indices, normals, texturecoords;
+
+	Material mat;
 };
 //Models are scenes that have their
 //corresponding buffers already filled
@@ -14,7 +16,7 @@ class Model
 {
 	//The aiScene which
 	//contains our actual model data
-	aiScene* scene;
+	const aiScene* scene;
 	//Our material object which contains
 	//texture data and data for uniforms
 	//
@@ -32,10 +34,12 @@ class Model
 	std::vector<BufferCombo> bufferIDs;
 
 	public:
-		Model(aiScene* _scene, Material* mat = NULL);
-		aiScene* getScene(void) { return scene; };
-		Material* getMaterial(void) { return material; };
+		Model(const aiScene* _scene, Material* mat = NULL);
+		const aiScene* getScene(void) { return scene; };
+		Material* getMaterial(void);
 		BufferCombo getBCombo(int index) { return bufferIDs[index]; };
+		unsigned int numBCombos(void) { return bufferIDs.size(); };
+		void updateBComboMat(Material mat, int index) { bufferIDs[index].mat = mat; }; 
 		GLuint getVAO(int index) { return bufferIDs[index].vao; };
 		unsigned int numMeshes(void)  { return bufferIDs.size(); };
 		//GLuint getVao(void) { return vao; };

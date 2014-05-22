@@ -93,6 +93,33 @@ bool Storage::readFile(std::string filename, std::string* target)
 
 }
 
+//Actually load a raw model's info into GPU memory.
+//After this step, a Model object is produced and
+//ready to be rendered. (this is the preferred way
+//to create models)
+Model Storage::loadModel( const char* name )
+{
+	const aiScene* scene = rawModels[name];
+	Model model = Model(rawModels[name]);
+
+	const char* matName;
+
+	//readModel already initializes all materials stored in our aiScene
+	//...so we just need to check and see if the name of our materials
+	//are in our own materials vector, and update them appropriately
+	//...again, this section will need to be removed with ASSIMP, eventually.
+	for(int i = 0; i < scene->mNumMeshes; i++)
+	{
+		scene->mMaterials[ scene->mMeshes[i]->mMaterialIndex ]->Get( AI_MATKEY_NAME, matName );
+		if(std::find( materials.begin(), materials.end(), matName ) != materials.end() )
+			model.updateBComboMat( materials[matName], i );
+	}
+
+	models.insert( std::pair< const char*, Model >( name, model ) );
+	
+	return model;
+
+}
 bool Storage::readModel( const char* filePath )
 {
 

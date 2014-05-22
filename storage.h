@@ -56,7 +56,7 @@ class Storage
 		//then have a way to create models, and store them in a 
 		//vector.
 		//
-		//Model loadModel(const char* name);
+		Model loadModel(const char* name);
 		bool loadTexture(const char* filePath, const char* name);
 
 		//Create a solid, single colour texture
@@ -69,6 +69,7 @@ class Storage
 		Material getMaterial(const char* name);
 	private:
 		std::map<const char*, const aiScene*> rawModels;
+		std::map<const char*, Model> models;
 		std::vector<const char*> textures;
 		std::map<const char*, GLuint> textureIDs;
 		std::map<const char*, Material> materials;
