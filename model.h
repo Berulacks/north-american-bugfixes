@@ -3,12 +3,8 @@
 
 struct BufferCombo
 {
-	const char* name;
+	std::string name;
 	GLuint vao, vertices, indices, normals, texturecoords;
-
-	//REMOVE ME AND UPDATEBCOMBOMAT AND MATERIAL* MATERIAL
-	//THESE ARE REPLACED WITH THE MATERIALS VECTOR
-	Material mat;
 };
 //Models are scenes that have their
 //corresponding buffers already filled
@@ -18,15 +14,9 @@ class Model
 {
 	//The aiScene which
 	//contains our actual model data
+	//(this needs to eventually be replaced with
+	//an internal format, when I phase assimp out)
 	const aiScene* scene;
-	//Our material object which contains
-	//texture data and data for uniforms
-	//
-	//Technically unnecessary because of
-	//the data stored in aiMaterials, but
-	//I will eventually get rid of assimp,
-	//so necessary until then.
-	Material* material;
 	//The vertex array object to be loaded
 	//on render. This assumes all our buffers
 	//are already set up
@@ -39,12 +29,10 @@ class Model
 		//Materials for each mesh
 		std::vector<Material> materials;
 		Model(); //this is horrible and you should feel bad
-		Model(const aiScene* _scene, Material* mat = NULL);
+		Model(const aiScene* _scene);
 		const aiScene* getScene(void) { return scene; };
-		Material* getMaterial(void);
 		BufferCombo getBCombo(int index) { return bufferIDs[index]; };
 		unsigned int numBCombos(void) { return bufferIDs.size(); };
-		void updateBComboMat(Material mat, int index) { bufferIDs[index].mat = mat; }; 
 		GLuint getVAO(int index) { return bufferIDs[index].vao; };
 		unsigned int numMeshes(void)  { return bufferIDs.size(); };
 		//Create necessary buffer objects

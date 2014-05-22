@@ -10,9 +10,7 @@ Object::Object(Model* mod, Material* mat)
 
 Material* Object::getMaterial()
 {
-	if( customMat != NULL )
-		return customMat;
-	return model->getMaterial();
+	return customMat;
 }
 
 glm::mat4 Object::getTransform(void)

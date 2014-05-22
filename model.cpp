@@ -1,16 +1,8 @@
 #include "model.h"
 
-Model::Model(const aiScene* _scene, Material* mat )
+Model::Model(const aiScene* _scene)
 {
-	//aiScene temp = *_scene;
 	scene = _scene;
-
-	if( mat != NULL )
-		material = mat;
-	//else
-	//	material = 
-	
-	//setUpBuffers();
 }
 
 
@@ -24,7 +16,9 @@ void Model::setUpBuffers()
 		glUseProgram( materials[i].shader->getID() );
 
 		BufferCombo buffers;
-		buffers.name = scene->mMeshes[i]->mName.C_Str();
+		buffers.name = std::string(scene->mMeshes[i]->mName.C_Str());
+		if(buffers.name.size() <= 0)
+			buffers.name = std::string("NAMELESS_MESH");
 
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
@@ -86,13 +80,13 @@ void Model::setUpBuffers()
 
 		bufferIDs.push_back( buffers );
 
-		glVertexAttribPointer( material->shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
-		glVertexAttribPointer( material->shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
-		glVertexAttribPointer( material->shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
+		glVertexAttribPointer( materials[i].shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
+		glVertexAttribPointer( materials[i].shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
+		glVertexAttribPointer( materials[i].shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
 
-		glEnableVertexAttribArray(material->shader->getAttrib("theV"));
-		glEnableVertexAttribArray(material->shader->getAttrib("theN"));
-		glEnableVertexAttribArray(material->shader->getAttrib("tex_in"));
+		glEnableVertexAttribArray(materials[i].shader->getAttrib("theV"));
+		glEnableVertexAttribArray(materials[i].shader->getAttrib("theN"));
+		glEnableVertexAttribArray(materials[i].shader->getAttrib("tex_in"));
 
 		glBindVertexArray( 0 );
 
@@ -101,12 +95,6 @@ void Model::setUpBuffers()
 
 
 }
-
-Material* Model::getMaterial()
-{
-	return material;
-}
-
 
 unsigned int* Model::generateFaces(aiFace* assimpFaceArray, int numFaces)
 {

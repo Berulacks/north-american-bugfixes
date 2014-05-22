@@ -27,7 +27,7 @@ void Renderer::render(std::vector<Object> objects)
 
 		for(int j = 0; j < model->numMeshes(); j++)
 		{
-			mat = model->getBCombo( j ).mat;
+			mat = model->materials[i];
 			shader = mat.shader;
 
 			setActiveProgram( shader );
