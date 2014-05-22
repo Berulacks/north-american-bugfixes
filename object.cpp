@@ -6,6 +6,7 @@ Object::Object(Model* mod, Material* mat)
 	model = mod;
 	if(mat != NULL)
 		customMat = mat;
+	scale = {1,1,1};
 }
 
 Material* Object::getMaterial()

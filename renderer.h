@@ -18,17 +18,13 @@ class Renderer
 		void render(std::vector<Object> objects);
 
 		bool initGL(void);
-		bool initSDL(void);
-		void toggleFullScreen(void);
+		void toggleFullScreen(SDL_Window* mainWindow);
 
 		void setActiveProgram(Program* toSet);
 		void updateProjection(glm::mat4 projection);
 	private:
 
 		glm::mat4 projection;
-
-		SDL_GLContext glContext;
-		SDL_Window* mainWindow;
 
 		Program* activeProgram;
 

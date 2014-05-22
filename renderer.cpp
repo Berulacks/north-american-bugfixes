@@ -35,11 +35,6 @@ void Renderer::render(std::vector<Object> objects)
 			glBindVertexArray( model->getVAO( i ) );
 			glBindTexture( GL_TEXTURE_2D, mat.texDiffuse );
 
-			/* Could be necessary....*/
-			//glEnableVertexAttribArray(mat.shader->getAttrib("theV"));
-			//glEnableVertexAttribArray(mat.shader->getAttrib("theN"));
-			//glEnableVertexAttribArray(mat.shader->getAttrib("tex_in"));
-
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
 			//This will obviously need to be abstracted in the future
 			updateUniforms( objects[i] );
@@ -102,7 +97,7 @@ void Renderer::updateProjection(glm::mat4 projection)
 }
 
 
-void Renderer::toggleFullScreen()
+void Renderer::toggleFullScreen(SDL_Window* mainWindow)
 {
 	int w, h;
 	if(!isFullScreen)
