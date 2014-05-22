@@ -3,27 +3,25 @@
 Model::Model(const aiScene* _scene, Material* mat )
 {
 	//aiScene temp = *_scene;
-	printf("SETTING SCENE\n");
 	scene = _scene;
-	printf("NUM INDICES %i\n", _scene->mMeshes[0]->mFaces[0].mNumIndices);
 
 	if( mat != NULL )
 		material = mat;
 	//else
 	//	material = 
 	
-	setUpBuffers();
+	//setUpBuffers();
 }
 
 
 void Model::setUpBuffers()
 {
 	GLuint vao, vbo, nbo, ibo, tbo;
-	glUseProgram( material->shader->getID() );
 
 	//Lets start with meshes
 	for( int i = 0; i < scene->mNumMeshes; i++)
 	{
+		glUseProgram( materials[i].shader->getID() );
 
 		BufferCombo buffers;
 		buffers.name = scene->mMeshes[i]->mName.C_Str();

@@ -74,7 +74,7 @@ class Storage
 		std::map<const char*, Model*> models;
 		std::vector<const char*> textures;
 		std::map<const char*, GLuint> textureIDs;
-		std::map<const char*, Material*> materials;
+		std::map<std::string, Material> materials;
 		std::vector<Program> programs;
 
 		//Eventually this should read text files from the materials

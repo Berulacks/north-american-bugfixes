@@ -6,6 +6,8 @@ struct BufferCombo
 	const char* name;
 	GLuint vao, vertices, indices, normals, texturecoords;
 
+	//REMOVE ME AND UPDATEBCOMBOMAT AND MATERIAL* MATERIAL
+	//THESE ARE REPLACED WITH THE MATERIALS VECTOR
 	Material mat;
 };
 //Models are scenes that have their
@@ -34,6 +36,8 @@ class Model
 	std::vector<BufferCombo> bufferIDs;
 
 	public:
+		//Materials for each mesh
+		std::vector<Material> materials;
 		Model(); //this is horrible and you should feel bad
 		Model(const aiScene* _scene, Material* mat = NULL);
 		const aiScene* getScene(void) { return scene; };
@@ -43,13 +47,12 @@ class Model
 		void updateBComboMat(Material mat, int index) { bufferIDs[index].mat = mat; }; 
 		GLuint getVAO(int index) { return bufferIDs[index].vao; };
 		unsigned int numMeshes(void)  { return bufferIDs.size(); };
-		//GLuint getVao(void) { return vao; };
-
-	private:
 		//Create necessary buffer objects
 		//and load the actual model data into
 		//them.
 		void setUpBuffers(void);
+
+	private:
 
 		//Generate indices (convert from ASSIMP faces
 		//format to an array of floats, suitable for 

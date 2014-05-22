@@ -99,11 +99,13 @@ bool Storage::readFile(std::string filename, std::string* target)
 //to create models)
 Model Storage::loadModel( const char* name )
 {
+	printf("Loading Model %s\n", name);
 	const aiScene* scene = rawModels[name];
-	printf("NUMINDICES %i\n", rawModels[name]->mMeshes[0]->mFaces[0].mNumIndices);
 	Model model = Model(rawModels[name]);
 
-	const char* matName;
+	aiString aiMatName;
+	std::string matName;
+	printf("Setting up materials...\n");
 
 	//readModel already initializes all materials stored in our aiScene
 	//...so we just need to check and see if the name of our materials
@@ -111,12 +113,21 @@ Model Storage::loadModel( const char* name )
 	//...again, this section will need to be removed with ASSIMP, eventually.
 	for(int i = 0; i < scene->mNumMeshes; i++)
 	{
-		scene->mMaterials[ scene->mMeshes[i]->mMaterialIndex ]->Get( AI_MATKEY_NAME, matName );
+		scene->mMaterials[ scene->mMeshes[i]->mMaterialIndex ]->Get( AI_MATKEY_NAME, aiMatName );
+		matName = std::string(aiMatName.C_Str());
+		printf("Searching for material %s for mesh %i\n", materials[matName].name.c_str(), i);
 		if(materials.count(matName) != 0)
-			model.updateBComboMat( *materials[matName], i );
+		{
+			printf("Found material %s for mesh %i\n", materials[matName].name.c_str(), i);
+			
+			//model.updateBComboMat( *materials[matName], i );
+			model.materials.push_back( materials[matName] );
+		}
 	}
+	model.setUpBuffers();
 
 	Model* pointer = new Model(model);
+	printf("Loading model %s into storage!\n", name);
 	models.insert( std::pair<const char*, Model*>( name, pointer ) );
 	
 	return model;
@@ -171,10 +182,8 @@ bool Storage::readModel( const char* filePath )
 
 	//*tx = *tempScene;
 
-	printf("(tempscene) NUM INDICES %i\n", tempScene->mMeshes[0]->mFaces[0].mNumIndices);
 	rawModels.insert( std::pair< const char* , const aiScene* > (filePath, tempScene) );
-	printf("(tempscene) NUM INDICES %i\n", rawModels[filePath]->mMeshes[0]->mFaces[0].mNumIndices);
-	printf("Added to vector\n");
+	printf("Added raw model %s to vector\n", filePath);
 	
 
 	printf("File %s has %i shapes:\n", filePath, tempScene->mNumMeshes);
@@ -191,7 +200,7 @@ bool Storage::readModel( const char* filePath )
 
 Material Storage::getMaterial ( const char* name )
 {
-	return *materials[name];
+	return materials[name];
 }
 
 bool Storage::checkGLErrors(const char* description)
@@ -239,7 +248,10 @@ bool Storage::initMaterial( aiMaterial* material, Program* shader )
 			mat->texDiffuse = textureIDs[ mat->texDiffuse_name.c_str() ];
 		}
 
-	materials.insert( std::pair<const char*, Material*>(mat->name.c_str(), mat) );
+	printf("Adding material %s to storage...\n", mat->name.c_str());
+	//materials.insert( std::pair<std::string, Material>(std::string(mat->name.c_str()), *mat) );
+	materials.emplace(std::string(mat->name.c_str()), *mat);
+	printf("Just added material %s to storage, we now have %lu materials.\n", mat->name.c_str(), materials.size());
 
 	//Because Load/CreateTexture for some odd reason wipes
 	//the name of mat
@@ -248,7 +260,7 @@ bool Storage::initMaterial( aiMaterial* material, Program* shader )
 	mat->texDiffuse_name = std::string(texPath.data);
 
 	printf("Material '%s' loaded, and ready!\n", mat->name.c_str());
-	//delete mat;
+	delete mat;
 
 	return true;
 }
