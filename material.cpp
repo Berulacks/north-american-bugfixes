@@ -13,8 +13,8 @@ void Material::updateVariables(aiMaterial* mtl)
         if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _diffuse))
 	{
 		diffuse.x = _diffuse[0];
-		diffuse.x = _diffuse[1];
-		diffuse.x = _diffuse[2];
+		diffuse.y = _diffuse[1];
+		diffuse.z = _diffuse[2];
 
 	}
  
@@ -22,8 +22,8 @@ void Material::updateVariables(aiMaterial* mtl)
         if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _specular))
 	{
 		specular.x = _specular[0];
-		specular.x = _specular[1];
-		specular.x = _specular[2];
+		specular.y = _specular[1];
+		specular.z = _specular[2];
 
 	}
  
@@ -31,8 +31,8 @@ void Material::updateVariables(aiMaterial* mtl)
         if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _emissive))
 	{
 		emissive.x = _emissive[0];
-		emissive.x = _emissive[1];
-		emissive.x = _emissive[2];
+		emissive.y = _emissive[1];
+		emissive.z = _emissive[2];
 
 	}
 
@@ -40,8 +40,8 @@ void Material::updateVariables(aiMaterial* mtl)
         if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _ambient))
 	{
 		ambient.x = _ambient[0];
-		ambient.x = _ambient[1];
-		ambient.x = _ambient[2];
+		ambient.y = _ambient[1];
+		ambient.z = _ambient[2];
 	}
 
 	aiString _name;

@@ -159,45 +159,45 @@ void Engine::processEvents()
 
 void Engine::initSDL()
 {
-if(SDL_Init(SDL_INIT_VIDEO) < 0)
-{
-quit();
-}
-printf("SDL Initialized!\n");
+	if(SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		quit();
+	}
+	printf("SDL Initialized!\n");
 
-//Mesa currently only supports a 3.3 core profile, AFAIK
-//So, being a Linux user with an Intel CPU (and mesa)
-//I'm going to have to stick with OpenGL 3.3
-SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	//Mesa currently only supports a 3.3 core profile, AFAIK
+	//So, being a Linux user with an Intel CPU (and mesa)
+	//I'm going to have to stick with OpenGL 3.3
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-mainWindow = SDL_CreateWindow("Pedestal", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	mainWindow = SDL_CreateWindow("Pedestal", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
-SDL_SetRelativeMouseMode( SDL_TRUE );
+	SDL_SetRelativeMouseMode( SDL_TRUE );
 
-if(!mainWindow)
-{
-printf("Woops, couldn't create the main window.");
-quit();
-}	
-printf("Done.\n");
+	if(!mainWindow)
+	{
+		printf("Woops, couldn't create the main window.");
+		quit();
+	}	
+	printf("Done.\n");
 
-printf("Creating GL context... ");
-glContext = SDL_GL_CreateContext(mainWindow);
-printf("Done.\n");
+	printf("Creating GL context... ");
+	glContext = SDL_GL_CreateContext(mainWindow);
+	printf("Done.\n");
 
-printf("Loading functions... ");
+	printf("Loading functions... ");
 
-if(ogl_LoadFunctions() == ogl_LOAD_FAILED)
-{
-exit(1);
-}
-printf("Functions loaded!\n");
-printf("OpenGL version is %s\n", glGetString(GL_VERSION) );
-printf("GLSL version is %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	if(ogl_LoadFunctions() == ogl_LOAD_FAILED)
+	{
+		exit(1);
+	}
+	printf("Functions loaded!\n");
+	printf("OpenGL version is %s\n", glGetString(GL_VERSION) );
+	printf("GLSL version is %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 }
 
