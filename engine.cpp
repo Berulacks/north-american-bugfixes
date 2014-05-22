@@ -27,6 +27,13 @@ bool Engine::init( int argc, const char* argv[] )
 
 	printf("Loading model!");
 	storage.readModel( files[0] );
+	Model mod = storage.loadModel( files[0] );
+	//Model mod = storage.getModel(files[0]);
+	
+	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
+	printf("Our model has %i meshes.\n", mod.numMeshes() );
+	printf("The first mesh of our model is called %s\n", mod.getBCombo(0).name);
+	printf("...and its material is called %s\n", mod.getBCombo(0).mat.name.c_str());
 
 	//Object obj = Object(storage.get
 

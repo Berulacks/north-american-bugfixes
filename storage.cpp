@@ -100,6 +100,7 @@ bool Storage::readFile(std::string filename, std::string* target)
 Model Storage::loadModel( const char* name )
 {
 	const aiScene* scene = rawModels[name];
+	printf("NUMINDICES %i\n", rawModels[name]->mMeshes[0]->mFaces[0].mNumIndices);
 	Model model = Model(rawModels[name]);
 
 	const char* matName;
@@ -125,7 +126,7 @@ bool Storage::readModel( const char* filePath )
 {
 
 	// Create an instance of the Importer class
-	Assimp::Importer importer;
+	//Assimp::Importer importer;
 	const aiScene* tempScene;
 
 	tempScene = importer.ReadFile( filePath,
@@ -166,7 +167,13 @@ bool Storage::readModel( const char* filePath )
 		initMaterial( tempScene->mMaterials[i], shader );
 	}
 
+	//aiScene* tx;
+
+	//*tx = *tempScene;
+
+	printf("(tempscene) NUM INDICES %i\n", tempScene->mMeshes[0]->mFaces[0].mNumIndices);
 	rawModels.insert( std::pair< const char* , const aiScene* > (filePath, tempScene) );
+	printf("(tempscene) NUM INDICES %i\n", rawModels[filePath]->mMeshes[0]->mFaces[0].mNumIndices);
 	printf("Added to vector\n");
 	
 
@@ -175,6 +182,8 @@ bool Storage::readModel( const char* filePath )
 		printf("Shape %i has %i vertices, and %i indices\n", j, tempScene->mMeshes[j]->mNumVertices, tempScene->mMeshes[j]->mNumFaces);
 
 	//delete tempScene;
+	
+	//loadModel( filePath );
 
 
 	return true;

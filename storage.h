@@ -40,6 +40,9 @@
 class Storage
 {
 
+
+	Assimp::Importer importer;
+
 	public:
 		Storage(void);
 
@@ -65,6 +68,7 @@ class Storage
 		bool initMaterial(aiMaterial* material, Program* shader);
 
 		Material getMaterial(const char* name);
+		Model getModel(const char* name) { return *models[name]; };
 	private:
 		std::map<const char*, const aiScene*> rawModels;
 		std::map<const char*, Model*> models;

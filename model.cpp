@@ -2,7 +2,11 @@
 
 Model::Model(const aiScene* _scene, Material* mat )
 {
+	//aiScene temp = *_scene;
+	printf("SETTING SCENE\n");
 	scene = _scene;
+	printf("NUM INDICES %i\n", _scene->mMeshes[0]->mFaces[0].mNumIndices);
+
 	if( mat != NULL )
 		material = mat;
 	//else
@@ -15,7 +19,7 @@ Model::Model(const aiScene* _scene, Material* mat )
 void Model::setUpBuffers()
 {
 	GLuint vao, vbo, nbo, ibo, tbo;
-	//glUseProgram( material->shader->getID() );
+	glUseProgram( material->shader->getID() );
 
 	//Lets start with meshes
 	for( int i = 0; i < scene->mNumMeshes; i++)
@@ -95,7 +99,7 @@ void Model::setUpBuffers()
 		glBindVertexArray( 0 );
 
 	}
-	//glUseProgram( 0 );
+	glUseProgram( 0 );
 
 
 }
@@ -108,7 +112,6 @@ Material* Model::getMaterial()
 
 unsigned int* Model::generateFaces(aiFace* assimpFaceArray, int numFaces)
 {
-
 	// create array with faces
 	// have to convert from Assimp format to array
 	unsigned int *faceArray;
@@ -120,6 +123,9 @@ unsigned int* Model::generateFaces(aiFace* assimpFaceArray, int numFaces)
 		const aiFace* face =  &assimpFaceArray[t];
 
 		memcpy(&faceArray[faceIndex], face->mIndices,3 * sizeof(unsigned int));
+		/*faceArray[faceIndex] = face->mIndices[0];
+		faceArray[faceIndex+1] = face->mIndices[1];
+		faceArray[faceIndex+2] = face->mIndices[2];*/
 		faceIndex += 3;
 	}
 
