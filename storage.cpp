@@ -22,7 +22,7 @@ GLuint Storage::createTexture( glm::vec3 colour )
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	checkGLErrors("Setting custom texture filtering mode");
 
-	textureIDs.insert( std::pair<const char*, GLuint>("RGBv", tex) );
+	textureIDs.emplace( std::string("RGBv"), tex );
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return tex;
@@ -72,7 +72,7 @@ bool Storage::loadTexture(const char* filePath, const char* name)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	checkGLErrors("Setting texture filtering mode");
 
-	textureIDs.insert( std::pair<const char*, GLuint>(name, tex) );
+	textureIDs.emplace( std::string( name ), tex );
 
 	delete[] finalPixels;
 
@@ -102,8 +102,8 @@ bool Storage::readFile(std::string filename, std::string* target)
 Model Storage::loadModel( const char* name )
 {
 	printf("Loading Model %s\n", name);
-	const aiScene* scene = rawModels[name];
-	Model model = Model(rawModels[name]);
+	const aiScene* scene = rawModels[std::string(name)];
+	Model model = Model(rawModels[std::string(name)]);
 
 	aiString aiMatName;
 	std::string matName;
@@ -130,7 +130,7 @@ Model Storage::loadModel( const char* name )
 
 	Model* pointer = new Model(model);
 	printf("Loading model %s into storage!\n", name);
-	models.insert( std::pair<const char*, Model*>( name, pointer ) );
+	models.emplace( std::string(name), pointer );
 	
 	return model;
 
@@ -184,7 +184,7 @@ bool Storage::readModel( const char* filePath )
 
 	//*tx = *tempScene;
 
-	rawModels.insert( std::pair< const char* , const aiScene* > (filePath, tempScene) );
+	rawModels.emplace( std::string(filePath), tempScene );
 	printf("Added raw model %s to vector\n", filePath);
 	
 
@@ -239,15 +239,16 @@ bool Storage::initMaterial( aiMaterial* material, Program* shader )
 	if(mat->texDiffuse_name.compare("NONE") == 0)
 	{
 		printf("No texture found!\nGenerating our own...\n");
-		mat->texDiffuse = createTexture( {0.5f,0.5f,0.5f} );
+		mat->texDiffuse = createTexture( {0.7f,0.5f,0.7f} );
 
 	}
 	else	
-		if(std::find( textures.begin(), textures.end(), mat->texDiffuse_name ) == textures.end())
+		//Have we already loaded our texture?
+		if( textureIDs.find( mat->texDiffuse_name ) == textureIDs.end() )
 		{
 			printf("Texture %s for material %s not already loaded, loading...\n", mat->texDiffuse_name.c_str(), mat->name.c_str());
 			loadTexture( mat->texDiffuse_name.c_str(), mat->texDiffuse_name.c_str() );
-			mat->texDiffuse = textureIDs[ mat->texDiffuse_name.c_str() ];
+			mat->texDiffuse = textureIDs[ mat->texDiffuse_name ];
 		}
 
 	printf("Adding material %s to storage...\n", mat->name.c_str());

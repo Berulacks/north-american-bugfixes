@@ -4,7 +4,7 @@ Renderer::Renderer()
 	printf("Renderer created!\n");
 }
 
-void Renderer::render(std::vector<Object> objects)
+void Renderer::render(std::vector<Object*> objects)
 {
 	glClearColor(1.0f,0.8f,0.8f,1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -22,7 +22,7 @@ void Renderer::render(std::vector<Object> objects)
 
 	for(int i = 0; i < objects.size(); i++)
 	{
-		model = objects[i].getModel();
+		model = objects[i]->getModel();
 		scene = model->getScene();
 
 		for(int j = 0; j < model->numMeshes(); j++)
@@ -36,7 +36,7 @@ void Renderer::render(std::vector<Object> objects)
 			glBindTexture( GL_TEXTURE_2D, mat.texDiffuse );
 			
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
-			updateUniforms( objects[i] );
+			updateUniforms( *objects[i] );
 			
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
 

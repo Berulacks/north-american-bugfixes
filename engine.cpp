@@ -33,7 +33,7 @@ bool Engine::init( int argc, const char* argv[] )
 	Model mod = storage.loadModel( files[0] );
 	Object sphere = Object(&mod);
 	sphere.translateBy( {0.0f,0.0f,5.0f} );
-	registerObject( sphere );
+	registerObject( &sphere );
 	
 	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
 	printf("Our model has %i meshes.\n", mod.numMeshes() );
@@ -126,9 +126,9 @@ void Engine::processEvents()
 				if(key == SDLK_f)
 					renderer.toggleFullScreen(mainWindow);
 				if(key == SDLK_UP)
-					objs[0].setScale( {5,5,5} );
+					objs[0]->setScale( {5,5,5} );
 				if(key == SDLK_DOWN)
-					objs[0].setScale( {1,1,1} );
+					objs[0]->setScale( {1,1,1} );
 
 				break;
 
@@ -161,7 +161,7 @@ void Engine::processEvents()
 	renderer.camera = glm::lookAt(renderer.cameraPos, renderer.cameraPos + lookat, glm::vec3(0, 1, 0));
 }
 
-bool registerObject(Object toAdd)
+bool Engine::registerObject(Object* toAdd)
 {
 	if( std::find(objs.begin(), objs.end(), toAdd) == objs.end())
 	{

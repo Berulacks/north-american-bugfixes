@@ -68,12 +68,11 @@ class Storage
 		bool initMaterial(aiMaterial* material, Program* shader);
 
 		Material getMaterial(const char* name);
-		Model getModel(const char* name) { return *models[name]; };
+		Model getModel(const char* name) { return *models[ std::string(name) ]; };
 	private:
-		std::map<const char*, const aiScene*> rawModels;
-		std::map<const char*, Model*> models;
-		std::vector<const char*> textures;
-		std::map<const char*, GLuint> textureIDs;
+		std::map<std::string, const aiScene*> rawModels;
+		std::map<std::string, Model*> models;
+		std::map<std::string, GLuint> textureIDs;
 		std::map<std::string, Material> materials;
 		std::vector<Program> programs;
 

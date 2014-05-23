@@ -45,10 +45,10 @@ class Engine
 		//collisions, and render the object
 		//Returns true if object was added, false
 		//if object is already present in list
-		bool registerObject(Object toAdd);
+		bool registerObject(Object* toAdd);
 
 	private:
-		std::vector<Object> objs;
+		std::vector<Object*> objs;
 		void render(void);
 		void processEvents(void);
 		void loop(int lastFrame);

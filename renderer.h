@@ -15,7 +15,7 @@ class Renderer
 		bool isFullScreen;
 
 		Renderer();
-		void render(std::vector<Object> objects);
+		void render(std::vector<Object*> objects);
 
 		bool initGL(void);
 		void toggleFullScreen(SDL_Window* mainWindow);
