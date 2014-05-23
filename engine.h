@@ -2,6 +2,9 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+//For functions that our main loop will call.
+typedef void (*Callback)();
+
 class Engine
 {
 	Renderer renderer;
@@ -36,7 +39,16 @@ class Engine
 		bool init( int argc, const char* argv[] );
 		void quit(void);
 
+		//Adds an object to the engine's list of 
+		//known objects. Then the engine can
+		//determine whether to apply physics,
+		//collisions, and render the object
+		//Returns true if object was added, false
+		//if object is already present in list
+		bool registerObject(Object toAdd);
+
 	private:
+		std::vector<Object> objs;
 		void render(void);
 		void processEvents(void);
 		void loop(int lastFrame);

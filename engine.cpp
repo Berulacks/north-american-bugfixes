@@ -28,12 +28,12 @@ bool Engine::init( int argc, const char* argv[] )
 	}
 
 	printf("Loading model!\n");
+
 	storage.readModel( files[0] );
 	Model mod = storage.loadModel( files[0] );
 	Object sphere = Object(&mod);
 	sphere.translateBy( {0.0f,0.0f,5.0f} );
-	objs.push_back( sphere );
-	//Model mod = storage.getModel(files[0]);
+	registerObject( sphere );
 	
 	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
 	printf("Our model has %i meshes.\n", mod.numMeshes() );
@@ -159,6 +159,16 @@ void Engine::processEvents()
 	lookat.z = cosf(renderer.xRot) * cosf(renderer.yRot);
 
 	renderer.camera = glm::lookAt(renderer.cameraPos, renderer.cameraPos + lookat, glm::vec3(0, 1, 0));
+}
+
+bool registerObject(Object toAdd)
+{
+	if( std::find(objs.begin(), objs.end(), toAdd) == objs.end())
+	{
+		objs.push_back(toAdd);
+		return true;
+	}
+	return false;
 }
 
 void Engine::initSDL()
