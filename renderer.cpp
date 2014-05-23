@@ -86,8 +86,9 @@ bool Renderer::initGL()
 	glEnable(GL_CULL_FACE);
 
 	printf("OpenGL initialized!\n");
-
-	return Storage::checkGLErrors("End of initGL");
+	//CheckGLErrors returns true if an error was found
+	//so we return the opposite
+	return !Storage::checkGLErrors("End of initGL");
 }
 
 void Renderer::updateProjection(glm::mat4 projection)
