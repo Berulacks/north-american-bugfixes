@@ -1,3 +1,4 @@
+#pragma once
 #include "model.h"
 
 //Objects are the actual in-engine objects
@@ -34,12 +35,15 @@ class Object
 		glm::vec3 velocity;
 		glm::vec3 rotVelocity;
 
+		OOBB getOOBB( int meshIndex );
+
 	private:
 		Model* model;
 
 		glm::vec3 position;
 		glm::vec3 rotation;
 		glm::vec3 scale;
+
 
 		//By default, any object will
 		//use the material stored in

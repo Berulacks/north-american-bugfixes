@@ -1,6 +1,8 @@
 #include "object.h"
 
 #define GRAVITY 9.8
+//For collision detection!
+#define EPSILON 0.00001
 
 class Physics
 {

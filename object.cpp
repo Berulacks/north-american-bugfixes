@@ -35,3 +35,23 @@ void Object::rotateBy(glm::vec3 vec)
 {
 	rotation += vec; 
 }
+
+
+OOBB Object::getOOBB( int meshIndex )
+{
+	OOBB oobb = model->getBCombo( meshIndex ).ooBB;
+	glm::mat4 transform = getTransform();
+
+	glm::vec4 c2 = glm::vec4(oobb.center, 0.0f) * transform;
+
+	glm::vec4 xAx = glm::vec4(oobb.axes[0], 0.0f) * transform;
+	glm::vec4 yAx = glm::vec4(oobb.axes[1], 0.0f) * transform;
+	glm::vec4 zAx = glm::vec4(oobb.axes[2], 0.0f) * transform;
+
+	oobb.center = glm::vec3(c2);
+	oobb.axes[0] = glm::vec3(xAx);
+	oobb.axes[1] = glm::vec3(yAx);
+	oobb.axes[2] = glm::vec3(zAx);
+
+	return oobb;
+}
