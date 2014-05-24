@@ -25,7 +25,16 @@ class Renderer
 	private:
 
 		BufferCombo boundingBox;
-		Program simplePr = Program("./shaders/simple.vs", "./shaders/simple.fs");
+		
+		//A basic pair of shaders
+		//that just renders incoming
+		//vertices.
+		Program* simplePr;
+		
+		//The vertex array object
+		//for rendering object 
+		//bounding boxes
+		GLuint bBoxVao;
 
 		glm::mat4 projection;
 

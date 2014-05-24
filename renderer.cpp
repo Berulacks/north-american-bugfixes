@@ -39,10 +39,17 @@ void Renderer::render(std::vector<Object*> objects)
 			updateUniforms( *objects[i] );
 			
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
-			if( objects[i]->renderBoundinxBox )
+			/*if( objects[i]->renderBoundinxBox )
 			{
+				setActiveProgram( simplePr );
+				glBindVertexArray( bBoxVao );
+				glBindTexture( GL_TEXTURE_2D, 0 );
+				glBindBuffer( GL_ARRAY_BUFFER, model->getBCombo( j ).boundingBox );
+				glVertexAttribPointer( simplePr->getAttrib("theV"),2,GL_FLOAT,0,0,0);
+				glEnableVertexAttribArray(simplePr->getAttrib("theV"));
+				glDrawElements(GL_LINES,20, GL_UNSIGNED_INT, NULL); 
 
-			}
+			}*/
 
 		}
 
@@ -89,7 +96,9 @@ bool Renderer::initGL()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
 
-	GLuint bBoxVao, bBoxIbo;
+	simplePr = new Program("./shaders/simple.vs", "./shaders/simple.fs");
+
+	GLuint bBoxIbo;
 
 	glGenVertexArrays(1, &bBoxVao);
 	glBindVertexArray(bBoxVao);
@@ -98,6 +107,8 @@ bool Renderer::initGL()
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, bBoxIbo );
 	GLuint indices[20] = {0, 1, 0, 2, 3, 1, 0, 4, 5, 1, 5, 4, 6, 2, 6, 7, 3, 7, 5, 1};
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, 20 * sizeof(GLuint),indices, GL_STATIC_DRAW); 
+
+	glEnableVertexAttribArray(simplePr->getAttrib("theV"));
 
 	glBindVertexArray(0);
 

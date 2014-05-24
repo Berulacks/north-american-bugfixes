@@ -46,8 +46,5 @@ class Model
 		//format to an array of floats, suitable for 
 		//OpenGL)
 		unsigned int* generateFaces(aiFace* assimpFaceArray, int numFaces);
-	
-
-
 
 };
