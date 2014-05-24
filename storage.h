@@ -34,6 +34,7 @@
 //#include <fstream>
 
 #include "model.h"
+#include "physics.h"
 
 //Stores actual mesh information
 //and handles file IO

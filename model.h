@@ -1,10 +1,26 @@
 #pragma once
+#include <cmath>
 #include "material.h"
 
+struct OOBB
+{
+	//x = center+e[0]axes[0]+e[1]axes[1]+e[2]axes[2]
+	glm::vec3 center;
+	glm::vec3 axes[3];
+	//Positive halwidth extents
+	//of OOBB along each axis
+	glm::vec3 e;
+
+
+};
 struct BufferCombo
 {
 	std::string name;
+	//Ints for buffers
 	GLuint vao, vertices, indices, normals, texturecoords, boundingBox;
+	//The object oriented bounding box
+	//for the mesh.
+	OOBB ooBB;
 };
 //Models are scenes that have their
 //corresponding buffers already filled

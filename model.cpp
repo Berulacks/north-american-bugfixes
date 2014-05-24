@@ -143,6 +143,32 @@ void Model::setUpBuffers()
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		buffers.boundingBox = bBoxVbo;
 
+		printf("min is %f, %f, %f\n", min.x,min.y,min.z);
+		printf("max is %f, %f, %f\n", max.x,max.y,max.z);
+
+		for(int j = 0; j < 8; j++)
+			printf("Corner #%i vertices: %f, %f, %f\n", j, cube[j].x, cube[j].y, cube[j].z);
+
+		OOBB oobb;
+
+		//The w/h/d of our OOBB
+		float xMag = abs(cube[3].x) + abs(cube[4].x);
+		float yMag = abs(cube[3].y) + abs(cube[4].y);
+		float zMag = abs(cube[3].z) + abs(cube[4].z);
+
+		//Because cube: <-*------->
+		//and OOBB:     <----*---->
+		oobb.center = { cube[3].x - xMag/2, cube[3].y - yMag/2, cube[3].z - zMag/2 };
+
+		oobb.e.x = xMag/2;
+		oobb.e.y = yMag/2;
+		oobb.e.z = zMag/2;
+
+		oobb.axes[0] = {1,0,0};
+		oobb.axes[1] = {0,1,0};
+		oobb.axes[2] = {0,0,1};
+
+		buffers.ooBB = oobb;
 
 		bufferIDs.push_back( buffers );
 	}
