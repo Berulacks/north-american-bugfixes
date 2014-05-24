@@ -3,8 +3,21 @@ north-american-bugfixes
 
 An opengl 3d renderer. Github recommended the title, and I happen to think it's brilliant. Unlike *some* people, I support github's creative endeavors.
 
-###Usage
+###Requirements
 
-Running 'make' will produce a runnable binary, which takes a model as an argument and renders it to the screen. If you'd like to try and play with the engine, edit engine.cpp.
+Nab requires:
 
-Eventually make will produce a compiled lib file that you can include in your personal projects, but we're not there just yet. Consider this a preview ;)
+* ASSIMP
+* SOIL
+* SDL2
+* OpenGL 3.3+
+
+###Building
+
+Running the included makefile without arguments will produce a static-library file (libNab.a) that can be included and used with any project. Just make sure to include the necessary header files with said project.
+
+In order to see a reference implementation of Nab, run
+
+    make pedestal
+    
+to build Pedestal, a model viewer built with Nab. It takes a model filepath as an argument.
