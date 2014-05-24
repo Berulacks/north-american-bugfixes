@@ -10,7 +10,7 @@ all:
 	ar rcs libNab.a c.o material.o model.o object.o program.o storage.o renderer.o engine.o 
 pedestal:
 	make && \
-	g++ -L. pedestal.cpp -Wwrite-strings -std=c++11 -lGLEW -lGL -lGLU -lSDL2 -lSOIL -lassimp -lNab -o pedestal
+	g++ -L. pedestal.cpp -Wwrite-strings -std=c++11 -ggdb -lGLEW -lGL -lGLU -lSDL2 -lSOIL -lassimp -lNab -o pedestal
 
 clean:
 	rm -f *.o

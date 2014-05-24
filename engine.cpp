@@ -15,21 +15,6 @@ bool Engine::init( int argc, const char* argv[] )
 		return false;
 	}
 
-	printf("Loading main object... \n");
-
-	//Filenames for the shapes to load
-	std::vector<const char*> files;
-	files.push_back( "./models/suzanne.obj");
-	//files.push_back("./models/sphere/sphere.obj");
-	//files.push_back("./models/dragon_recon/dragon_vrip.ply");
-	//files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
-	//files.push_back( "./models/dabrovic/sponza.obj");
-	
-	if(argc >= 2)
-	{
-		files.push_back(argv[1]);
-	}
-
 	/*storage.readModel( files[0] );
 	Model mod = storage.loadModel( files[0] );
 	Object sphere = Object(&mod);

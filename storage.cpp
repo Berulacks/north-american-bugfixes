@@ -101,6 +101,11 @@ bool Storage::readFile(std::string filename, std::string* target)
 //to create models)
 Model Storage::loadModel( const char* name )
 {
+	if(rawModels.size() == 0 || rawModels.find( std::string(name) ) == rawModels.end() )
+	{
+		printf("[ERROR] Can't load Model: model %s has not been read into the program, yet!\n", name);
+		return NULL;
+	}
 	printf("Loading Model %s\n", name);
 	const aiScene* scene = rawModels[std::string(name)];
 	Model model = Model(rawModels[std::string(name)]);
