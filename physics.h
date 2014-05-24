@@ -1,27 +1,13 @@
-#ifndef GLM_FORCE_RADIANS
-#define GLM_FORCE_RADIANS
-#endif
+#include "object.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtc/matrix_access.hpp>
+#define GRAVITY 9.8
 
 class Physics
 {
 	public:
-		Physics();
-
-
-
-
-
-
-
-
-
-
-
-
+		Physics() {};
+		void updatePhysics( std::vector<Object*> objects, float deltaT );
+		bool checkForCollision(OOBB ob1, OOBB ob2);
+		void collisionResolution(Object* ob1, Object* ob2);
+		glm::vec3 getPointOnOOB(OOBB ob1, glm::vec3 point);
 };

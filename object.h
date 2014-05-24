@@ -16,6 +16,7 @@ class Object
 		Material* getMaterial(void);
 
 		void translateBy(glm::vec3);
+		void rotateBy(glm::vec3);
 		void setScale(glm::vec3 target){ scale = target; };
 
 		//Should we apply physics steps to this object?
@@ -30,15 +31,15 @@ class Object
 		//TODO: After OOB generation
 		float momentOfInertia();
 
+		glm::vec3 velocity;
+		glm::vec3 rotVelocity;
+
 	private:
 		Model* model;
 
 		glm::vec3 position;
 		glm::vec3 rotation;
 		glm::vec3 scale;
-
-		glm::vec3 velocity;
-		glm::vec3 rotVelocity;
 
 		//By default, any object will
 		//use the material stored in

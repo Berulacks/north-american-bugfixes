@@ -30,3 +30,8 @@ void Object::translateBy(glm::vec3 vec)
 {
 	position += vec; 
 }
+
+void Object::rotateBy(glm::vec3 vec)
+{
+	rotation += vec; 
+}
