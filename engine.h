@@ -2,6 +2,9 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+//For functions that our main loop will call.
+typedef void (*Callback)(const float deltaT);
+
 class Engine
 {
 	Renderer renderer;
@@ -36,9 +39,33 @@ class Engine
 		bool init( int argc, const char* argv[] );
 		void quit(void);
 
+		//Starts the main update loop.
+		void start(int lastFrame);
+
+		//Adds an object to the engine's list of 
+		//known objects. Then the engine can
+		//determine whether to apply physics,
+		//collisions, and render the object
+		//Returns true if object was added, false
+		//if object is already present in list
+		bool registerObject(Object* toAdd);
+
+		//Add a custom function to our update loop.
+		//This is for integrating your own program
+		//with the engine's update loop.
+		bool registerCallback(Callback function);
+
+		Renderer* getRenderer(void) { return &renderer; };
+		Storage* getStorage(void) { return &storage; };
+
 	private:
+		std::vector<Object*> objs;
+		//Outside functions to be appended
+		//to our main update loop. These
+		//functions will be passed a 
+		//deltaT value (in seconds)
+		std::vector<Callback> functions;
 		void render(void);
 		void processEvents(void);
-		void loop(int lastFrame);
-		void initSDL(void);
+		bool initSDL(void);
 };

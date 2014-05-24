@@ -4,6 +4,7 @@ Program::Program(const char* vertexShader, const char* fragShader)
 {
 	ready = false;
 	id = glCreateProgram();
+	printf("Initializing shaders...\n");
 	if(initShader(GL_VERTEX_SHADER, vertexShader) && initShader(GL_FRAGMENT_SHADER, fragShader))
 	{
 		glLinkProgram(id);

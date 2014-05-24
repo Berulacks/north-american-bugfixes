@@ -77,12 +77,8 @@ void Model::setUpBuffers()
 
 		buffers.texturecoords = tbo;
 		glVertexAttribPointer( materials[i].shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
+
 		delete[] texCoords;
-
-		//buffers.matIndex = scene->mMeshes[i]->mMaterialIndex;
-
-		bufferIDs.push_back( buffers );
-
 
 		glEnableVertexAttribArray(materials[i].shader->getAttrib("theV"));
 		glEnableVertexAttribArray(materials[i].shader->getAttrib("theN"));
@@ -90,6 +86,65 @@ void Model::setUpBuffers()
 
 		glBindVertexArray( 0 );
 
+		//Setup bounding box buffer
+		glm::vec3 min = glm::vec3(FLT_MAX);
+		glm::vec3 max = glm::vec3(FLT_MIN);
+		glm::vec3 vert, comp;
+
+		for(int j = 0; j < scene->mMeshes[i]->mNumVertices; j++)
+		{
+			vert.x = scene->mMeshes[i]->mVertices[j].x;
+			vert.y = scene->mMeshes[i]->mVertices[j].y;
+			vert.z = scene->mMeshes[i]->mVertices[j].z;
+
+			if( vert.x < min.x )
+				min.x = vert.x;
+			if( vert.x > max.x )
+				max.x = vert.x;
+			if( vert.y < min.y )
+				min.y = vert.y;
+			if( vert.y > max.y )
+				max.y = vert.y;
+			if( vert.z < min.z )
+				min.z = vert.z;
+			if( vert.z > max.z )
+				max.z = vert.z;
+
+		}
+
+		glm::vec3 cube[8];
+
+		cube[4] = min;
+		cube[3] = max;
+
+		cube[1] = max;
+		cube[1].y = min.y;
+
+		cube[2] = max;
+		cube[2].x = min.x;
+
+		cube[7] = max;
+		cube[7].z = min.z;
+
+		cube[6] = min;
+		cube[6].y = max.y;
+
+		cube[5] = min;
+		cube[5].x = max.x;
+
+		cube[0] = min;
+		cube[0].z = max.z;
+
+		GLuint bBoxVbo;
+		glGenBuffers( 1, &bBoxVbo );
+		glBindBuffer( GL_ARRAY_BUFFER, bBoxVbo );
+		printf("bBoxVbo is %i\n", bBoxVbo);
+		glBufferData( GL_ARRAY_BUFFER, 8 * 3 * sizeof(float), cube, GL_STATIC_DRAW );
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
+		buffers.boundingBox = bBoxVbo;
+
+
+		bufferIDs.push_back( buffers );
 	}
 	glUseProgram( 0 );
 

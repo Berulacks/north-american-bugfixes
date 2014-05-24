@@ -4,7 +4,7 @@ Renderer::Renderer()
 	printf("Renderer created!\n");
 }
 
-void Renderer::render(std::vector<Object> objects)
+void Renderer::render(std::vector<Object*> objects)
 {
 	glClearColor(1.0f,0.8f,0.8f,1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -22,7 +22,7 @@ void Renderer::render(std::vector<Object> objects)
 
 	for(int i = 0; i < objects.size(); i++)
 	{
-		model = objects[i].getModel();
+		model = objects[i]->getModel();
 		scene = model->getScene();
 
 		for(int j = 0; j < model->numMeshes(); j++)
@@ -36,9 +36,24 @@ void Renderer::render(std::vector<Object> objects)
 			glBindTexture( GL_TEXTURE_2D, mat.texDiffuse );
 			
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
-			updateUniforms( objects[i] );
+			updateUniforms( *objects[i] );
 			
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
+			if( objects[i]->renderBoundingBox )
+			{
+				setActiveProgram( simplePr );
+				glBindVertexArray( bBoxVao );
+				glBindTexture( GL_TEXTURE_2D, 0 );
+				glBindBuffer( GL_ARRAY_BUFFER, model->getBCombo( j ).boundingBox );
+				//When you finally fix updateUniforms such that it isn't horrible, make sure to give a way to only send the mvp matrix in, so we can delete this line
+				glm::mat4 mv = projection * (camera * objects[i]->getTransform());
+				glUniformMatrix4fv(activeProgram->getUniform("mvp"), 1, GL_FALSE, glm::value_ptr(mv) );
+
+				glVertexAttribPointer( simplePr->getAttrib("theV"),3,GL_FLOAT,0,0,0);
+				glEnableVertexAttribArray(simplePr->getAttrib("theV"));
+				glDrawElements(GL_LINE_STRIP,20, GL_UNSIGNED_INT, NULL); 
+
+			}
 
 		}
 
@@ -85,9 +100,30 @@ bool Renderer::initGL()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
 
-	printf("OpenGL initialized!\n");
+	simplePr = new Program("./shaders/simple.vs", "./shaders/simple.fs");
 
-	return Storage::checkGLErrors("End of initGL");
+	GLuint bBoxIbo;
+
+	glGenVertexArrays(1, &bBoxVao);
+	glBindVertexArray(bBoxVao);
+
+	glGenBuffers(1, &bBoxIbo);
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, bBoxIbo );
+	GLuint indices[20] = {0, 1, 0, 2, 3, 1, 0, 4, 5, 1, 5, 4, 6, 2, 6, 7, 3, 7, 5, 1};
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, 20 * sizeof(GLuint),indices, GL_STATIC_DRAW); 
+
+	glEnableVertexAttribArray(simplePr->getAttrib("theV"));
+
+	glBindVertexArray(0);
+
+	boundingBox.name = "BoundingBox";
+	boundingBox.vao = bBoxVao;
+	boundingBox.indices = bBoxIbo;
+
+	printf("OpenGL initialized!\n");
+	//CheckGLErrors returns true if an error was found
+	//so we return the opposite
+	return !Storage::checkGLErrors("End of initGL");
 }
 
 void Renderer::updateProjection(glm::mat4 projection)

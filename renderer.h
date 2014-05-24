@@ -15,7 +15,7 @@ class Renderer
 		bool isFullScreen;
 
 		Renderer();
-		void render(std::vector<Object> objects);
+		void render(std::vector<Object*> objects);
 
 		bool initGL(void);
 		void toggleFullScreen(SDL_Window* mainWindow);
@@ -23,6 +23,18 @@ class Renderer
 		void setActiveProgram(Program* toSet);
 		void updateProjection(glm::mat4 projection);
 	private:
+
+		BufferCombo boundingBox;
+		
+		//A basic pair of shaders
+		//that just renders incoming
+		//vertices.
+		Program* simplePr;
+		
+		//The vertex array object
+		//for rendering object 
+		//bounding boxes
+		GLuint bBoxVao;
 
 		glm::mat4 projection;
 

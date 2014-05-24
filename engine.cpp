@@ -4,55 +4,42 @@ std::vector<Object> objs;
 
 bool Engine::init( int argc, const char* argv[] )
 {
-	initSDL();
-	renderer.initGL();
-
-	printf("Loading main object... \n");
-
-	//Filenames for the shapes to load
-	std::vector<const char*> files;
-	//files.push_back( "./models/suzanne.obj");
-	//files.push_back("./models/sphere/sphere.obj");
-	//files.push_back("./models/dragon_recon/dragon_vrip.ply");
-	//files.push_back("./models/bunny/reconstruction/bun_zipper.ply");
-	//files.push_back( "./models/dabrovic/sponza.obj");
-	
-	if(argc >= 2)
+	if(!initSDL())
 	{
-		files.push_back(argv[1]);
+		printf("Could not initiate SDL!\n");
+		return false;
 	}
-	else
+	if(!renderer.initGL())
 	{
-		printf("[ERROR] Incorrect number of arguments! (%i)\n", argc);
-		exit(1);
+		printf("Could not initialize OpenGL!\n");
+		return false;
 	}
 
-	printf("Loading model!\n");
-	storage.readModel( files[0] );
+	/*storage.readModel( files[0] );
 	Model mod = storage.loadModel( files[0] );
 	Object sphere = Object(&mod);
 	sphere.translateBy( {0.0f,0.0f,5.0f} );
-	objs.push_back( sphere );
-	//Model mod = storage.getModel(files[0]);
+	registerObject( &sphere );
 	
 	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
 	printf("Our model has %i meshes.\n", mod.numMeshes() );
 	printf("The first mesh of our model is called %s\n", mod.getBCombo(0).name.c_str());
 	printf("...and its material is called %s\n", mod.materials[0].name.c_str());
 
-	printf("\nOkay! Let's give rendering this mother a shot!\n");
+	printf("\nOkay! Let's give rendering this mother a shot!\n");*/
 
 	SDL_GL_SetSwapInterval(1);
 
 	printf("Completed initialization!\n");
 
-	loop( SDL_GetTicks() );
-
-	return 1;
+	return true;
 }
 
-void Engine::loop(int lastFrame)
+void Engine::start(int lastFrame)
 {
+	if( lastFrame == 0)
+		lastFrame = SDL_GetTicks();
+
 	//Lets process our events, first
 	processEvents();
 
@@ -70,22 +57,24 @@ void Engine::loop(int lastFrame)
 	timeStepsToProcess += deltaF;
 
 
+	//Sometimes we might have some timeSteps
+	//left over to process, what with rendering
+	//perhaps taking too long. This (hopefully)
+	//mitigates that.
 	while(timeStepsToProcess >= deltaT)
 	{
-		//Note: Since we're using 
-		//a constant deltaT declared
-		//in the header file, we're
-		//not passing dT as an argument
+
 		timeStepsToProcess -= deltaT;
+		for(int i = 0; i < functions.size(); i++)
+			(*functions[i])(physT);
 
 	}
 
 	renderer.render(objs);
 	SDL_GL_SwapWindow(mainWindow);
 
-
 	if(active)
-		loop(currentTime);
+		start(currentTime);
 	else
 		quit();
 
@@ -126,9 +115,11 @@ void Engine::processEvents()
 				if(key == SDLK_f)
 					renderer.toggleFullScreen(mainWindow);
 				if(key == SDLK_UP)
-					objs[0].setScale( {5,5,5} );
+					objs[0]->setScale( {5,5,5} );
 				if(key == SDLK_DOWN)
-					objs[0].setScale( {1,1,1} );
+					objs[0]->setScale( {1,1,1} );
+				if(key == SDLK_b)
+					objs[0]->renderBoundingBox = !objs[0]->renderBoundingBox;
 
 				break;
 
@@ -160,12 +151,32 @@ void Engine::processEvents()
 
 	renderer.camera = glm::lookAt(renderer.cameraPos, renderer.cameraPos + lookat, glm::vec3(0, 1, 0));
 }
+bool Engine::registerCallback( Callback function )
+{
+	if( std::find(functions.begin(), functions.end(), function) == functions.end())
+	{
+		functions.push_back( function );
+		printf("Added callback!\n");
+		return true;
+	}
+	return false;
 
-void Engine::initSDL()
+}
+bool Engine::registerObject(Object* toAdd)
+{
+	if( std::find(objs.begin(), objs.end(), toAdd) == objs.end())
+	{
+		objs.push_back(toAdd);
+		return true;
+	}
+	return false;
+}
+
+bool Engine::initSDL()
 {
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		quit();
+		return false;
 	}
 	printf("SDL Initialized!\n");
 
@@ -185,7 +196,7 @@ void Engine::initSDL()
 	if(!mainWindow)
 	{
 		printf("Woops, couldn't create the main window.");
-		quit();
+		return false;
 	}	
 	printf("Done.\n");
 
@@ -197,11 +208,13 @@ void Engine::initSDL()
 
 	if(ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
-		exit(1);
+		return false;
 	}
 	printf("Functions loaded!\n");
 	printf("OpenGL version is %s\n", glGetString(GL_VERSION) );
 	printf("GLSL version is %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+	return true;
 
 }
 
