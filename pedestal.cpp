@@ -17,7 +17,10 @@ int main( int argc, const char* argv[] )
 	myRenderer = program.getRenderer();
 
 	std::vector<const char*> files;
-	files.push_back( "./models/suzanne.obj");
+	if(argv[1] == NULL)
+		files.push_back( "./models/suzanne.obj");
+	else
+		files.push_back( argv[1] );
 
 	if( !myStorage->readModel(files[0]) )
 		program.quit();
