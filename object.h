@@ -25,6 +25,8 @@ class Object
 		//Should we NOT render this object?
 		bool hidden = false;
 
+		bool renderBoundinxBox = false;
+
 		//TODO: After OOB generation
 		float momentOfInertia();
 

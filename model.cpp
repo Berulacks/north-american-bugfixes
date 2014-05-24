@@ -77,6 +77,24 @@ void Model::setUpBuffers()
 
 		buffers.texturecoords = tbo;
 		glVertexAttribPointer( materials[i].shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
+		glm::vec3 min = glm::vec3(FLT_MIN);
+		glm::vec3 max = glm::vec3(FLT_MAX);
+		glm::vec3 vert, comp;
+
+		for(int j = 0; j < scene->mMeshes[i]->mNumVertices; j++)
+		{
+			vert.x = scene->mMeshes[i]->mVertices[j].x;
+			vert.y = scene->mMeshes[i]->mVertices[j].y;
+			vert.z = scene->mMeshes[i]->mVertices[j].z;
+
+			min = glm::lessThan( min, vert );
+			max = glm::lessThan( max, vert );
+
+		}
+
+		buffers.boundingBox[0] = min;
+		buffers.boundingBox[1] = max;
+
 		delete[] texCoords;
 
 		//buffers.matIndex = scene->mMeshes[i]->mMaterialIndex;

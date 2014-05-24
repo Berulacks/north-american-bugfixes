@@ -39,6 +39,10 @@ void Renderer::render(std::vector<Object*> objects)
 			updateUniforms( *objects[i] );
 			
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
+			if( objects[i]->renderBoundinxBox )
+			{
+
+			}
 
 		}
 
@@ -84,6 +88,22 @@ bool Renderer::initGL()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
+
+	GLuint bBoxVao, bBoxIbo;
+
+	glGenVertexArrays(1, &bBoxVao);
+	glBindVertexArray(bBoxVao);
+
+	glGenBuffers(1, &bBoxIbo);
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, bBoxIbo );
+	GLuint indices[20] = {0, 1, 0, 2, 3, 1, 0, 4, 5, 1, 5, 4, 6, 2, 6, 7, 3, 7, 5, 1};
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, 20 * sizeof(GLuint),indices, GL_STATIC_DRAW); 
+
+	glBindVertexArray(0);
+
+	boundingBox.name = "BoundingBox";
+	boundingBox.vao = bBoxVao;
+	boundingBox.indices = bBoxIbo;
 
 	printf("OpenGL initialized!\n");
 	//CheckGLErrors returns true if an error was found

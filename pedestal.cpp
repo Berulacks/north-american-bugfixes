@@ -28,6 +28,7 @@ int main( int argc, const char* argv[] )
 	Model mod = myStorage->loadModel( files[0] );
 	Object sphere = Object(&mod);
 	sphere.translateBy( {0.0f,0.0f,5.0f} );
+	sphere.renderBoundinxBox = true;
 	program.registerObject( &sphere );
 
 	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");

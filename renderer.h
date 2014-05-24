@@ -24,6 +24,9 @@ class Renderer
 		void updateProjection(glm::mat4 projection);
 	private:
 
+		BufferCombo boundingBox;
+		Program simplePr = Program("./shaders/simple.vs", "./shaders/simple.fs");
+
 		glm::mat4 projection;
 
 		Program* activeProgram;

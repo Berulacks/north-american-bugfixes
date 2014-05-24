@@ -4,7 +4,7 @@
 struct BufferCombo
 {
 	std::string name;
-	GLuint vao, vertices, indices, normals, texturecoords;
+	GLuint vao, vertices, indices, normals, texturecoords, boundingBox;
 };
 //Models are scenes that have their
 //corresponding buffers already filled
