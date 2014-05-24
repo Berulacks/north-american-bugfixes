@@ -55,3 +55,34 @@ OOBB Object::getOOBB( int meshIndex )
 
 	return oobb;
 }
+
+//NEEDS TO TAKE A MESH INDEX WHEN WE ACTUALLY
+//REMOVE ASSIMP AND START USING OUR OWN MESH
+//CLASS. 
+glm::vec3 Object::momentOfInertia()
+{
+	glm::vec3 mI;
+	OOBB oobb = model->getBCombo( 0 ).ooBB;
+
+	mI.x = ( oobb.e[0] * oobb.e[0] * 2 * 2 + oobb.e[2] * oobb.e[2] * 2 * 2 ) * mass * (1.0f / 12.0f);
+	mI.y = ( oobb.e[1] * oobb.e[1] * 2 * 2 + oobb.e[2] * oobb.e[2] * 2 * 2 ) * mass * (1.0f / 12.0f);
+	mI.z = ( oobb.e[1] * oobb.e[1] * 2 * 2 + oobb.e[0] * oobb.e[0] * 2 * 2 ) * mass * (1.0f / 12.0f);
+
+
+	return mI;
+}
+
+void Object::addToVelocity(glm::vec3 toAdd)
+{
+	if( sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z) <= MAX_VEL)
+		velocity += toAdd;
+
+}
+
+
+void Object::addToRotVelocity(glm::vec3 toAdd)
+{
+	if( sqrt(rotVelocity.x * rotVelocity.x + rotVelocity.y * rotVelocity.y + rotVelocity.z * rotVelocity.z) <= MAX_VEL)
+		rotVelocity += toAdd;
+
+}

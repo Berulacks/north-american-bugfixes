@@ -1,6 +1,8 @@
 #pragma once
 #include "model.h"
 
+#define MAX_VEL 10.0f
+
 //Objects are the actual in-engine objects
 //Each object has a unique transformation matrix
 //But can use any of the models or materials
@@ -29,11 +31,15 @@ class Object
 
 		bool renderBoundingBox = false;
 
-		//TODO: After OOB generation
-		float momentOfInertia();
+		glm::vec3 momentOfInertia(void);
 
-		glm::vec3 velocity;
-		glm::vec3 rotVelocity;
+		glm::vec3 getVelocity(void) { return velocity; };
+		glm::vec3 getRotVelocity(void) { return rotVelocity; };
+
+		void addToVelocity(glm::vec3 toAdd);
+		void addToRotVelocity(glm::vec3 toAdd);
+
+		glm::vec3 getPosition() { return position; };
 
 		OOBB getOOBB( int meshIndex );
 
@@ -44,6 +50,8 @@ class Object
 		glm::vec3 rotation;
 		glm::vec3 scale;
 
+		glm::vec3 velocity;
+		glm::vec3 rotVelocity;
 
 		//By default, any object will
 		//use the material stored in

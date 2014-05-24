@@ -1,15 +1,18 @@
+#pragma once
+
 #include "object.h"
 
-#define GRAVITY 9.8
+#define GRAVITY 9.8f
 //For collision detection!
-#define EPSILON 0.00001
+#define EPSILON 0.00001f
+#define E_CONSTANT 1.0f
 
 class Physics
 {
 	public:
 		Physics() {};
-		void updatePhysics( std::vector<Object*> objects, float deltaT );
-		bool checkForCollision(OOBB ob1, OOBB ob2);
-		void collisionResolution(Object* ob1, Object* ob2);
-		glm::vec3 getPointOnOOB(OOBB ob1, glm::vec3 point);
+		static void updatePhysics( std::vector<Object*> objects, float deltaT );
+		static bool checkForCollision(OOBB ob1, OOBB ob2);
+		static void collisionResolution(Object* ob1, Object* ob2);
+		static glm::vec3 getPointOnOOB(OOBB ob1, glm::vec3 point);
 };

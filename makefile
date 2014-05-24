@@ -15,3 +15,8 @@ pedestal:
 
 clean:
 	rm -f *.o
+
+
+phys1:
+	make && \
+	g++ -L. phys1.cpp -Wwrite-strings -std=c++11 -ggdb -lGLEW -lGL -lGLU -lSDL2 -lSOIL -lassimp -lNab -o phys1

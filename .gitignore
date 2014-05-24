@@ -15,6 +15,7 @@
 # The output of our makefile
 runfile
 pedestal
+phys1
 *.pyc
 
 #textures

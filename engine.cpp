@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "physics.h"
 
 std::vector<Object> objs;
 
@@ -64,6 +65,7 @@ void Engine::start(int lastFrame)
 	while(timeStepsToProcess >= deltaT)
 	{
 
+		Physics::updatePhysics( objs, physT );
 		timeStepsToProcess -= deltaT;
 		for(int i = 0; i < functions.size(); i++)
 			(*functions[i])(physT);
