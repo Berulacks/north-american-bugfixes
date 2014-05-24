@@ -39,17 +39,21 @@ void Renderer::render(std::vector<Object*> objects)
 			updateUniforms( *objects[i] );
 			
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
-			/*if( objects[i]->renderBoundinxBox )
+			if( objects[i]->renderBoundingBox )
 			{
 				setActiveProgram( simplePr );
 				glBindVertexArray( bBoxVao );
 				glBindTexture( GL_TEXTURE_2D, 0 );
 				glBindBuffer( GL_ARRAY_BUFFER, model->getBCombo( j ).boundingBox );
-				glVertexAttribPointer( simplePr->getAttrib("theV"),2,GL_FLOAT,0,0,0);
-				glEnableVertexAttribArray(simplePr->getAttrib("theV"));
-				glDrawElements(GL_LINES,20, GL_UNSIGNED_INT, NULL); 
+				//When you finally fix updateUniforms such that it isn't horrible, make sure to give a way to only send the mvp matrix in, so we can delete this line
+				glm::mat4 mv = projection * (camera * objects[i]->getTransform());
+				glUniformMatrix4fv(activeProgram->getUniform("mvp"), 1, GL_FALSE, glm::value_ptr(mv) );
 
-			}*/
+				glVertexAttribPointer( simplePr->getAttrib("theV"),3,GL_FLOAT,0,0,0);
+				glEnableVertexAttribArray(simplePr->getAttrib("theV"));
+				glDrawElements(GL_LINE_STRIP,20, GL_UNSIGNED_INT, NULL); 
+
+			}
 
 		}
 
