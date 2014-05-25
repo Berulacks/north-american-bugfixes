@@ -28,6 +28,7 @@ void Physics::updatePhysics( std::vector<Object *> objects, float deltaT )
 						checkForCollision(objects[i]->getOOBB(0), objects[j]->getOOBB(0)) 
 				  )
 				{
+					printf("COLLISION!\n");
 					//collisionResolution(objects[i], objects[j]);
 				}//end of if statement
 			}//end of j for loop
@@ -53,7 +54,8 @@ void Physics::updatePhysics( std::vector<Object *> objects, float deltaT )
 
 bool Physics::checkForCollision( OOBB ob1, OOBB ob2)
 {
-	printf("Checking for collisions!\n");
+	printf("Position for obj1: %f, %f, %f\n", ob1.center.x, ob1.center.y, ob1.center.z);
+	printf("Position for obj2: %f, %f, %f\n", ob2.center.x, ob2.center.y, ob2.center.z);
 	float ra, rb;
 	glm::mat3 R, AbsR;
 	// Compute rotation matrix expressing b in a’s coordinate frame
@@ -132,7 +134,6 @@ bool Physics::checkForCollision( OOBB ob1, OOBB ob2)
 	if (abs(t[1] * R[0][2] - t[0] * R[1][2]) > ra + rb) return false;
 	
 	// Since no separating axis is found, the OBBs must be intersecting
-	printf("COLLISION!\n");
 	return true;
 }
 

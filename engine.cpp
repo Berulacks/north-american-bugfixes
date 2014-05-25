@@ -121,7 +121,8 @@ void Engine::processEvents()
 				if(key == SDLK_DOWN)
 					objs[0]->setScale( {1,1,1} );
 				if(key == SDLK_b)
-					objs[0]->renderBoundingBox = !objs[0]->renderBoundingBox;
+					for(int i = 0; i < objs.size(); i++)
+						objs[i]->renderBoundingBox = !objs[i]->renderBoundingBox;
 
 				break;
 

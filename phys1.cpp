@@ -29,6 +29,7 @@ int main( int argc, const char* argv[] )
 	Object sphere = Object(&mod);
 	sphere.translateBy( {0.0f,20.0f,15.0f} );
 	sphere.isPhysicsObject = true;
+	sphere.rotateBy( {0.1, 0.4, 0.3} );
 	sphere.collidable = true;
 	program.registerObject( &sphere );
 
