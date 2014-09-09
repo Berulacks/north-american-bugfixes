@@ -138,7 +138,7 @@ void Model::setUpBuffers()
 		GLuint bBoxVbo;
 		glGenBuffers( 1, &bBoxVbo );
 		glBindBuffer( GL_ARRAY_BUFFER, bBoxVbo );
-		printf("bBoxVbo is %i\n", bBoxVbo);
+		//printf("bBoxVbo is %i\n", bBoxVbo);
 		glBufferData( GL_ARRAY_BUFFER, 8 * 3 * sizeof(float), cube, GL_STATIC_DRAW );
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		buffers.boundingBox = bBoxVbo;
