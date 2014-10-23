@@ -107,8 +107,8 @@ Model Storage::loadModel( const char* name )
 		return NULL;
 	}
 	printf("Loading Model %s\n", name);
-	const aiScene* scene = rawModels[std::string(name)];
-	Model model = Model(rawModels[std::string(name)]);
+	ModelData scene = rawModels[std::string(name)];
+	Model model = Model( scene );
 
 	aiString aiMatName;
 	std::string matName;
@@ -258,14 +258,9 @@ bool Storage::readModel( const char* filePath )
 	printf("Added raw model %s to vector\n", filePath);
 	
 
-	printf("File %s has %i shapes:\n", filePath, tempScene->mNumMeshes);
-	for(int j = 0; j < tempScene->mNumMeshes ; j++ )
-		printf("Shape %i has %i vertices, and %i indices\n", j, tempScene->mMeshes[j]->mNumVertices, tempScene->mMeshes[j]->mNumFaces);
-
-	//delete tempScene;
-	
-	//loadModel( filePath );
-
+	printf("File %s has %lu shapes:\n", filePath, rawData.meshes.size() );
+	for(int j = 0; j < rawData.meshes.size() ; j++ )
+		printf("Shape %i has %lu vertices, and %lu indices\n", j, rawData.meshes[j].positions.size(), rawData.meshes[j].indices.size() );
 
 	return true;
 }
@@ -300,6 +295,8 @@ bool Storage::storeProgram( Program toAdd )
 	return true;
 }
 
+//TODO: Convert the aiMaterial* to a custom data structure, and have initMaterial use that. Reasoning: when we're loading in materials directly from .mtl files, we might not want to use ASSIMP. Though, if ASSIMP can handle doing that, then this is totally okay.
+//TODO: Learn more about how ASSIMP loads materials...
 Material Storage::initMaterial( aiMaterial* material, Program* shader )
 {
 	Material mat = Material(shader);
