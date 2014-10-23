@@ -45,6 +45,7 @@ class Model
 		//Generate indices (convert from ASSIMP faces
 		//format to an array of floats, suitable for 
 		//OpenGL)
-		unsigned int* generateFaces(aiFace* assimpFaceArray, int numFaces);
+		static unsigned int* generateFaces(aiFace* assimpFaceArray, int numFaces);
+		static std::vector<unsigned int> generateFacesVector(aiFace* assimpFaceArray, int numFaces);
 
 };

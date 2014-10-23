@@ -174,3 +174,26 @@ unsigned int* Model::generateFaces(aiFace* assimpFaceArray, int numFaces)
 
 }
 
+
+std::vector<unsigned int> Model::generateFacesVector(aiFace* assimpFaceArray, int numFaces)
+{
+	// create array with faces
+	// have to convert from Assimp format to array
+    std::vector<unsigned int> faceArray;
+
+	unsigned int faceIndex = 0;
+
+	for (unsigned int t = 0; t <  numFaces; ++t) {
+		const aiFace* face =  &assimpFaceArray[t];
+
+		//memcpy(&faceArray[faceIndex], face->mIndices,3 * sizeof(unsigned int));
+		//faceIndex += 3;
+        
+        faceArray.push_back( face->mIndices[0] );
+        faceArray.push_back( face->mIndices[1] );
+        faceArray.push_back( face->mIndices[2] );
+	}
+
+	return faceArray;
+
+}

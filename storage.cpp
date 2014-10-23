@@ -140,11 +140,10 @@ Model Storage::loadModel( const char* name )
 	return model;
 
 }
+
 bool Storage::readModel( const char* filePath )
 {
 
-	// Create an instance of the Importer class
-	//Assimp::Importer importer;
 	const aiScene* tempScene;
 
 	tempScene = importer.ReadFile( filePath,
@@ -154,7 +153,7 @@ bool Storage::readModel( const char* filePath )
 		aiProcess_Triangulate    | // triangulate polygons with more than 3 edges
 		aiProcess_SortByPType              | // make 'clean' meshes which consist of a single typ of primitives
 		0);
-	//
+    
 	// If the import failed, report it
 	if( !tempScene)
 	{
@@ -163,7 +162,6 @@ bool Storage::readModel( const char* filePath )
 	}
 
 	printf("Loaded file %s.\n", filePath);
-
 
 	printf("Material count : %i\n", tempScene->mNumMaterials);
 
@@ -179,17 +177,84 @@ bool Storage::readModel( const char* filePath )
 	else
 		shader = &programs[0];
 
+    //Our data struct to hold all the values
+    //we import from assimp
+    ModelData rawData;
+
+    //Read materials
 	for(int i = 0; i < tempScene->mNumMaterials; i++)
 	{
 		printf("Initializing material %i...\n", i);
-		initMaterial( tempScene->mMaterials[i], shader );
+
+        rawData.materials.push_back( initMaterial( tempScene->mMaterials[i], shader ) );
 	}
 
-	//aiScene* tx;
+    //Read meshes
+    for(int i = 0; i < tempScene->mNumMeshes; i++)
+    {
+            MeshData rawMesh;
 
-	//*tx = *tempScene;
+            int numVertices;
+            //Vertices
+            if( tempScene->mMeshes[i]->HasPositions() )
+            {
+                    numVertices = tempScene->mMeshes[i]->mNumVertices;
 
-	rawModels.emplace( std::string(filePath), tempScene );
+                    for(int v = 0; v < numVertices; v++)
+                    {
+                            glm::vec3 vertex;
+                            
+                            vertex.x = tempScene->mMeshes[i]->mVertices[v].x;
+                            vertex.y = tempScene->mMeshes[i]->mVertices[v].y;
+                            vertex.z = tempScene->mMeshes[i]->mVertices[v].z;
+
+                            rawMesh.positions.push_back( vertex );
+                    }
+            }
+
+            //Indices
+            if( tempScene->mMeshes[i]->HasFaces() )
+            {
+
+                    rawMesh.indices = generateFacesVector( tempScene->mMeshes[i]->mFaces, tempScene->mMeshes[i]->mNumFaces );
+
+            }
+
+            //Normals
+            if( tempScene->mMeshes[i]->HasNormals() )
+            {
+                    for(int n = 0; n < numVertices; n++)
+                    {
+                            glm::vec3 normal;
+
+                            normal.x = tempScene->mMeshes[i]->mNormals[n].x;
+                            normal.y = tempScene->mMeshes[i]->mNormals[n].y;
+                            normal.z = tempScene->mMeshes[i]->mNormals[n].z;
+
+                            rawMesh.normals.push_back( normal );
+                    }
+
+            }
+
+            //Texture Coordinates
+            //TODO: Change this from "0" to something that makes sense
+            if( tempScene->mMeshes[i]->HasTextureCoords( 0 ) )
+            {
+                    for(int t = 0; t < numVertices; t++)
+                    {
+
+                            rawMesh.UVs.push_back( tempScene->mMeshes[i]->mTextureCoords[0][t].x );
+                            rawMesh.UVs.push_back( tempScene->mMeshes[i]->mTextureCoords[0][t].y );
+
+                    }
+
+            }
+
+            rawData.meshes.push_back(rawMesh);
+    }
+
+	//rawModels.emplace( std::string(filePath), tempScene );
+	rawModels.emplace( std::string(filePath), rawData );
 	printf("Added raw model %s to vector\n", filePath);
 	
 
@@ -235,42 +300,40 @@ bool Storage::storeProgram( Program toAdd )
 	return true;
 }
 
-bool Storage::initMaterial( aiMaterial* material, Program* shader )
+Material Storage::initMaterial( aiMaterial* material, Program* shader )
 {
-	Material *mat = new Material(shader);
-	mat->updateVariables( material );
+	Material mat = Material(shader);
+	mat.updateVariables( material );
 
-	printf("Checking texture for material %s...\n", mat->name.c_str());
-	if(mat->texDiffuse_name.compare("NONE") == 0)
+	printf("Checking texture for material %s...\n", mat.name.c_str());
+	if(mat.texDiffuse_name.compare("NONE") == 0)
 	{
 		printf("No texture found!\nGenerating our own...\n");
-		mat->texDiffuse = createTexture( {0.7f,0.5f,0.7f} );
+		mat.texDiffuse = createTexture( {0.7f,0.5f,0.7f} );
 
 	}
 	else	
 		//Have we already loaded our texture?
-		if( textureIDs.find( mat->texDiffuse_name ) == textureIDs.end() )
+		if( textureIDs.find( mat.texDiffuse_name ) == textureIDs.end() )
 		{
-			printf("Texture %s for material %s not already loaded, loading...\n", mat->texDiffuse_name.c_str(), mat->name.c_str());
-			loadTexture( mat->texDiffuse_name.c_str(), mat->texDiffuse_name.c_str() );
-			mat->texDiffuse = textureIDs[ mat->texDiffuse_name ];
+			printf("Texture %s for material %s not already loaded, loading...\n", mat.texDiffuse_name.c_str(), mat.name.c_str());
+			loadTexture( mat.texDiffuse_name.c_str(), mat.texDiffuse_name.c_str() );
+			mat.texDiffuse = textureIDs[ mat.texDiffuse_name ];
 		}
 
-	printf("Adding material %s to storage...\n", mat->name.c_str());
-	//materials.insert( std::pair<std::string, Material>(std::string(mat->name.c_str()), *mat) );
-	materials.emplace(std::string(mat->name.c_str()), *mat);
-	printf("Just added material %s to storage, we now have %lu materials.\n", mat->name.c_str(), materials.size());
+	printf("Adding material %s to storage...\n", mat.name.c_str());
+	materials.emplace(std::string(mat.name.c_str()), mat);
+	printf("Just added material %s to storage, we now have %lu materials.\n", mat.name.c_str(), materials.size());
 
 	//Because Load/CreateTexture for some odd reason wipes
 	//the name of mat
 	aiString texPath;  
         material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
-	mat->texDiffuse_name = std::string(texPath.data);
+	mat.texDiffuse_name = std::string(texPath.data);
 
-	printf("Material '%s' loaded, and ready!\n", mat->name.c_str());
-	delete mat;
+	printf("Material '%s' loaded, and ready!\n", mat.name.c_str());
 
-	return true;
+	return mat;
 }
 void Storage::initMaterials()
 {
@@ -278,4 +341,28 @@ void Storage::initMaterials()
 	storeProgram( *prog );
 	Material mat(prog);
 	//mat.updateVariables( 
+}
+
+
+std::vector<unsigned int> Storage::generateFacesVector(aiFace* assimpFaceArray, int numFaces)
+{
+	// create array with faces
+	// have to convert from Assimp format to array
+    std::vector<unsigned int> faceArray;
+
+	unsigned int faceIndex = 0;
+
+	for (unsigned int t = 0; t <  numFaces; ++t) {
+		const aiFace* face =  &assimpFaceArray[t];
+
+		//memcpy(&faceArray[faceIndex], face->mIndices,3 * sizeof(unsigned int));
+		//faceIndex += 3;
+        
+        faceArray.push_back( face->mIndices[0] );
+        faceArray.push_back( face->mIndices[1] );
+        faceArray.push_back( face->mIndices[2] );
+	}
+
+	return faceArray;
+
 }
