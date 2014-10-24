@@ -78,7 +78,9 @@ void Model::setUpBuffers(ModelData data)
 
 		}
         else 
+        {
             glBufferData( GL_ARRAY_BUFFER, data.meshes[i].UVs.size() * sizeof(float), &data.meshes[i].UVs[0], GL_STATIC_DRAW);
+        }
 
 		buffers.texturecoords = tbo;
 		glVertexAttribPointer( materials[i].shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
