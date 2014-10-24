@@ -25,7 +25,7 @@ int main( int argc, const char* argv[] )
 	if( !myStorage->readModel(files[0]) )
 		program.quit();
 	
-	Model mod = myStorage->loadModel( files[0] );
+	Model mod = *( myStorage->loadModel( files[0] ) );
 	Object sphere = Object(&mod);
 	sphere.translateBy( {0.0f,0.0f,5.0f} );
 	program.registerObject( &sphere );

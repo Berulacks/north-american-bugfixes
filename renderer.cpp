@@ -15,7 +15,8 @@ void Renderer::render(std::vector<Object*> objects)
 	
 	//Eventually this will be replaced
 	//with a custom datatype
-	const aiScene* scene;
+	//const aiScene* scene;
+    ModelData data;
 	Model* model;
 	Material mat;
 	Program* shader;
@@ -23,7 +24,9 @@ void Renderer::render(std::vector<Object*> objects)
 	for(int i = 0; i < objects.size(); i++)
 	{
 		model = objects[i]->getModel();
-		scene = model->getScene();
+		//scene = model->getScene();
+        //data = model->
+
 
 		for(int j = 0; j < model->numMeshes(); j++)
 		{
@@ -38,7 +41,8 @@ void Renderer::render(std::vector<Object*> objects)
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
 			updateUniforms( *objects[i] );
 			
-			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
+			glDrawElements(GL_TRIANGLES, model->getBCombo(j).numIndices, GL_UNSIGNED_INT, NULL); 
+
 			if( objects[i]->renderBoundingBox )
 			{
 				setActiveProgram( simplePr );

@@ -1,24 +1,38 @@
 #include "model.h"
 
-Model::Model(const aiScene* _scene)
+Model::Model( ModelData data )
 {
-	scene = _scene;
+	//scene = _scene;
+    
+
+    //Read in materials
+    for(int i = 0; i < data.materials.size(); i++)
+    {
+        materials.push_back( data.materials[i] );
+    }
+
+    setUpBuffers( data );
+    
 }
 
-
-void Model::setUpBuffers()
+void Model::setUpBuffers(ModelData data)
 {
 	GLuint vao, vbo, nbo, ibo, tbo;
 
+    int numMeshes = data.numMeshes() ;
+
 	//Lets start with meshes
-	for( int i = 0; i < scene->mNumMeshes; i++)
+	for( int i = 0; i < numMeshes; i++)
 	{
 		glUseProgram( materials[i].shader->getID() );
 
+        unsigned int numVertices = data.meshes[i].positions.size();
+
 		BufferCombo buffers;
-		buffers.name = std::string(scene->mMeshes[i]->mName.C_Str());
-		if(buffers.name.size() <= 0)
-			buffers.name = std::string("NAMELESS_MESH");
+        buffers.numVertices = numVertices;
+        buffers.numIndices = data.meshes[i].indices.size();
+
+		buffers.name = data.meshes[i].name;
 
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
@@ -28,21 +42,19 @@ void Model::setUpBuffers()
 		//Vertices
 		glGenBuffers(1, &vbo);
 		glBindBuffer( GL_ARRAY_BUFFER, vbo );
-		glBufferData( GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * 3 * sizeof(float), scene->mMeshes[i]->mVertices, GL_STATIC_DRAW);
+		glBufferData( GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float), &data.meshes[i].positions[0], GL_STATIC_DRAW);
 		buffers.vertices = vbo;
 		glVertexAttribPointer( materials[i].shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
 		//Indices
 		glGenBuffers(1, &ibo);
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-		unsigned int* indices = generateFaces( scene->mMeshes[i]->mFaces, scene->mMeshes[i]->mNumFaces );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, scene->mMeshes[i]->mNumFaces * 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, data.meshes[i].indices.size() * sizeof(unsigned int), &data.meshes[i].indices[0], GL_STATIC_DRAW);
 		buffers.indices = ibo;
-		delete[] indices;
 
 		//Normals
 		glGenBuffers(1, &nbo);
 		glBindBuffer( GL_ARRAY_BUFFER, nbo );
-		glBufferData( GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * 3 * sizeof(float), scene->mMeshes[i]->mNormals, GL_STATIC_DRAW);
+		glBufferData( GL_ARRAY_BUFFER, data.meshes[i].normals.size() * 3 * sizeof(float), &data.meshes[i].normals[0], GL_STATIC_DRAW);
 		buffers.normals = nbo;
 		glVertexAttribPointer( materials[i].shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
 
@@ -50,35 +62,27 @@ void Model::setUpBuffers()
 		glGenBuffers(1, &tbo);
 		glBindBuffer( GL_ARRAY_BUFFER, tbo );
 		
-		//float *texCoords = (float *)malloc(sizeof(float)*2*scene->mMeshes[i]->mNumVertices);
-		float *texCoords = new float[2 * scene->mMeshes[i]->mNumVertices];
-
-		if(scene->mMeshes[i]->HasTextureCoords(0))
-		{
-
-			for (unsigned int k = 0; k < scene->mMeshes[i]->mNumVertices; ++k) {
-
-				texCoords[k*2]   = scene->mMeshes[i]->mTextureCoords[0][k].x;
-				texCoords[k*2+1] = scene->mMeshes[i]->mTextureCoords[0][k].y; 
-			}
-
-		}
-		else
+		if( ! data.meshes[i].hasUVs() )
 		{
 			//We don't have any texcoords, so lets generate our own.
-			for (unsigned int k = 0; k < scene->mMeshes[i]->mNumVertices; ++k) 
+            float *texCoords = new float[2 * numVertices];
+
+			for (unsigned int k = 0; k < numVertices; ++k) 
 			{
-				texCoords[k*2] = scene->mMeshes[i]->mVertices[k].x;
-				texCoords[k*2+1] = scene->mMeshes[i]->mVertices[k].z;
+				texCoords[k*2] = data.meshes[i].positions[k].x;
+				texCoords[k*2+1] = data.meshes[i].positions[k].z;
 			}
 
+            glBufferData( GL_ARRAY_BUFFER, numVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
+            delete[] texCoords;
+
 		}
-		glBufferData( GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * 2 * sizeof(float), texCoords, GL_STATIC_DRAW);
+        else 
+            glBufferData( GL_ARRAY_BUFFER, data.meshes[i].UVs.size() * sizeof(float), &data.meshes[i].UVs[0], GL_STATIC_DRAW);
 
 		buffers.texturecoords = tbo;
 		glVertexAttribPointer( materials[i].shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
 
-		delete[] texCoords;
 
 		glEnableVertexAttribArray(materials[i].shader->getAttrib("theV"));
 		glEnableVertexAttribArray(materials[i].shader->getAttrib("theN"));
@@ -91,11 +95,11 @@ void Model::setUpBuffers()
 		glm::vec3 max = glm::vec3(FLT_MIN);
 		glm::vec3 vert, comp;
 
-		for(int j = 0; j < scene->mMeshes[i]->mNumVertices; j++)
+		for(int j = 0; j < numVertices; j++)
 		{
-			vert.x = scene->mMeshes[i]->mVertices[j].x;
-			vert.y = scene->mMeshes[i]->mVertices[j].y;
-			vert.z = scene->mMeshes[i]->mVertices[j].z;
+			vert.x = data.meshes[i].positions[j].x;
+			vert.y = data.meshes[i].positions[j].y;
+			vert.z = data.meshes[i].positions[j].z;
 
 			if( vert.x < min.x )
 				min.x = vert.x;

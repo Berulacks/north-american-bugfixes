@@ -99,18 +99,17 @@ bool Storage::readFile(std::string filename, std::string* target)
 //After this step, a Model object is produced and
 //ready to be rendered. (this is the preferred way
 //to create models)
-Model Storage::loadModel( const char* name )
+Model *Storage::loadModel( const char* name )
 {
 	if(rawModels.size() == 0 || rawModels.find( std::string(name) ) == rawModels.end() )
 	{
 		printf("[ERROR] Can't load Model: model %s has not been read into the program, yet!\n", name);
-		return NULL;
 	}
 	printf("Loading Model %s\n", name);
 	ModelData scene = rawModels[std::string(name)];
 	Model model = Model( scene );
 
-	aiString aiMatName;
+	/*aiString aiMatName;
 	std::string matName;
 	printf("Setting up materials...\n");
 
@@ -135,9 +134,10 @@ Model Storage::loadModel( const char* name )
 
 	Model* pointer = new Model(model);
 	printf("Loading model %s into storage!\n", name);
-	models.emplace( std::string(name), pointer );
+	models.emplace( std::string(name), pointer );*/
+    models.emplace( std::string( name ), model );
 	
-	return model;
+	return &models[ name ];
 
 }
 
@@ -194,6 +194,12 @@ bool Storage::readModel( const char* filePath )
     {
             MeshData rawMesh;
 
+            rawMesh.name = std::string( tempScene->mMeshes[i]->mName.C_Str() );
+            if( rawMesh.name.size() <= 0 )
+            {
+                rawMesh.name = std::string( "NAMELESS_MESH" );
+            }
+
             int numVertices;
             //Vertices
             if( tempScene->mMeshes[i]->HasPositions() )
@@ -242,10 +248,8 @@ bool Storage::readModel( const char* filePath )
             {
                     for(int t = 0; t < numVertices; t++)
                     {
-
                             rawMesh.UVs.push_back( tempScene->mMeshes[i]->mTextureCoords[0][t].x );
                             rawMesh.UVs.push_back( tempScene->mMeshes[i]->mTextureCoords[0][t].y );
-
                     }
 
             }
