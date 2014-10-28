@@ -17,6 +17,8 @@ Model::Model( ModelData data )
 
 void Model::setUpBuffers(ModelData data)
 {
+    Program::checkGLErrors( "beginning of model init" );
+
 	GLuint vao, vbo, nbo, ibo, tbo;
 
     int numMeshes = data.numMeshes() ;
@@ -24,7 +26,8 @@ void Model::setUpBuffers(ModelData data)
 	//Lets start with meshes
 	for( int i = 0; i < numMeshes; i++)
 	{
-		glUseProgram( materials[i].shader->getID() );
+        Material mat = data.meshes[i].material;
+		glUseProgram( mat.shader->getID() );
 
         unsigned int numVertices = data.meshes[i].positions.size();
 
@@ -37,14 +40,17 @@ void Model::setUpBuffers(ModelData data)
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 		buffers.vao = vao;
-		//Storage::checkGLErrors("VAO creation");
 
 		//Vertices
 		glGenBuffers(1, &vbo);
+		Program::checkGLErrors("VBO creation");
 		glBindBuffer( GL_ARRAY_BUFFER, vbo );
+        Program::checkGLErrors( "VBO Binding" );
 		glBufferData( GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float), &data.meshes[i].positions[0], GL_STATIC_DRAW);
+        Program::checkGLErrors( "BufferData for vertices" );
 		buffers.vertices = vbo;
-		glVertexAttribPointer( materials[i].shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
+		glVertexAttribPointer( mat.shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
+        Program::checkGLErrors( "Vertex attrib for vertices" );
 		//Indices
 		glGenBuffers(1, &ibo);
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
@@ -55,8 +61,10 @@ void Model::setUpBuffers(ModelData data)
 		glGenBuffers(1, &nbo);
 		glBindBuffer( GL_ARRAY_BUFFER, nbo );
 		glBufferData( GL_ARRAY_BUFFER, data.meshes[i].normals.size() * 3 * sizeof(float), &data.meshes[i].normals[0], GL_STATIC_DRAW);
+        Program::checkGLErrors( "BufferData for normals" );
 		buffers.normals = nbo;
-		glVertexAttribPointer( materials[i].shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
+		glVertexAttribPointer( mat.shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
+        Program::checkGLErrors( "Vertex attrib for normals" );
 
 		//Texture coords
 		glGenBuffers(1, &tbo);
@@ -81,14 +89,19 @@ void Model::setUpBuffers(ModelData data)
         {
             glBufferData( GL_ARRAY_BUFFER, data.meshes[i].UVs.size() * sizeof(float), &data.meshes[i].UVs[0], GL_STATIC_DRAW);
         }
+        Program::checkGLErrors( "4" );
 
 		buffers.texturecoords = tbo;
-		glVertexAttribPointer( materials[i].shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
+		glVertexAttribPointer( mat.shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
+        Program::checkGLErrors( "Vertex attrib for textures" );
 
 
-		glEnableVertexAttribArray(materials[i].shader->getAttrib("theV"));
-		glEnableVertexAttribArray(materials[i].shader->getAttrib("theN"));
-		glEnableVertexAttribArray(materials[i].shader->getAttrib("tex_in"));
+		glEnableVertexAttribArray(mat.shader->getAttrib("theV"));
+        Program::checkGLErrors( "Enable vertex atrib for vertices" );
+		glEnableVertexAttribArray(mat.shader->getAttrib("theN"));
+        Program::checkGLErrors( "Enable vertex atrib for normals" );
+		glEnableVertexAttribArray(mat.shader->getAttrib("tex_in"));
+        Program::checkGLErrors( "Enable vertex atrib for textures" );
 
 		glBindVertexArray( 0 );
 
@@ -148,11 +161,13 @@ void Model::setUpBuffers(ModelData data)
 		glBufferData( GL_ARRAY_BUFFER, 8 * 3 * sizeof(float), cube, GL_STATIC_DRAW );
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		buffers.boundingBox = bBoxVbo;
+        Program::checkGLErrors( "7" );
 
 
 		bufferIDs.push_back( buffers );
 	}
 	glUseProgram( 0 );
+    Program::checkGLErrors( "end of model init" );
 
 
 }
