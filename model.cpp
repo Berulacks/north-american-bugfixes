@@ -166,9 +166,9 @@ void Model::setUpBuffers(ModelData data)
         //Add material index to storage
         //(so the renderer can load the right material
         //from the model object, for each mesh)
-        for(int i = 0; i < materials.size(); i++)
-            if(materials[i].name == data.meshes[i].material.name)
-                buffers.matIndex = i;
+        for(int j = 0; j < materials.size(); j++)
+            if(materials[j].name == data.meshes[i].material.name)
+                buffers.matIndex = j;
 
 
 		bufferIDs.push_back( buffers );
