@@ -20,6 +20,9 @@ pedestal
 # apitrace
 *.trace
 
+# gdb
+.gdbinit
+
 #textures
 textures/*
 
