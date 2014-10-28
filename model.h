@@ -22,7 +22,7 @@ struct MeshData
         //Stored in pairs of ints
         //so...
         //x1,y1,x2,y2,x3,y3,...etc.
-        std::vector<unsigned int> UVs;
+        std::vector<float> UVs;
 
         Material material;
 
