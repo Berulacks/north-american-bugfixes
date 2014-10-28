@@ -186,7 +186,9 @@ bool Storage::readModel( const char* filePath )
 	{
 		printf("Initializing material %i...\n", i);
 
-        rawData.materials.push_back( initMaterial( tempScene->mMaterials[i], shader ) );
+        Material toAdd = initMaterial( tempScene->mMaterials[i], shader );
+
+        rawData.materials.push_back( toAdd );
 	}
 
     //Read meshes
@@ -253,6 +255,9 @@ bool Storage::readModel( const char* filePath )
                     }
 
             }
+
+            //MATERIAL FOR MESH:
+            rawMesh.material = rawData.materials[tempScene->mMeshes[i]->mMaterialIndex];
 
             rawData.meshes.push_back(rawMesh);
     }
@@ -360,6 +365,7 @@ Material Storage::initMaterial( aiMaterial* material, Program* shader )
 
 	return mat;
 }
+
 void Storage::initMaterials()
 {
 	Program* prog = new Program("./shaders/vertex.vs", "./shaders/fragment.fs");

@@ -32,7 +32,7 @@ void Renderer::render(std::vector<Object*> objects)
 
 		for(int j = 0; j < model->numMeshes(); j++)
 		{
-			mat = model->materials[j];
+			mat = model->materials[ model->getBCombo(j).matIndex ];
 			shader = mat.shader;
 
 			setActiveProgram( shader );

@@ -8,6 +8,7 @@ struct BufferCombo
 
     unsigned int numVertices;
     unsigned int numIndices;
+    unsigned int matIndex;
 };
 
 //A simple struct to store
