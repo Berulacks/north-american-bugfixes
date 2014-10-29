@@ -37,6 +37,8 @@ class Program
 		GLuint getID(void);
 		bool isReady(void);
 
+		static bool checkGLErrors(const char* description="");
+
 		//void updateUniforms(glm::mat4 camera, glm::mat4 projection, Object obj);
 
 	private:
@@ -49,7 +51,6 @@ class Program
 		bool initShader(GLenum type, std::string file);
 		bool readFile(std::string filename, std::string* target);
 
-		static bool checkGLErrors(const char* description="");
 
 
 };

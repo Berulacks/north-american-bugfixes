@@ -25,7 +25,7 @@ int main( int argc, const char* argv[] )
 	if( !myStorage->readModel(files[0]) )
 		program.quit();
 	
-	Model mod = myStorage->loadModel( files[0] );
+	Model mod = *( myStorage->loadModel( files[0] ) );
 	Object sphere = Object(&mod);
 	sphere.translateBy( {0.0f,0.0f,5.0f} );
 	program.registerObject( &sphere );
@@ -34,7 +34,7 @@ int main( int argc, const char* argv[] )
 	printf("Our model has %i meshes.\n", mod.numMeshes() );
 	printf("The first mesh of our model is called %s\n", mod.getBCombo(0).name.c_str());
 	printf("...and its material is called %s\n", mod.materials[0].name.c_str());
-	printf("And it looks for a texture called%s\n", mod.materials[0].texDiffuse_name.c_str() );
+	printf("And it looks for a texture called %s\n", mod.materials[0].texDiffuse_name.c_str() );
 
 	program.start( SDL_GetTicks() );
 

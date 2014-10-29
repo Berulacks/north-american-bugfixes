@@ -51,4 +51,6 @@ void Material::updateVariables(aiMaterial* mtl)
 
         unsigned int max;
         aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);
+
+        ready = true;
 }

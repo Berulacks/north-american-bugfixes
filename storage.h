@@ -57,7 +57,7 @@ class Storage
 		//then have a way to create models, and store them in a 
 		//vector.
 		//
-		Model loadModel(const char* name);
+		Model *loadModel(const char* name);
 		bool loadTexture(const char* filePath, const char* name);
 
 		//Create a solid, single colour texture
@@ -65,13 +65,15 @@ class Storage
 		//a texture)
 		GLuint createTexture(glm::vec3 colour);
 
-		bool initMaterial(aiMaterial* material, Program* shader);
+		Material initMaterial(aiMaterial* material, Program* shader);
 
 		Material getMaterial(const char* name);
-		Model getModel(const char* name) { return *models[ std::string(name) ]; };
+		Model getModel(const char* name) { return models[ std::string(name) ]; };
+
+		static std::vector<unsigned int> generateFacesVector(aiFace* assimpFaceArray, int numFaces);
 	private:
-		std::map<std::string, const aiScene*> rawModels;
-		std::map<std::string, Model*> models;
+		std::map<std::string, ModelData> rawModels;
+		std::map<std::string, Model> models;
 		std::map<std::string, GLuint> textureIDs;
 		std::map<std::string, Material> materials;
 		std::vector<Program> programs;

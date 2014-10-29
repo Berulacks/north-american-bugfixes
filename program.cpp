@@ -105,8 +105,32 @@ bool Program::checkGLErrors(const char* description)
 
 	while(error != GL_NO_ERROR)
 	{
-		printf("[ERROR]@[%s]: %s\n", description, gluErrorString(error));
-		error = glGetError();
+        std::string errorType;
+
+        switch(error)
+        {
+            case GL_INVALID_OPERATION:
+                errorType = "[GL_INVALID_OPERATION]";
+                break;
+            case GL_INVALID_ENUM:
+                errorType = "[GL_INVALID_ENUM]";
+                break;
+            case GL_INVALID_VALUE:
+                errorType = "[GL_INVALID_VALUE]";
+                break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION:
+                errorType = "[GL_INVALID_FRAMEBUFFER_OPERATION]";
+                break;
+            case GL_OUT_OF_MEMORY:
+                errorType = "[GL_OUT_OF_MEMORY]";
+                break;
+            default:
+                errorType = "[UNKOWN_TYPE]";
+        }
+        
+		printf("[ERROR]%s@[%s]: %s\n", errorType.c_str(), description, gluErrorString(error));
+
+        error = glGetError();
 		hadError = true;
 	}
 
