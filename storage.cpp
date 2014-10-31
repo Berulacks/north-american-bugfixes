@@ -42,7 +42,7 @@ bool Storage::loadTexture(const char* filePath, const char* name)
 	base.append( std::string(filePath) );
 	printf("Loading texture %s ... \n", base.c_str());
 	unsigned char* pixels = SOIL_load_image(base.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
-	const int size = width* 3 * height;
+    const int size = glm::abs( width* 3 * height );
 	unsigned char* finalPixels = new unsigned char[size];
 
 	//Flip the rows of our texture

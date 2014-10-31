@@ -20,6 +20,9 @@ pedestal
 #textures
 textures/*
 
+#gdb files
+.gdbinit
+
 # Models I don't want in
 # version control
 rungholt
