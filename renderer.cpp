@@ -7,7 +7,9 @@ Renderer::Renderer()
 void Renderer::render(std::vector<Object*> objects)
 {
 	glClearColor(1.0f,0.8f,0.8f,1.0f);
+    Storage::checkGLErrors( "glClearColor" );
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    Storage::checkGLErrors( "glClear" );
 
 
 	glm::mat4 mv, mvp;
@@ -15,7 +17,8 @@ void Renderer::render(std::vector<Object*> objects)
 	
 	//Eventually this will be replaced
 	//with a custom datatype
-	const aiScene* scene;
+	//const aiScene* scene;
+    ModelData data;
 	Model* model;
 	Material mat;
 	Program* shader;
@@ -23,22 +26,28 @@ void Renderer::render(std::vector<Object*> objects)
 	for(int i = 0; i < objects.size(); i++)
 	{
 		model = objects[i]->getModel();
-		scene = model->getScene();
+		//scene = model->getScene();
+        //data = model->
+
 
 		for(int j = 0; j < model->numMeshes(); j++)
 		{
-			mat = model->materials[j];
+			mat = model->materials[ model->getBCombo(j).matIndex ];
 			shader = mat.shader;
 
 			setActiveProgram( shader );
+            Storage::checkGLErrors( "Setting active program" );
 
 			glBindVertexArray( model->getVAO( j ) );
+            Storage::checkGLErrors("Binding vertex array");
 			glBindTexture( GL_TEXTURE_2D, mat.texDiffuse );
+            Storage::checkGLErrors( "Binding texture" );
 			
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
 			updateUniforms( *objects[i] );
 			
-			glDrawElements(GL_TRIANGLES, scene->mMeshes[j]->mNumFaces * 3, GL_UNSIGNED_INT, NULL); 
+			glDrawElements(GL_TRIANGLES, model->getBCombo(j).numIndices, GL_UNSIGNED_INT, NULL); 
+
 			if( objects[i]->renderBoundingBox )
 			{
 				setActiveProgram( simplePr );
@@ -72,6 +81,7 @@ void Renderer::setActiveProgram(Program *toSet)
 	if(toSet != 0)
 	{
 		glUseProgram( toSet->getID() );
+        Storage::checkGLErrors( "glUseProgram: toSet->getID()" );
 		activeProgram = toSet;
 	}
 	else

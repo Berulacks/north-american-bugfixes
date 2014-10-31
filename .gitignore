@@ -17,6 +17,12 @@ runfile
 pedestal
 *.pyc
 
+# apitrace
+*.trace
+
+# gdb
+.gdbinit
+
 #textures
 textures/*
 
