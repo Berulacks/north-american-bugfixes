@@ -1,18 +1,6 @@
-#include "engine.h"
-#include <BulletDynamics/btBulletDynamicsCommon.h>
+#include "pedestal.h"
 
-Renderer* myRenderer;
-Storage* myStorage;
-Engine* myEngine;
-
-//Our sphere (in-engine representation)
-Object* sphere;
-
-btDiscreteDynamicsWorld* dynamicsWorld;
-//Our sphere (bullet representation)
-btRigidBody* fallRigidBody;
-
-void processEvents(float physT)
+void Pedestal::processEvents(float physT)
 {
 	SDL_Event event;
 	SDL_Keycode key;
@@ -79,7 +67,7 @@ void processEvents(float physT)
 	myRenderer->camera = glm::lookAt(myRenderer->cameraPos, myRenderer->cameraPos + lookat, glm::vec3(0, 1, 0));
 }
 
-void initBullet(void)
+void Pedestal::initBullet(void)
 {
     btBroadphaseInterface* broadphase = new btDbvtBroadphase();
     btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -108,11 +96,12 @@ void initBullet(void)
 
     btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
     fallRigidBody = new btRigidBody(fallRigidBodyCI);
+    bodies.push_back( fallRigidBody );
     dynamicsWorld->addRigidBody(fallRigidBody);
 
 }
 
-void step(float physT)
+void Pedestal::step(float physT)
 {
 
     dynamicsWorld->stepSimulation(physT, 8);
@@ -122,12 +111,19 @@ void step(float physT)
     GLfloat* matrix = new GLfloat[15];
     trans.getOpenGLMatrix( matrix );
 
-    sphere->setTranslation( { matrix[12], matrix[13], matrix[14] } );
-    printf("Trans is %f, %f, %f!\n", matrix[12], matrix[13], matrix[14] );
+    for(int i = 0; i < objs.size(); i++)
+    {
 
+        bodies[i]->getMotionState()->getWorldTransform(trans);
+
+        GLfloat* matrix = new GLfloat[15];
+        trans.getOpenGLMatrix( matrix );
+        objs[i]->setTranslation( { matrix[12], matrix[13], matrix[14] } );
+        delete[] matrix;
+    }
 }
 
-int main( int argc, const char* argv[] )
+Pedestal::Pedestal( int argc, const char* argv[] )
 {
 	Engine program;
 	if( !program.init(argc, argv) )
@@ -137,8 +133,9 @@ int main( int argc, const char* argv[] )
 
 	printf("Program initialized, let's add a callback!\n");
 
-	program.registerCallback( processEvents );
-    program.registerCallback( step );
+    using std::placeholders::_1;
+	program.registerCallback( std::bind( &Pedestal::processEvents, this, _1 ) );
+    program.registerCallback(std::bind( &Pedestal::step, this, _1 ));
 	
 	myStorage = program.getStorage();
 	myRenderer = program.getRenderer();
@@ -155,9 +152,10 @@ int main( int argc, const char* argv[] )
 		program.quit();
 	
 	Model mod = *( myStorage->loadModel( files[0] ) );
-	sphere = new Object(&mod);
+	Object* sphere = new Object(&mod);
 	sphere->translateBy( {0.0f,0.0f,5.0f} );
 	program.registerObject( sphere );
+    objs.push_back( sphere );
 
 	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
 	printf("Our model has %i meshes.\n", mod.numMeshes() );
@@ -176,7 +174,12 @@ int main( int argc, const char* argv[] )
 
 
 	program.start( SDL_GetTicks() );
-
-	return 0;
 	
+}
+
+
+int main( int argc, const char* argv[] )
+{
+    Pedestal pedestal(argc, argv);
+    return 0;
 }
