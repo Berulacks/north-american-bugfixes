@@ -86,70 +86,14 @@ void Engine::processEvents()
 	SDL_Keycode key;
 	glm::vec3 lookat;
 
-	while (SDL_PollEvent(&event)) 
+	/*while (SDL_PollEvent(&event)) 
 	{
 		switch(event.type)
 		{
-			case SDL_KEYDOWN:
-				key = event.key.keysym.sym;
-				if(key == SDLK_SPACE
-						||
-					key == SDLK_RETURN
-						||
-					key == SDLK_ESCAPE)
-
-					active = false;
-
-				if(key == SDLK_w)
-					renderer.cameraPos -= glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(renderer.camera) * physT;
-
-				if(key == SDLK_s)
-					renderer.cameraPos += glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(renderer.camera) * physT;
-
-				if(key == SDLK_a)
-					renderer.cameraPos -= glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(renderer.camera) * physT;
-
-				if(key == SDLK_d)
-					renderer.cameraPos += glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(renderer.camera) * physT;
-
-				if(key == SDLK_f)
-					renderer.toggleFullScreen(mainWindow);
-				if(key == SDLK_UP)
-					objs[0]->setScale( {5,5,5} );
-				if(key == SDLK_DOWN)
-					objs[0]->setScale( {1,1,1} );
-				if(key == SDLK_b)
-					objs[0]->renderBoundingBox = !objs[0]->renderBoundingBox;
-
-				break;
-
-			case SDL_MOUSEMOTION:
-
-				renderer.xRot -= event.motion.xrel * 0.001;
-				renderer.yRot -= event.motion.yrel * 0.001;
-				break;
-		}
-
-	}
-
-
-
-	if(renderer.xRot < -M_PI)
-		renderer.xRot += M_PI * 2;
-
-	else if(renderer.xRot > M_PI)
-		renderer.xRot -= M_PI * 2;
-
-	if(renderer.yRot < -M_PI / 2)
-		renderer.yRot = -M_PI / 2;
-	if(renderer.yRot > M_PI / 2)
-		renderer.yRot = M_PI / 2;
-
-	lookat.x = sinf(renderer.xRot) * cosf(renderer.yRot);
-	lookat.y = sinf(renderer.yRot);
-	lookat.z = cosf(renderer.xRot) * cosf(renderer.yRot);
-
-	renderer.camera = glm::lookAt(renderer.cameraPos, renderer.cameraPos + lookat, glm::vec3(0, 1, 0));
+            //TODO: Send events to their rightful place
+            break;
+	    }
+    }*/
 }
 bool Engine::registerCallback( Callback function )
 {

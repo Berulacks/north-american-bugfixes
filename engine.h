@@ -58,6 +58,8 @@ class Engine
 		Renderer* getRenderer(void) { return &renderer; };
 		Storage* getStorage(void) { return &storage; };
 
+        SDL_Window* getWindow(void) { return mainWindow; };
+
 	private:
 		std::vector<Object*> objs;
 		//Outside functions to be appended
