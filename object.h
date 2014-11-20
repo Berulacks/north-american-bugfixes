@@ -19,6 +19,7 @@ class Object
 		void translateBy(glm::vec3);
         void setTranslation(glm::vec3 translation) { position = translation; };
 		void setScale(glm::vec3 target){ scale = target; };
+        void setTransform( glm::mat4 trans );
 
 		//Should we apply physics steps to this object?
 		bool isPhysicsObject = false;
@@ -41,6 +42,11 @@ class Object
 
 		glm::vec3 velocity;
 		glm::vec3 rotVelocity;
+
+        //THIS IS OPTIONAL
+        //THIS OVERRIDES "position" etc.
+        bool hasTransform = false;
+        glm::mat4 transform;
 
 		//By default, any object will
 		//use the material stored in

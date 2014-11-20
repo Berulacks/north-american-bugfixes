@@ -36,6 +36,11 @@ void Pedestal::processEvents(float physT)
 				if(key == SDLK_f)
 					myRenderer->toggleFullScreen(myEngine->getWindow() );
 
+                if(key == SDLK_o)
+                    addObj( &mod, false, 1, findCameraPoint() );
+                if(key == SDLK_p)
+                    addObj( &cube, true, 1, findCameraPoint() );
+
 				break;
 
 			case SDL_MOUSEMOTION:
@@ -67,6 +72,17 @@ void Pedestal::processEvents(float physT)
 	myRenderer->camera = glm::lookAt(myRenderer->cameraPos, myRenderer->cameraPos + lookat, glm::vec3(0, 1, 0));
 }
 
+glm::vec3 Pedestal::findCameraPoint()
+{
+    glm::vec3 lookat;
+	lookat.x = sinf(myRenderer->xRot) * cosf(myRenderer->yRot);
+	lookat.y = sinf(myRenderer->yRot);
+	lookat.z = cosf(myRenderer->xRot) * cosf(myRenderer->yRot);
+
+    return myRenderer->cameraPos + lookat * 5.0f;
+}
+
+
 void Pedestal::initBullet(void)
 {
     btBroadphaseInterface* broadphase = new btDbvtBroadphase();
@@ -85,20 +101,34 @@ void Pedestal::initBullet(void)
     btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0, groundMotionState, groundShape, btVector3(0, 0, 0));
     btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
     dynamicsWorld->addRigidBody(groundRigidBody);
+}
+
+void Pedestal::addObj(Model *model, bool isCube, float radius, glm::vec3 position)
+{
 
 
-    btCollisionShape* fallShape = new btSphereShape(2);
-    btDefaultMotionState* fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 50, 15)));
+    btCollisionShape* fallShape;
+    if(!isCube) 
+        fallShape = new btSphereShape(radius);
+    else
+        fallShape = new btBoxShape( btVector3(1,1,1) );
+
+    btDefaultMotionState* fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(position.x, position.y, position.z) ) );
 
     btScalar mass = 0.2;
     btVector3 fallInertia(0, 0, 0);
     fallShape->calculateLocalInertia(mass, fallInertia);
 
     btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
-    fallRigidBody = new btRigidBody(fallRigidBodyCI);
-    bodies.push_back( fallRigidBody );
-    dynamicsWorld->addRigidBody(fallRigidBody);
+    btRigidBody* body = new btRigidBody(fallRigidBodyCI);
+    bodies.push_back( body );
+    dynamicsWorld->addRigidBody(body);
 
+
+	Object* obj = new Object(model);
+	obj->translateBy( {0.0f,0.0f,5.0f} );
+	myEngine->registerObject( obj );
+    objs.push_back( obj );
 }
 
 void Pedestal::step(float physT)
@@ -106,20 +136,18 @@ void Pedestal::step(float physT)
 
     dynamicsWorld->stepSimulation(physT, 8);
     btTransform trans;
-    fallRigidBody->getMotionState()->getWorldTransform(trans);
-
-    GLfloat* matrix = new GLfloat[15];
-    trans.getOpenGLMatrix( matrix );
+    glm::mat4 finalT;
 
     for(int i = 0; i < objs.size(); i++)
     {
 
         bodies[i]->getMotionState()->getWorldTransform(trans);
 
-        GLfloat* matrix = new GLfloat[15];
-        trans.getOpenGLMatrix( matrix );
-        objs[i]->setTranslation( { matrix[12], matrix[13], matrix[14] } );
-        delete[] matrix;
+        //objs[i]->setTranslation( { trans.getOrigin().x(), trans.getOrigin().y(), trans.getOrigin().z() } );
+        
+        trans.getOpenGLMatrix( glm::value_ptr( finalT ) );
+
+        objs[i]->setTransform( finalT );
     }
 }
 
@@ -150,18 +178,17 @@ Pedestal::Pedestal( int argc, const char* argv[] )
 
 	if( !myStorage->readModel(files[0]) )
 		program.quit();
+    if( !myStorage->readModel( "./models/cube/cube.obj" ) )
+        program.quit();
 	
-	Model mod = *( myStorage->loadModel( files[0] ) );
-	Object* sphere = new Object(&mod);
-	sphere->translateBy( {0.0f,0.0f,5.0f} );
-	program.registerObject( sphere );
-    objs.push_back( sphere );
+	mod = *( myStorage->loadModel( files[0] ) );
+    cube = *( myStorage->loadModel( "./models/cube/cube.obj" ) );
 
-	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
+	/*printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
 	printf("Our model has %i meshes.\n", mod.numMeshes() );
 	printf("The first mesh of our model is called %s\n", mod.getBCombo(0).name.c_str());
 	printf("...and its material is called %s\n", mod.materials[0].name.c_str());
-	printf("And it looks for a texture called %s\n", mod.materials[0].texDiffuse_name.c_str() );
+	printf("And it looks for a texture called %s\n", mod.materials[0].texDiffuse_name.c_str() );*/
 
     initBullet();
 
@@ -169,9 +196,8 @@ Pedestal::Pedestal( int argc, const char* argv[] )
         program.quit();
 
     Object plane = Object( myStorage->loadModel( "./models/plane/plane.obj" ) );
-    plane.setTranslation( {0, 1, 10} );
+    plane.setTranslation( {0, 0, 10} );
     program.registerObject( &plane );
-
 
 	program.start( SDL_GetTicks() );
 	
