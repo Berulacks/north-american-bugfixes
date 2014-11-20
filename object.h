@@ -10,12 +10,14 @@ class Object
 		//Lets just say we're using SI units
 		float mass = 1.0f;
 
+        Object() { scale = {1,1,1}; };
 		Object(Model* mod, Material* mat = NULL);
 		Model* getModel(void) { return model; };
 		glm::mat4 getTransform(void);
 		Material* getMaterial(void);
 
 		void translateBy(glm::vec3);
+        void setTranslation(glm::vec3 translation) { position = translation; };
 		void setScale(glm::vec3 target){ scale = target; };
 
 		//Should we apply physics steps to this object?
