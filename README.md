@@ -7,9 +7,9 @@ An opengl 3d renderer. Github recommended the title, and I happen to think it's 
 
 Nab requires:
 
-* ASSIMP
-* SOIL
-* SDL2
+* [ASSIMP](http://assimp.sourceforge.net)
+* [SOIL](http://www.lonesock.net/soil.html)
+* [SDL2](https://www.libsdl.org/)
 * OpenGL 3.3+
 
 ###Building
