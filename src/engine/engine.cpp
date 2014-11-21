@@ -26,9 +26,9 @@ void Engine::start(int lastFrame)
 {
     while(active)
     {
-        if( lastFrame == 0)
+        if(lastFrame == 0)
             lastFrame = SDL_GetTicks();
-
+        
         //Lets process our events, first
         processEvents();
 
@@ -61,6 +61,8 @@ void Engine::start(int lastFrame)
 
         renderer.render(objs);
         SDL_GL_SwapWindow(mainWindow);
+
+        lastFrame = currentTime;
     }
 
     quit();
