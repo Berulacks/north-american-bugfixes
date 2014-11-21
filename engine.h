@@ -1,9 +1,7 @@
+#include <functional>
 #include "renderer.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-//For functions that our main loop will call.
-typedef void (*Callback)(const float deltaT);
 
 class Engine
 {
@@ -15,7 +13,7 @@ class Engine
 
 	GLuint program;
 
-        std::map<const char*,GLuint> gpuLocations;
+    std::map<const char*,GLuint> gpuLocations;
 
 	glm::mat4 camera;
 	glm::mat4 projection;
@@ -53,7 +51,7 @@ class Engine
 		//Add a custom function to our update loop.
 		//This is for integrating your own program
 		//with the engine's update loop.
-		bool registerCallback(Callback function);
+		bool registerCallback(std::function<void(float)> function);
 
 		Renderer* getRenderer(void) { return &renderer; };
 		Storage* getStorage(void) { return &storage; };
@@ -66,7 +64,7 @@ class Engine
 		//to our main update loop. These
 		//functions will be passed a 
 		//deltaT value (in seconds)
-		std::vector<Callback> functions;
+		std::vector< std::function<void(float)> > functions;
 		void render(void);
 		void processEvents(void);
 		bool initSDL(void);

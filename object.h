@@ -10,13 +10,18 @@ class Object
 		//Lets just say we're using SI units
 		float mass = 1.0f;
 
+        Object() { scale = {1,1,1}; };
 		Object(Model* mod, Material* mat = NULL);
 		Model* getModel(void) { return model; };
 		glm::mat4 getTransform(void);
 		Material* getMaterial(void);
 
 		void translateBy(glm::vec3);
+        void setTranslation(glm::vec3 translation) { position = translation; };
 		void setScale(glm::vec3 target){ scale = target; };
+        void setTransform( glm::mat4 trans );
+
+        glm::vec3 getPosition(void);
 
 		//Should we apply physics steps to this object?
 		bool isPhysicsObject = false;
@@ -39,6 +44,11 @@ class Object
 
 		glm::vec3 velocity;
 		glm::vec3 rotVelocity;
+
+        //Should we use a static transform
+        //instead of recalculating every frame?
+        bool useTransform = false;
+        glm::mat4 transform;
 
 		//By default, any object will
 		//use the material stored in

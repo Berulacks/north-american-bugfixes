@@ -66,7 +66,7 @@ void Engine::start(int lastFrame)
 
 		timeStepsToProcess -= deltaT;
 		for(int i = 0; i < functions.size(); i++)
-			(*functions[i])(physT);
+			functions[i](physT);
 
 	}
 
@@ -95,15 +95,16 @@ void Engine::processEvents()
 	    }
     }*/
 }
-bool Engine::registerCallback( Callback function )
+
+bool Engine::registerCallback( std::function<void(float)> function )
 {
-	if( std::find(functions.begin(), functions.end(), function) == functions.end())
-	{
-		functions.push_back( function );
-		printf("Added callback!\n");
-		return true;
-	}
-	return false;
+	/*if( std::find(functions.begin(), functions.end(), function) == functions.end())
+	{*/
+    functions.push_back( function );
+    printf("Added callback!\n");
+    return true;
+	//}
+	//return false;
 
 }
 bool Engine::registerObject(Object* toAdd)
