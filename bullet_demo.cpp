@@ -48,6 +48,8 @@ void BulletDemo::processEvents(float physT)
 				myRenderer->xRot -= event.motion.xrel * 0.001;
 				myRenderer->yRot -= event.motion.yrel * 0.001;
 				break;
+            case SDL_MOUSEBUTTONUP:
+                fireObj();
 		}
 
 	}
@@ -82,6 +84,16 @@ glm::vec3 BulletDemo::findCameraPoint()
     return myRenderer->cameraPos + lookat * 5.0f;
 }
 
+void BulletDemo::fireObj(void)
+{
+    std::pair<Object*,btRigidBody*> pair = addObj( &mod, false, 2, myRenderer->cameraPos );
+    btRigidBody* body = pair.second;
+
+    glm::vec3 velocity = (findCameraPoint() - myRenderer->cameraPos) * 3.0f;
+
+    body->setLinearVelocity( btVector3( velocity.x, velocity.y, velocity.z ) );
+}
+
 
 void BulletDemo::initBullet(void)
 {
@@ -103,7 +115,7 @@ void BulletDemo::initBullet(void)
     dynamicsWorld->addRigidBody(groundRigidBody);
 }
 
-void BulletDemo::addObj(Model *model, bool isCube, float radius, glm::vec3 position)
+std::pair<Object*,btRigidBody*> BulletDemo::addObj(Model *model, bool isCube, float radius, glm::vec3 position)
 {
 
 
@@ -133,6 +145,8 @@ void BulletDemo::addObj(Model *model, bool isCube, float radius, glm::vec3 posit
 
 	myEngine->registerObject( obj );
     objs.push_back( obj );
+
+    return std::pair<Object*,btRigidBody*>(obj, body);
 }
 
 void BulletDemo::step(float physT)
