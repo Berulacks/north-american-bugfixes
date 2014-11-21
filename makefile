@@ -10,7 +10,11 @@ all:
 	ar rcs libNab.a c.o material.o model.o object.o program.o storage.o renderer.o engine.o 
 pedestal:
 	make && \
-	g++ -L. pedestal.cpp -Wwrite-strings -std=c++11 -ggdb -I/usr/include/bullet -lBulletDynamics -lBulletCollision -lLinearMath -lGL -lGLU -lSDL2 -lSOIL -lassimp -lNab -o pedestal
+	g++ -L. pedestal.cpp -Wwrite-strings -std=c++11 -ggdb -lGL -lGLU -lSDL2 -lSOIL -lassimp -lNab -o pedestal
+
+bullet_demo:
+	make && \
+	g++ -L. bullet_demo.cpp -Wwrite-strings -std=c++11 -ggdb -I/usr/include/bullet -lBulletDynamics -lBulletCollision -lLinearMath -lGL -lGLU -lSDL2 -lSOIL -lassimp -lNab -o bullet_demo
 
 clean:
 	rm -f *.o
