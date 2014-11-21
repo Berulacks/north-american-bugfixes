@@ -26,4 +26,4 @@ To build the bullet_demo, run:
 
     make bullet_demo
     
-These commands (and just running make without arguments) will produce binaries in the same directory as the Nab source. Both demoes take a model file path as an argument, which controls what gets rendered on the screen.
+These commands (and just running make without arguments) will produce binaries in the "*build/*" directory. Both demoes take a model file path as an argument, which controls what gets rendered on the screen.

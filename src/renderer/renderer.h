@@ -1,5 +1,5 @@
-#include "storage.h"
-#include "object.h"
+#include "../engine/storage.h"
+#include "../data_structs/object.h"
 
 //A renderer object stores necessary scene data, such 
 //as the camera and projection matrices
