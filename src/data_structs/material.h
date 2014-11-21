@@ -8,31 +8,32 @@
 class Material
 {
 	public:
-		bool ready = false;
-		Program* shader;
-		std::string name;
 
-		glm::vec3 diffuse;
-		glm::vec3 specular;
-		glm::vec3 ambient;
-		glm::vec3 emissive;
+        bool ready = false;
+        Program* shader;
+        std::string name;
 
-		float shininess;
+        glm::vec3 diffuse;
+        glm::vec3 specular;
+        glm::vec3 ambient;
+        glm::vec3 emissive;
 
-		GLuint texDiffuse;
-		std::string texDiffuse_name;
-		GLuint texSpecular;
-		std::string texSpecular_name;
+        float shininess;
 
-		//Update our materials variables
-		//(e.g. diffuse, specular)
-		//with data stored in our aiScene
-		void updateVariables(aiMaterial* mtl);
+        GLuint texDiffuse;
+        std::string texDiffuse_name;
+        GLuint texSpecular;
+        std::string texSpecular_name;
 
-		Material() {};
-		Material(Program* _shader)
-		{
-			shader = _shader;
-		};
+        //Update our materials variables
+        //(e.g. diffuse, specular)
+        //with data stored in our aiScene
+        void updateVariables(aiMaterial* mtl);
+
+        Material() {};
+        Material(Program* _shader)
+        {
+            shader = _shader;
+        };
 
 };
