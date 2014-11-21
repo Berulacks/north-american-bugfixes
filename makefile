@@ -1,4 +1,5 @@
-# .PHONY: all pedestal bullet_demo clean
+.PHONY: all pedestal bullet_demo clean
+
 all:
 	mkdir -p build && \
 	gcc -c -std=c99 -o c.o libs/gl_core_3_3.c && \
@@ -13,12 +14,12 @@ all:
 	rm -f *.o
 pedestal:
 	make && \
-	g++ -L. pedestal.cpp -Wwrite-strings -std=c++11 -ggdb -lGL -lGLU -lSDL2 -lSOIL -lassimp -lNab -o pedestal && \
+	g++ -L./build -I./src ./src/examples/pedestal.cpp -Wwrite-strings -std=c++11 -ggdb -lGL -lGLU -lSDL2 -lSOIL -lassimp -I./src -lNab -o build/pedestal && \
 	rm -f *.o
 
 bullet_demo:
 	make && \
-	g++ -L. bullet_demo.cpp -Wwrite-strings -std=c++11 -ggdb -I/usr/include/bullet -lBulletDynamics -lBulletCollision -lLinearMath -lGL -lGLU -lSDL2 -lSOIL -lassimp -lNab -o bullet_demo && \
+	g++ -L./build ./src/examples/bullet_demo.cpp -Wwrite-strings -std=c++11 -ggdb -I/usr/include/bullet -lBulletDynamics -lBulletCollision -lLinearMath -lGL -lGLU -lSDL2 -lSOIL -lassimp -I./src -lNab -o ./build/bullet_demo && \
 	rm -f *.o
 
 clean:

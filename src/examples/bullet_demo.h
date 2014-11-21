@@ -1,4 +1,4 @@
-#include "../engine/engine.h"
+#include <nab.h>
 #include <BulletDynamics/btBulletDynamicsCommon.h>
 
 class BulletDemo
