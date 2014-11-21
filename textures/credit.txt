@@ -1,0 +1,3 @@
+earthmap1k.jpg - http://planetpixelemporium.com/earth.html
+mrarmo6x6.png - http://graphics.cs.williams.edu/data/meshes.xml (Sibenik
+Cathedral model)

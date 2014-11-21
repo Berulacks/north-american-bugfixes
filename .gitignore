@@ -27,6 +27,11 @@ bullet_demo
 #textures
 textures/*
 
+!textures/mramor6x6.png
+!textures/checker.jpg
+!textures/credit.txt
+!textures/earthmap1k.jpg
+
 #gdb files
 .gdbinit
 
@@ -45,5 +50,3 @@ teapot*
 default.mtl
 sanmiguel*
 sponza*
-cube*
-plane*
