@@ -36,7 +36,7 @@ import ycm_core
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
 flags = [
 '-I/usr/include/bullet',
-'-I../',
+'-I../src',
 '-lBulletDynamics',
 '-lBulletCollision',
 '-lLinearMath',

@@ -88,12 +88,14 @@ Pedestal::Pedestal( int argc, const char* argv[] )
 	myStorage = program.getStorage();
 	myRenderer = program.getRenderer();
 
+    myStorage->addTextureFolder( "./examples/textures/" );
+
     myRenderer->cameraPos = {0.0, 3.0, 0.0};
 
 	std::vector<const char*> files;
 
 	if(argv[1] == NULL)
-		files.push_back( "./models/suzanne.obj");
+		files.push_back( "./examples/models/suzanne.obj");
 	else
     {
 		files.push_back( argv[1] );
@@ -113,10 +115,10 @@ Pedestal::Pedestal( int argc, const char* argv[] )
 	printf("...and its material is called %s\n", model.materials[0].name.c_str());
 	printf("And it looks for a texture called %s\n", model.materials[0].texDiffuse_name.c_str() );
 
-    if( !myStorage->readModel( "./models/plane/plane.obj" ) )
+    if( !myStorage->readModel( "./examples/models/plane/plane.obj" ) )
         program.quit();
 
-    Object plane = Object( myStorage->loadModel( "./models/plane/plane.obj" ) );
+    Object plane = Object( myStorage->loadModel( "./examples/models/plane/plane.obj" ) );
     plane.setTranslation( {0, -2, 4} );
     program.registerObject( &plane );
 

@@ -26,4 +26,4 @@ To build the bullet_demo, run:
 
     make bullet_demo
     
-These commands (and just running make without arguments) will produce binaries in the "*build/*" directory. Both demos take a model file path as an argument, which controls what gets rendered on the screen.
+These commands (and just running make without arguments) will produce binaries in the "*build/*" directory. Both demos take a model file path as an argument, which controls what gets rendered on the screen. Because of relative path usage in the examples, please run them from inside the main project directory, and not inside the "*build/*" (as in, your shell's $PWD should be one directory above "*build/*").

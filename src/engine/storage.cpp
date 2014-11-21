@@ -29,6 +29,11 @@ GLuint Storage::createTexture( glm::vec3 colour )
 }
 bool Storage::loadTexture(const char* filePath, const char* name)
 {
+    if( textureFolders.size() == 0 )
+    {
+        printf("[ERROR] Trying to loadTexture without defining a texture folder.");
+        return 0;
+    }
 
 	GLuint tex = 0;
 	int width, height, channels;
@@ -38,7 +43,8 @@ bool Storage::loadTexture(const char* filePath, const char* name)
 	glBindTexture(GL_TEXTURE_2D, tex);
 	checkGLErrors("Binding texture");
 
-	std::string base = "./textures/";
+    //TODO: MAKE THIS WORK WITH MULTIPLE FOLDERS
+	std::string base = textureFolders[0];
 	base.append( std::string(filePath) );
 	printf("Loading texture %s ... \n", base.c_str());
 	unsigned char* pixels = SOIL_load_image(base.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
@@ -147,7 +153,7 @@ bool Storage::readModel( const char* filePath )
 	if(programs.size() == 0)
 	{
 		printf("No shaders found, creating one for materials...\n");
-		shader = new Program("./shaders/vertex.vs", "./shaders/fragment.fs");
+		shader = new Program("./src/shaders/vertex.vs", "./src/shaders/fragment.fs");
 		storeProgram ( *shader );
 	}	
 	else
@@ -344,7 +350,8 @@ Material Storage::initMaterial( aiMaterial* material, Program* shader )
 
 void Storage::initMaterials()
 {
-	Program* prog = new Program("./shaders/vertex.vs", "./shaders/fragment.fs");
+    //TODO: OH GOD, THIS NEEDS TO CHANGE
+	Program* prog = new Program("./src/shaders/vertex.vs", "./src/shaders/fragment.fs");
 	storeProgram( *prog );
 	Material mat(prog);
 	//mat.updateVariables( 

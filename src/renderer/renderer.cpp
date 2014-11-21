@@ -104,7 +104,7 @@ bool Renderer::initGL()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
 
-	simplePr = new Program("./shaders/simple.vs", "./shaders/simple.fs");
+	simplePr = new Program("./src/shaders/simple.vs", "./src/shaders/simple.fs");
 
 	GLuint bBoxIbo;
 

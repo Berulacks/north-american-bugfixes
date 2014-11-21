@@ -2,7 +2,7 @@
 
 all:
 	mkdir -p build && \
-	gcc -c -std=c99 -o c.o libs/gl_core_3_3.c && \
+	gcc -c -std=c99 -o c.o ./src/libs/gl_core_3_3.c && \
 	g++ -c ./src/data_structs/material.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o material.o && \
 	g++ -c ./src/data_structs/model.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o model.o && \
 	g++ -c ./src/data_structs/object.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o object.o && \
@@ -14,13 +14,13 @@ all:
 	rm -f *.o
 pedestal:
 	make && \
-	g++ -L./build -I./src ./src/examples/pedestal.cpp -Wwrite-strings -std=c++11 -ggdb -lGL -lGLU -lSDL2 -lSOIL -lassimp -I./src -lNab -o build/pedestal && \
+	g++ -L./build -I./src ./examples/pedestal.cpp -Wwrite-strings -std=c++11 -ggdb -lGL -lGLU -lSDL2 -lSOIL -lassimp -I./src -lNab -o build/pedestal && \
 	rm -f *.o
 
 bullet_demo:
 	make && \
-	g++ -L./build ./src/examples/bullet_demo.cpp -Wwrite-strings -std=c++11 -ggdb -I/usr/include/bullet -lBulletDynamics -lBulletCollision -lLinearMath -lGL -lGLU -lSDL2 -lSOIL -lassimp -I./src -lNab -o ./build/bullet_demo && \
+	g++ -L./build ./examples/bullet_demo.cpp -Wwrite-strings -std=c++11 -ggdb -I/usr/include/bullet -lBulletDynamics -lBulletCollision -lLinearMath -lGL -lGLU -lSDL2 -lSOIL -lassimp -I./src -lNab -o ./build/bullet_demo && \
 	rm -f *.o
 
 clean:
-	rm -rf *.o build *.pyc ./src/examples/*.pyc
+	rm -rf *.o build *.pyc ./examples/*.pyc

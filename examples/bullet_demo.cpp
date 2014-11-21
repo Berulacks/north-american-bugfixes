@@ -181,8 +181,9 @@ BulletDemo::BulletDemo( int argc, const char* argv[] )
     program.registerCallback(std::bind( &BulletDemo::step, this, _1 ));
 	
 	myStorage = program.getStorage();
-	myRenderer = program.getRenderer();
+    myStorage->addTextureFolder( "./examples/textures/" );
 
+	myRenderer = program.getRenderer();
     myRenderer->cameraPos = {0.0, 3.0, 0.0};
 
 	std::vector<const char*> files;
@@ -190,7 +191,7 @@ BulletDemo::BulletDemo( int argc, const char* argv[] )
     renderBBox = false;
 
 	if(argv[1] == NULL)
-		files.push_back( "./models/cube/cube.obj");
+		files.push_back( "./examples/models/cube/cube.obj");
 	else
     {
 		files.push_back( argv[1] );
@@ -199,13 +200,13 @@ BulletDemo::BulletDemo( int argc, const char* argv[] )
 
 	if( !myStorage->readModel(files[0]) 
             ||  
-        !myStorage->readModel( "./models/sphere/sphere.obj" ) )
+        !myStorage->readModel( "./examples/models/sphere/sphere.obj" ) )
     {
         printf("Could not load models!\n");
 		program.quit();
     }
 	
-    mod =  myStorage->loadModel( "./models/sphere/sphere.obj" );
+    mod =  myStorage->loadModel( "./examples/models/sphere/sphere.obj" );
     cube =  myStorage->loadModel( files[0] );
 
 	/*printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
@@ -216,10 +217,10 @@ BulletDemo::BulletDemo( int argc, const char* argv[] )
 
     initBullet();
 
-    if( !myStorage->readModel( "./models/plane/plane.obj" ) )
+    if( !myStorage->readModel( "./examples/models/plane/plane.obj" ) )
         program.quit();
 
-    Object plane = Object( myStorage->loadModel( "./models/plane/plane.obj" ) );
+    Object plane = Object( myStorage->loadModel( "./examples/models/plane/plane.obj" ) );
 
     plane.setTranslation( {0, 0, 10} );
     glm::vec3 scale(2.0f,2.0f,1.0f);

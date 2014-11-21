@@ -7,7 +7,7 @@
 #ifndef OGL_LD
 #define OGL_LD
 
-#include "../../libs/gl_core_3_3.h"
+#include "../libs/gl_core_3_3.h"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
@@ -26,12 +26,6 @@
 
 #include <SDL2/SDL.h>
 #include <SOIL/SOIL.h>
-
-
-//#include <vector>
-//#include <map>
-//#include <iostream>
-//#include <fstream>
 
 #include "../data_structs/model.h"
 
@@ -79,6 +73,9 @@ class Storage
 
         //Convert an array of faces (in aiFace format) to an openGL compatible indices array
 		static std::vector<unsigned int> generateFacesVector(aiFace* assimpFaceArray, int numFaces);
+
+        void addTextureFolder( std::string toAdd ){ textureFolders.push_back(toAdd); };
+
 	private:
         //Raw model data
 		std::map<std::string, ModelData> rawModels;
@@ -91,6 +88,8 @@ class Storage
 		//Eventually this should read text files from the materials
 		//folder in order to create actual sets of materials
 		void initMaterials(void);
+
+        std::vector<std::string> textureFolders;
 
 
 
