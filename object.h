@@ -21,6 +21,8 @@ class Object
 		void setScale(glm::vec3 target){ scale = target; };
         void setTransform( glm::mat4 trans );
 
+        glm::vec3 getPosition(void);
+
 		//Should we apply physics steps to this object?
 		bool isPhysicsObject = false;
 		//Should we check if this object collides with others?
@@ -43,9 +45,9 @@ class Object
 		glm::vec3 velocity;
 		glm::vec3 rotVelocity;
 
-        //THIS IS OPTIONAL
-        //THIS OVERRIDES "position" etc.
-        bool hasTransform = false;
+        //Should we use a static transform
+        //instead of recalculating every frame?
+        bool useTransform = false;
         glm::mat4 transform;
 
 		//By default, any object will

@@ -18,6 +18,10 @@ class Pedestal
 
     btDiscreteDynamicsWorld* dynamicsWorld;
 
+    //Render BBox for boxes?
+    //(true if the model isn't a perfect cube)
+    bool renderBBox;
+
     public:
         Pedestal(int argc, const char* argv[]);
         void processEvents(float physT);

@@ -126,7 +126,11 @@ void Pedestal::addObj(Model *model, bool isCube, float radius, glm::vec3 positio
 
 
 	Object* obj = new Object(model);
+
+    if(isCube && renderBBox)
+        obj->renderBoundingBox = true;
 	obj->translateBy( {0.0f,0.0f,5.0f} );
+
 	myEngine->registerObject( obj );
     objs.push_back( obj );
 }
@@ -171,18 +175,27 @@ Pedestal::Pedestal( int argc, const char* argv[] )
     myRenderer->cameraPos = {0.0, 3.0, 0.0};
 
 	std::vector<const char*> files;
-	if(argv[1] == NULL)
-		files.push_back( "./models/suzanne.obj");
-	else
-		files.push_back( argv[1] );
 
-	if( !myStorage->readModel(files[0]) )
+    renderBBox = false;
+
+	if(argv[1] == NULL)
+		files.push_back( "./models/cube/cube.obj");
+	else
+    {
+		files.push_back( argv[1] );
+        renderBBox = true;
+    }
+
+	if( !myStorage->readModel(files[0]) 
+            ||  
+        !myStorage->readModel( "./models/sphere/sphere.obj" ) )
+    {
+        printf("Could not load models!\n");
 		program.quit();
-    if( !myStorage->readModel( "./models/cube/cube.obj" ) )
-        program.quit();
+    }
 	
-	mod = *( myStorage->loadModel( files[0] ) );
-    cube = *( myStorage->loadModel( "./models/cube/cube.obj" ) );
+    mod = *( myStorage->loadModel( "./models/sphere/sphere.obj" ) );
+    cube = *( myStorage->loadModel( files[0] ) );
 
 	/*printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
 	printf("Our model has %i meshes.\n", mod.numMeshes() );
@@ -196,7 +209,11 @@ Pedestal::Pedestal( int argc, const char* argv[] )
         program.quit();
 
     Object plane = Object( myStorage->loadModel( "./models/plane/plane.obj" ) );
+
     plane.setTranslation( {0, 0, 10} );
+    glm::vec3 scale(2.0f,2.0f,1.0f);
+    plane.setScale( scale );
+
     program.registerObject( &plane );
 
 	program.start( SDL_GetTicks() );
