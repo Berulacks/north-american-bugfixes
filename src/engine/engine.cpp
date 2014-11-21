@@ -24,46 +24,46 @@ bool Engine::init( int argc, const char* argv[] )
 
 void Engine::start(int lastFrame)
 {
-	if( lastFrame == 0)
-		lastFrame = SDL_GetTicks();
+    while(active)
+    {
+        if( lastFrame == 0)
+            lastFrame = SDL_GetTicks();
 
-	//Lets process our events, first
-	processEvents();
+        //Lets process our events, first
+        processEvents();
 
-	//Because we're using a constant 
-	//deltaT with a variable fps
-	//we have no choice but to
-	//do multiple physics steps if
-	//our dF > dT (or else we could
-	//potentially pass in really big
-	//or really small values to the physics
-	//simulation)
-	int currentTime = SDL_GetTicks();
-	//The change between frames
-	int deltaF = currentTime - lastFrame;
-	timeStepsToProcess += deltaF;
+        //Because we're using a constant 
+        //deltaT with a variable fps
+        //we have no choice but to
+        //do multiple physics steps if
+        //our dF > dT (or else we could
+        //potentially pass in really big
+        //or really small values to the physics
+        //simulation)
+        int currentTime = SDL_GetTicks();
+        //The change between frames
+        int deltaF = currentTime - lastFrame;
+        timeStepsToProcess += deltaF;
 
 
-	//Sometimes we might have some timeSteps
-	//left over to process, what with rendering
-	//perhaps taking too long. This (hopefully)
-	//mitigates that.
-	while(timeStepsToProcess >= deltaT)
-	{
+        //Sometimes we might have some timeSteps
+        //left over to process, what with rendering
+        //perhaps taking too long. This (hopefully)
+        //mitigates that.
+        while(timeStepsToProcess >= deltaT)
+        {
 
-		timeStepsToProcess -= deltaT;
-		for(int i = 0; i < functions.size(); i++)
-			functions[i](physT);
+            timeStepsToProcess -= deltaT;
+            for(int i = 0; i < functions.size(); i++)
+                functions[i](physT);
 
-	}
+        }
 
-	renderer.render(objs);
-	SDL_GL_SwapWindow(mainWindow);
+        renderer.render(objs);
+        SDL_GL_SwapWindow(mainWindow);
+    }
 
-	if(active)
-		start(currentTime);
-	else
-		quit();
+    quit();
 
 }
 
@@ -158,6 +158,7 @@ void Engine::quit()
 	SDL_DestroyWindow(mainWindow);
 	SDL_Quit();
 
+    exit(0);
 }
 
 Engine::Engine()
