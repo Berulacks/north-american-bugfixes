@@ -16,8 +16,14 @@ Nab requires:
 
 Running the included makefile without arguments will produce a static-library file (libNab.a) that can be included and used with any project. Just make sure to include the necessary header files with said project.
 
-In order to see a reference implementation of Nab, run
+The project also includes two example implementations: pedestal (a model viewer), and bullet_demo (a small physics playground that requires [bullet](http://bulletphysics.org/))
+
+To build pedestal, run:
 
     make pedestal
+
+To build the bullet_demo, run:
+
+    make bullet_demo
     
-to build Pedestal, a model viewer built with Nab. It takes a model filepath as an argument.
+These commands (and just running make without arguments) will produce binaries in the same directory as the Nab source. Both demoes take a model file path as an argument, which controls what gets rendered on the screen.
