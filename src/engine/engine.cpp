@@ -9,11 +9,16 @@ bool Engine::init( int argc, const char* argv[] )
 		printf("Could not initiate SDL!\n");
 		return false;
 	}
+    else
+        printf("SDL Initialized!\n");
+
 	if(!renderer.initGL())
 	{
 		printf("Could not initialize OpenGL!\n");
 		return false;
 	}
+    else
+        printf("Succesfully initialized OpenGL!\n");
 
 	SDL_GL_SetSwapInterval(1);
 
@@ -113,7 +118,6 @@ bool Engine::initSDL()
 	{
 		return false;
 	}
-	printf("SDL Initialized!\n");
 
 	//Mesa currently only supports a 3.3 core profile, AFAIK
 	//So, being a Linux user with an Intel CPU (and mesa)

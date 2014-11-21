@@ -124,7 +124,6 @@ bool Renderer::initGL()
 	boundingBox.vao = bBoxVao;
 	boundingBox.indices = bBoxIbo;
 
-	printf("OpenGL initialized!\n");
 	//CheckGLErrors returns true if an error was found
 	//so we return the opposite
 	return !Storage::checkGLErrors("End of initGL");
