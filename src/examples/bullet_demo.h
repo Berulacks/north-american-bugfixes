@@ -29,7 +29,7 @@ class BulletDemo
         void step(float physT);
 
         void fireObj(void);
-        std::pair<Object*,btRigidBody*> addObj(Model* model, bool isCube, float radius=2,glm::vec3 position={0,2,5});
+        std::pair<Object*,btRigidBody*> addObj(Model model, bool isCube, float radius=2,glm::vec3 position={0,2,5});
 
         glm::vec3 findCameraPoint(void);
 

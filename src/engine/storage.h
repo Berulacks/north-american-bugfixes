@@ -44,20 +44,23 @@ class Storage
 	Assimp::Importer importer;
 
 	public:
+
 		Storage(void);
 
+        //Read a file into a string
 		static bool readFile(std::string filename, std::string* target);
+        //Poll for OpenGLErrors, print 'description' if an error is found.
 		static bool checkGLErrors(const char* description="");
 
 		bool storeProgram( Program toAdd );
 
-		//Reads model into memory
+		//Reads a model into memory
 		bool readModel(const char* filePath);
-		//TODO: figure out how to get a Model class definition in here
-		//then have a way to create models, and store them in a 
-		//vector.
-		//
-		Model *loadModel(const char* name);
+
+        //Load a model onto the graphics card.
+		Model loadModel(const char* name);
+
+        //Load a texture from a file
 		bool loadTexture(const char* filePath, const char* name);
 
 		//Create a solid, single colour texture
@@ -65,14 +68,21 @@ class Storage
 		//a texture)
 		GLuint createTexture(glm::vec3 colour);
 
+        //Initialize an imported material
+        //TODO: Create a similar function from materials scanned in
+        //from a "maerials" directory
 		Material initMaterial(aiMaterial* material, Program* shader);
 
 		Material getMaterial(const char* name);
+
 		Model getModel(const char* name) { return models[ std::string(name) ]; };
 
+        //Convert an array of faces (in aiFace format) to an openGL compatible indices array
 		static std::vector<unsigned int> generateFacesVector(aiFace* assimpFaceArray, int numFaces);
 	private:
+        //Raw model data
 		std::map<std::string, ModelData> rawModels;
+        //Model objects representing data on GPU
 		std::map<std::string, Model> models;
 		std::map<std::string, GLuint> textureIDs;
 		std::map<std::string, Material> materials;

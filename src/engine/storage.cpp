@@ -99,45 +99,21 @@ bool Storage::readFile(std::string filename, std::string* target)
 //After this step, a Model object is produced and
 //ready to be rendered. (this is the preferred way
 //to create models)
-Model *Storage::loadModel( const char* name )
+Model Storage::loadModel( const char* name )
 {
+
 	if(rawModels.size() == 0 || rawModels.find( std::string(name) ) == rawModels.end() )
 	{
 		printf("[ERROR] Can't load Model: model %s has not been read into the program, yet!\n", name);
 	}
+
 	printf("Loading Model %s\n", name);
 	ModelData scene = rawModels[std::string(name)];
 	Model model = Model( scene );
 
-	/*aiString aiMatName;
-	std::string matName;
-	printf("Setting up materials...\n");
-
-	//readModel already initializes all materials stored in our aiScene
-	//...so we just need to check and see if the name of our materials
-	//are in our own materials vector, and update them appropriately
-	//...again, this section will need to be removed with ASSIMP, eventually.
-	for(int i = 0; i < scene->mNumMeshes; i++)
-	{
-		scene->mMaterials[ scene->mMeshes[i]->mMaterialIndex ]->Get( AI_MATKEY_NAME, aiMatName );
-		matName = std::string(aiMatName.C_Str());
-		printf("Searching for material %s for mesh %i\n", materials[matName].name.c_str(), i);
-		if(materials.count(matName) != 0)
-		{
-			printf("Found material %s for mesh %i\n", materials[matName].name.c_str(), i);
-			
-			//model.updateBComboMat( *materials[matName], i );
-			model.materials.push_back( materials[matName] );
-		}
-	}
-	model.setUpBuffers();
-
-	Model* pointer = new Model(model);
-	printf("Loading model %s into storage!\n", name);
-	models.emplace( std::string(name), pointer );*/
     models.emplace( std::string( name ), model );
 	
-	return &models[ name ];
+	return model;
 
 }
 

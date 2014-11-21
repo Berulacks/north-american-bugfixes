@@ -1,7 +1,7 @@
 #include "object.h"
 
 
-Object::Object(Model* mod, Material* mat)
+Object::Object(Model mod, Material* mat)
 {
 	model = mod;
 	if(mat != NULL)

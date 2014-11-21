@@ -105,7 +105,7 @@ Pedestal::Pedestal( int argc, const char* argv[] )
 		program.quit();
     }
 	
-    Model model = *( myStorage->loadModel( files[0] ) );
+    Model model = myStorage->loadModel( files[0] );
 
 	printf("Okay, our modelel is supposedly loaded, lets check it for some info:\n");
 	printf("Our modelel has %i meshes.\n", model.numMeshes() );
@@ -120,7 +120,7 @@ Pedestal::Pedestal( int argc, const char* argv[] )
     plane.setTranslation( {0, -2, 4} );
     program.registerObject( &plane );
 
-	obj = new Object(&model);
+	obj = new Object(model);
 	obj->translateBy( {0.0f,0.0f,5.0f} );
 	myEngine->registerObject( obj );
 

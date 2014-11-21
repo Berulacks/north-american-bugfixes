@@ -15,30 +15,24 @@ void Renderer::render(std::vector<Object*> objects)
 	glm::mat4 mv, mvp;
 	glm::mat3 rot, normal;
 	
-	//Eventually this will be replaced
-	//with a custom datatype
-	//const aiScene* scene;
     ModelData data;
-	Model* model;
+	Model model;
 	Material mat;
 	Program* shader;
 
 	for(int i = 0; i < objects.size(); i++)
 	{
 		model = objects[i]->getModel();
-		//scene = model->getScene();
-        //data = model->
 
-
-		for(int j = 0; j < model->numMeshes(); j++)
+		for(int j = 0; j < model.numMeshes(); j++)
 		{
-			mat = model->materials[ model->getBCombo(j).matIndex ];
+			mat = model.materials[ model.getBCombo(j).matIndex ];
 			shader = mat.shader;
 
 			setActiveProgram( shader );
             Storage::checkGLErrors( "Setting active program" );
 
-			glBindVertexArray( model->getVAO( j ) );
+			glBindVertexArray( model.getVAO( j ) );
             Storage::checkGLErrors("Binding vertex array");
 			glBindTexture( GL_TEXTURE_2D, mat.texDiffuse );
             Storage::checkGLErrors( "Binding texture" );
@@ -46,14 +40,14 @@ void Renderer::render(std::vector<Object*> objects)
 			//Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
 			updateUniforms( *objects[i] );
 			
-			glDrawElements(GL_TRIANGLES, model->getBCombo(j).numIndices, GL_UNSIGNED_INT, NULL); 
+			glDrawElements(GL_TRIANGLES, model.getBCombo(j).numIndices, GL_UNSIGNED_INT, NULL); 
 
 			if( objects[i]->renderBoundingBox )
 			{
 				setActiveProgram( simplePr );
 				glBindVertexArray( bBoxVao );
 				glBindTexture( GL_TEXTURE_2D, 0 );
-				glBindBuffer( GL_ARRAY_BUFFER, model->getBCombo( j ).boundingBox );
+				glBindBuffer( GL_ARRAY_BUFFER, model.getBCombo( j ).boundingBox );
 				//When you finally fix updateUniforms such that it isn't horrible, make sure to give a way to only send the mvp matrix in, so we can delete this line
 				glm::mat4 mv = projection * (camera * objects[i]->getTransform());
 				glUniformMatrix4fv(activeProgram->getUniform("mvp"), 1, GL_FALSE, glm::value_ptr(mv) );
@@ -195,7 +189,7 @@ void Renderer::updateUniforms( Object obj, Program* program )
 
 	//THIS NEEDS TO BE MOVED SOMEWHERE ELSE
 	//THIS NEEDS TO BE DONE ON A PER-MESH BASIS
-	glm::vec3 kD = obj.getModel()->materials[0].diffuse;
+	glm::vec3 kD = obj.getModel().materials[0].diffuse;
 	//Light constant
 	glUniform3fv(activeProgram->getUniform("Kd"), 1, glm::value_ptr( kD ) );
 	//Light intensity

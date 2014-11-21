@@ -3,6 +3,7 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+//Main engine instance.
 class Engine
 {
 	Renderer renderer;
@@ -11,13 +12,10 @@ class Engine
 	SDL_GLContext glContext;
 	SDL_Window* mainWindow;
 
-	GLuint program;
-
     std::map<const char*,GLuint> gpuLocations;
 
 	glm::mat4 camera;
 	glm::mat4 projection;
-	glm::mat4 model;
 
 	int active = 1;
 	//60 fps (in milliseconds)
@@ -33,8 +31,11 @@ class Engine
 	int timeStepsToProcess = 0;
 
 	public:
+
 		Engine();
+        //Initializes the engine, renderer, and storage
 		bool init( int argc, const char* argv[] );
+
 		void quit(void);
 
 		//Starts the main update loop.
@@ -56,16 +57,21 @@ class Engine
 		Renderer* getRenderer(void) { return &renderer; };
 		Storage* getStorage(void) { return &storage; };
 
+        //Returns the main SDL window the engine has created
         SDL_Window* getWindow(void) { return mainWindow; };
 
 	private:
+        //The list of objects currently registered with the engine.
 		std::vector<Object*> objs;
 		//Outside functions to be appended
 		//to our main update loop. These
 		//functions will be passed a 
 		//deltaT value (in seconds)
 		std::vector< std::function<void(float)> > functions;
+        //Render the objects in objs
 		void render(void);
+        //TODO
 		void processEvents(void);
+        //Initialize SDL functions and the main window
 		bool initSDL(void);
 };

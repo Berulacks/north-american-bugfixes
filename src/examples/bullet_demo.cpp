@@ -37,9 +37,9 @@ void BulletDemo::processEvents(float physT)
 					myRenderer->toggleFullScreen(myEngine->getWindow() );
 
                 if(key == SDLK_o)
-                    addObj( &mod, false, 1, findCameraPoint() );
+                    addObj( mod, false, 1, findCameraPoint() );
                 if(key == SDLK_p)
-                    addObj( &cube, true, 1, findCameraPoint() );
+                    addObj( cube, true, 1, findCameraPoint() );
 
 				break;
 
@@ -86,7 +86,7 @@ glm::vec3 BulletDemo::findCameraPoint()
 
 void BulletDemo::fireObj(void)
 {
-    std::pair<Object*,btRigidBody*> pair = addObj( &mod, false, 2, myRenderer->cameraPos );
+    std::pair<Object*,btRigidBody*> pair = addObj( mod, false, 2, myRenderer->cameraPos );
     btRigidBody* body = pair.second;
 
     glm::vec3 velocity = (findCameraPoint() - myRenderer->cameraPos) * 3.0f;
@@ -115,7 +115,7 @@ void BulletDemo::initBullet(void)
     dynamicsWorld->addRigidBody(groundRigidBody);
 }
 
-std::pair<Object*,btRigidBody*> BulletDemo::addObj(Model *model, bool isCube, float radius, glm::vec3 position)
+std::pair<Object*,btRigidBody*> BulletDemo::addObj(Model model, bool isCube, float radius, glm::vec3 position)
 {
 
 
@@ -205,8 +205,8 @@ BulletDemo::BulletDemo( int argc, const char* argv[] )
 		program.quit();
     }
 	
-    mod = *( myStorage->loadModel( "./models/sphere/sphere.obj" ) );
-    cube = *( myStorage->loadModel( files[0] ) );
+    mod =  myStorage->loadModel( "./models/sphere/sphere.obj" );
+    cube =  myStorage->loadModel( files[0] );
 
 	/*printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
 	printf("Our model has %i meshes.\n", mod.numMeshes() );

@@ -23,4 +23,4 @@ bullet_demo:
 	rm -f *.o
 
 clean:
-	rm -rf *.o build
+	rm -rf *.o build *.pyc ./src/examples/*.pyc

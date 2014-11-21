@@ -15,19 +15,6 @@ bool Engine::init( int argc, const char* argv[] )
 		return false;
 	}
 
-	/*storage.readModel( files[0] );
-	Model mod = storage.loadModel( files[0] );
-	Object sphere = Object(&mod);
-	sphere.translateBy( {0.0f,0.0f,5.0f} );
-	registerObject( &sphere );
-	
-	printf("Okay, our model is supposedly loaded, lets check it for some info:\n");
-	printf("Our model has %i meshes.\n", mod.numMeshes() );
-	printf("The first mesh of our model is called %s\n", mod.getBCombo(0).name.c_str());
-	printf("...and its material is called %s\n", mod.materials[0].name.c_str());
-
-	printf("\nOkay! Let's give rendering this mother a shot!\n");*/
-
 	SDL_GL_SetSwapInterval(1);
 
 	printf("Completed initialization!\n");
@@ -102,6 +89,7 @@ bool Engine::registerCallback( std::function<void(float)> function )
 	{*/
     functions.push_back( function );
     printf("Added callback!\n");
+
     return true;
 	//}
 	//return false;
