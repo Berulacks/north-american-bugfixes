@@ -141,7 +141,7 @@ std::pair<Object*,btRigidBody*> BulletDemo::addObj(Model model, bool isCube, flo
 
     if(isCube && renderBBox)
         obj->renderBoundingBox = true;
-	obj->translateBy( {0.0f,0.0f,5.0f} );
+	obj->translateBy( {position.x,position.y,position.z} );
 
 	myEngine->registerObject( obj );
     objs.push_back( obj );
@@ -176,9 +176,8 @@ BulletDemo::BulletDemo( int argc, const char* argv[] )
 
 	printf("Program initialized, let's add a callback!\n");
 
-    using std::placeholders::_1;
-	program.registerCallback( std::bind( &BulletDemo::processEvents, this, _1 ) );
-    program.registerCallback(std::bind( &BulletDemo::step, this, _1 ));
+	program.registerCallback( std::bind( &BulletDemo::processEvents, this, std::placeholders::_1 ) );
+    program.registerCallback(std::bind( &BulletDemo::step, this, std::placeholders::_1 ));
 	
 	myStorage = program.getStorage();
     myStorage->addTextureFolder( "./examples/textures/" );
