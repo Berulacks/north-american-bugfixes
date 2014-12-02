@@ -10,11 +10,12 @@ Nab requires:
 * [ASSIMP](http://assimp.sourceforge.net)
 * [SOIL](http://www.lonesock.net/soil.html)
 * [SDL2](https://www.libsdl.org/)
+* [GLM](http://glm.g-truc.net/0.9.6/index.html)
 * OpenGL 3.3+
 
 ###Building
 
-Running the included makefile without arguments will produce a static-library file (libNab.a) that can be included and used with any project. Just make sure to add the "*/src*" directory as an include folder, and libNab.a as a library.
+As it stands right now, the project only builds on \*nix systems. Running the included makefile without arguments will produce a static-library file (libNab.a) that can be included and used with any project. Just make sure to add the "*/src*" directory as an include folder, and libNab.a as a library.
 
 The project also includes two example implementations: pedestal (a model viewer), and bullet_demo (a small physics playground that requires [bullet](http://bulletphysics.org/))
 
