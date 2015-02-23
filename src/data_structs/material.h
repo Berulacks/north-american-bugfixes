@@ -17,6 +17,8 @@ class Material
         glm::vec3 specular;
         glm::vec3 ambient;
         glm::vec3 emissive;
+        glm::vec3 transparent;
+        glm::vec3 reflective;
 
         float shininess;
 

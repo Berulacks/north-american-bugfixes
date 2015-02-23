@@ -3,45 +3,56 @@
 void Material::updateVariables(aiMaterial* mtl)
 {
     aiString texPath;   //contains filename of texture
-        if(AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &texPath)){
+
+    if(AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &texPath))
+    {
         texDiffuse_name = std::string(texPath.data);
-            }
+    }
     else
         texDiffuse_name = std::string("NONE");
  
-        aiColor4D _diffuse;
-        if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _diffuse))
-    {
-        diffuse.x = _diffuse[0];
-        diffuse.y = _diffuse[1];
-        diffuse.z = _diffuse[2];
+    aiColor4D _tempVector;
 
+    if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _tempVector))
+    {
+        diffuse.x = _tempVector[0];
+        diffuse.y = _tempVector[1];
+        diffuse.z = _tempVector[2];
     }
  
-        aiColor4D _specular;
-        if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _specular))
+    if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_SPECULAR, _tempVector))
     {
-        specular.x = _specular[0];
-        specular.y = _specular[1];
-        specular.z = _specular[2];
-
+        specular.x = _tempVector[0];
+        specular.y = _tempVector[1];
+        specular.z = _tempVector[2];
     }
  
-        aiColor4D _emissive;
-        if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _emissive))
+    if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_EMISSIVE, _tempVector))
     {
-        emissive.x = _emissive[0];
-        emissive.y = _emissive[1];
-        emissive.z = _emissive[2];
-
+        emissive.x = _tempVector[0];
+        emissive.y = _tempVector[1];
+        emissive.z = _tempVector[2];
     }
 
-        aiColor4D _ambient;
-        if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_DIFFUSE, _ambient))
+    if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_AMBIENT, _tempVector))
     {
-        ambient.x = _ambient[0];
-        ambient.y = _ambient[1];
-        ambient.z = _ambient[2];
+        ambient.x = _tempVector[0];
+        ambient.y = _tempVector[1];
+        ambient.z = _tempVector[2];
+    }
+
+    if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_TRANSPARENT, _tempVector))
+    {
+        transparent.x = _tempVector[0];
+        transparent.y = _tempVector[1];
+        transparent.z = _tempVector[2];
+    }
+
+    if(AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_REFLECTIVE, _tempVector))
+    {
+        reflective.x = _tempVector[0];
+        reflective.y = _tempVector[1];
+        reflective.z = _tempVector[2];
     }
 
     aiString _name;
@@ -49,8 +60,8 @@ void Material::updateVariables(aiMaterial* mtl)
     name = std::string(_name.C_Str());
     printf("Initialized material %s!\n", name.c_str());
 
-        unsigned int max;
-        aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);
+    unsigned int max;
+    aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);
 
-        ready = true;
+    ready = true;
 }
