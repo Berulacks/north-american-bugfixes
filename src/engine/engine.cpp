@@ -4,27 +4,27 @@ std::vector<Object> objs;
 
 bool Engine::init( int argc, const char* argv[] )
 {
-	if(!initSDL())
-	{
-		printf("Could not initiate SDL!\n");
-		return false;
-	}
+    if(!initSDL())
+    {
+        printf("Could not initiate SDL!\n");
+        return false;
+    }
     else
         printf("SDL Initialized!\n");
 
-	if(!renderer.initGL())
-	{
-		printf("Could not initialize OpenGL!\n");
-		return false;
-	}
+    if(!renderer.initGL())
+    {
+        printf("Could not initialize OpenGL!\n");
+        return false;
+    }
     else
         printf("Succesfully initialized OpenGL!\n");
 
-	SDL_GL_SetSwapInterval(1);
+    SDL_GL_SetSwapInterval(1);
 
-	printf("Completed initialization!\n");
+    printf("Completed initialization!\n");
 
-	return true;
+    return true;
 }
 
 void Engine::start(int lastFrame)
@@ -76,93 +76,93 @@ void Engine::start(int lastFrame)
 
 void Engine::processEvents()
 {
-	SDL_Event event;
-	SDL_Keycode key;
-	glm::vec3 lookat;
+    SDL_Event event;
+    SDL_Keycode key;
+    glm::vec3 lookat;
 
-	/*while (SDL_PollEvent(&event)) 
-	{
-		switch(event.type)
-		{
+    /*while (SDL_PollEvent(&event)) 
+    {
+        switch(event.type)
+        {
             //TODO: Send events to their rightful place
             break;
-	    }
+        }
     }*/
 }
 
 bool Engine::registerCallback( std::function<void(float)> function )
 {
-	/*if( std::find(functions.begin(), functions.end(), function) == functions.end())
-	{*/
+    /*if( std::find(functions.begin(), functions.end(), function) == functions.end())
+    {*/
     functions.push_back( function );
     printf("Added callback!\n");
 
     return true;
-	//}
-	//return false;
+    //}
+    //return false;
 
 }
 bool Engine::registerObject(Object* toAdd)
 {
-	if( std::find(objs.begin(), objs.end(), toAdd) == objs.end())
-	{
-		objs.push_back(toAdd);
-		return true;
-	}
-	return false;
+    if( std::find(objs.begin(), objs.end(), toAdd) == objs.end())
+    {
+        objs.push_back(toAdd);
+        return true;
+    }
+    return false;
 }
 
 bool Engine::initSDL()
 {
-	if(SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		return false;
-	}
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        return false;
+    }
 
-	//Mesa currently only supports a 3.3 core profile, AFAIK
-	//So, being a Linux user with an Intel CPU (and mesa)
-	//I'm going to have to stick with OpenGL 3.3
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    //Mesa currently only supports a 3.3 core profile, AFAIK
+    //So, being a Linux user with an Intel CPU (and mesa)
+    //I'm going to have to stick with OpenGL 3.3
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-	mainWindow = SDL_CreateWindow("Pedestal", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    mainWindow = SDL_CreateWindow("Pedestal", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
-	SDL_SetRelativeMouseMode( SDL_TRUE );
+    SDL_SetRelativeMouseMode( SDL_TRUE );
 
-	if(!mainWindow)
-	{
-		printf("Woops, couldn't create the main window.");
-		return false;
-	}	
-	printf("Done.\n");
+    if(!mainWindow)
+    {
+        printf("Woops, couldn't create the main window.");
+        return false;
+    }    
+    printf("Done.\n");
 
-	printf("Creating GL context... ");
-	glContext = SDL_GL_CreateContext(mainWindow);
-	printf("Done.\n");
+    printf("Creating GL context... ");
+    glContext = SDL_GL_CreateContext(mainWindow);
+    printf("Done.\n");
 
-	printf("Loading functions... ");
+    printf("Loading functions... ");
 
-	if(ogl_LoadFunctions() == ogl_LOAD_FAILED)
-	{
-		return false;
-	}
-	printf("Functions loaded!\n");
-	printf("OpenGL version is %s\n", glGetString(GL_VERSION) );
-	printf("GLSL version is %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    if(ogl_LoadFunctions() == ogl_LOAD_FAILED)
+    {
+        return false;
+    }
+    printf("Functions loaded!\n");
+    printf("OpenGL version is %s\n", glGetString(GL_VERSION) );
+    printf("GLSL version is %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	return true;
+    return true;
 
 }
 
 void Engine::quit()
 {
-	printf("\nQuitting!\n");
-	SDL_GL_DeleteContext(glContext);
-	SDL_DestroyWindow(mainWindow);
-	SDL_Quit();
+    printf("\nQuitting!\n");
+    SDL_GL_DeleteContext(glContext);
+    SDL_DestroyWindow(mainWindow);
+    SDL_Quit();
 
     exit(0);
 }

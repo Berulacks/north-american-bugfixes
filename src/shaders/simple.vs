@@ -7,6 +7,6 @@ attribute vec3 theV;
 
 void main()
 {
-	gl_Position = mvp * vec4(theV,1.0);
+    gl_Position = mvp * vec4(theV,1.0);
 }
 

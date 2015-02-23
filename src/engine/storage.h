@@ -35,59 +35,54 @@ class Storage
 {
 
 
-	Assimp::Importer importer;
+    Assimp::Importer importer;
 
-	public:
+    public:
 
-		Storage(void);
+        Storage(void);
 
         //Read a file into a string
-		static bool readFile(std::string filename, std::string* target);
-        //Poll for OpenGLErrors, print 'description' if an error is found.
-		static bool checkGLErrors(const char* description="");
+        static bool readFile(std::string filename, std::string* target);
 
-		bool storeProgram( Program toAdd );
+        bool storeProgram( Program toAdd );
 
-		//Reads a model into memory
-		bool readModel(const char* filePath);
+        //Reads a model into memory
+        bool readModel(const char* filePath);
 
         //Load a model onto the graphics card.
-		Model loadModel(const char* name);
+        Model loadModel(const char* name);
 
         //Load a texture from a file
-		bool loadTexture(const char* filePath, const char* name);
+        bool loadTexture(const char* filePath, const char* name);
 
-		//Create a solid, single colour texture
-		//(used for when an object doesn't have
-		//a texture)
-		GLuint createTexture(glm::vec3 colour);
+        //Create a solid, single colour texture
+        //(used for when an object doesn't have
+        //a texture)
+        GLuint createTexture(glm::vec3 colour);
 
         //Initialize an imported material
         //TODO: Create a similar function from materials scanned in
         //from a "maerials" directory
-		Material initMaterial(aiMaterial* material, Program* shader);
+        Material initMaterial(aiMaterial* material, Program* shader);
 
-		Material getMaterial(const char* name);
+        Material getMaterial(const char* name);
 
-		Model getModel(const char* name) { return models[ std::string(name) ]; };
-
-        //Convert an array of faces (in aiFace format) to an openGL compatible indices array
-		static std::vector<unsigned int> generateFacesVector(aiFace* assimpFaceArray, int numFaces);
+        Model getModel(const char* name) { return models[ std::string(name) ]; };
 
         void addTextureFolder( std::string toAdd ){ textureFolders.push_back(toAdd); };
 
-	private:
+    private:
         //Raw model data
-		std::map<std::string, ModelData> rawModels;
+        std::map<std::string, ModelData> rawModels;
         //Model objects representing data on GPU
-		std::map<std::string, Model> models;
-		std::map<std::string, GLuint> textureIDs;
-		std::map<std::string, Material> materials;
-		std::vector<Program> programs;
+        std::map<std::string, Model> models;
+        std::map<std::string, GLuint> textureIDs;
+        std::map<std::string, Material> materials;
+        std::vector<Program> programs;
 
-		//Eventually this should read text files from the materials
-		//folder in order to create actual sets of materials
-		void initMaterials(void);
+        //Eventually this should read text files from the materials
+        //folder in order to create actual sets of materials
+        void initMaterials(void);
 
         std::vector<std::string> textureFolders;
 

@@ -7,5 +7,5 @@ uniform sampler2D texSampler;
 
 void main()
 {
-	gl_FragColor = col;
+    gl_FragColor = col;
 }

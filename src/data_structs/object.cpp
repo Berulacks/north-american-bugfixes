@@ -3,15 +3,15 @@
 
 Object::Object(Model mod, Material* mat)
 {
-	model = mod;
-	if(mat != NULL)
-		customMat = mat;
-	scale = {1,1,1};
+    model = mod;
+    if(mat != NULL)
+        customMat = mat;
+    scale = {1,1,1};
 }
 
 Material* Object::getMaterial()
 {
-	return customMat;
+    return customMat;
 }
 
 void Object::setTransform( glm::mat4 trans )
@@ -21,7 +21,7 @@ void Object::setTransform( glm::mat4 trans )
 }
 glm::mat4 Object::getTransform(void)
 {
-	glm::mat4 trans;
+    glm::mat4 trans;
 
     if(!useTransform)
     {
@@ -49,5 +49,5 @@ glm::vec3 Object::getPosition()
 
 void Object::translateBy(glm::vec3 vec)
 {
-	position += vec; 
+    position += vec; 
 }

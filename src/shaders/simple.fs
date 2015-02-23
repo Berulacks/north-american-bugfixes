@@ -2,5 +2,5 @@
 
 void main()
 {
-	gl_FragColor = vec4(215,215,15,15);
+    gl_FragColor = vec4(215,215,15,15);
 }

@@ -6,7 +6,7 @@
 //loaded in the storage class
 class Object
 {
-	public:
+    public:
         //Lets just say we're using SI units
         float mass = 1.0f;
 
@@ -35,7 +35,7 @@ class Object
         //TODO: After OOB generation
         float momentOfInertia();
 
-	private:
+    private:
 
         Model model;
 
