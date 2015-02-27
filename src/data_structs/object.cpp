@@ -53,40 +53,40 @@ void Object::setTransform( glm::mat4 trans )
 
     glm::quat q;
 
-	double xr = 0;
-	double yr = 0;
-	double zr = 0;
+    double xr = 0;
+    double yr = 0;
+    double zr = 0;
 
-	if(angle == 0)
-	{
-		q[3] = 1;
-		q[0] = 0;
-		q[1] = 0;
-		q[2] = 0;
-	}
-	else if(angle < M_PI)
-	{
-		//Extract axises from skew symmetric matrix
-		xr = (trans[1][2] - trans[2][1])/(2*sin(angle));
-		yr = (trans[2][0] - trans[0][2])/(2*sin(angle));
-		zr = (trans[0][1] - trans[1][0])/(2*sin(angle));
-	}
-	else if(angle == M_PI)
-	{
+    if(angle == 0)
+    {
+        q[3] = 1;
+        q[0] = 0;
+        q[1] = 0;
+        q[2] = 0;
+    }
+    else if(angle < M_PI)
+    {
+        //Extract axises from skew symmetric matrix
+        xr = (trans[1][2] - trans[2][1])/(2*sin(angle));
+        yr = (trans[2][0] - trans[0][2])/(2*sin(angle));
+        zr = (trans[0][1] - trans[1][0])/(2*sin(angle));
+    }
+    else if(angle == M_PI)
+    {
 
         if( scaleMag > 1 )
             xr = 0.5*sqrt((trans[0][0] / tempScale[0])-(trans[1][1] / tempScale[1])-(trans[2][2] / tempScale[2])+1);
         else
             xr = 0.5*sqrt((trans[0][0])-(trans[1][1])-(trans[2][2])+1);
 
-		yr = trans[1][0]/(2*xr);
-		zr = trans[2][0]/(2*xr);
-	}
+        yr = trans[1][0]/(2*xr);
+        zr = trans[2][0]/(2*xr);
+    }
 
-	q[3] = cos(angle/2);
-	q[0] = xr * sin(angle*0.5);
-	q[1] = yr * sin(angle*0.5);
-	q[2] = zr * sin(angle*0.5);
+    q[3] = cos(angle/2);
+    q[0] = xr * sin(angle*0.5);
+    q[1] = yr * sin(angle*0.5);
+    q[2] = zr * sin(angle*0.5);
 
     q = glm::normalize( q );
 
