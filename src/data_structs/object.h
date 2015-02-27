@@ -17,8 +17,11 @@ class Object
         Material* getMaterial(void);
 
         void translateBy(glm::vec3);
+        void rotateBy(glm::vec3 eulerAngles);
+
         void setTranslation(glm::vec3 translation) { position = translation; };
         void setScale(glm::vec3 target){ scale = target; };
+        void setRotation(glm::quat target) { rotation = target; };
         void setTransform( glm::mat4 trans );
 
         glm::vec3 getPosition(void);
@@ -40,7 +43,7 @@ class Object
         Model model;
 
         glm::vec3 position;
-        glm::vec3 rotation;
+        glm::quat rotation;
         glm::vec3 scale;
 
         glm::vec3 velocity;

@@ -38,6 +38,14 @@ void Pedestal::processEvents(float physT)
 					myRenderer->toggleFullScreen(myEngine->getWindow() );
                 if(key == SDLK_b)
                     obj->renderBoundingBox = !obj->renderBoundingBox ;
+                if(key == SDLK_UP)
+                    obj->rotateBy( {0.1f, 0.0f, 0.0f} );
+                if(key == SDLK_DOWN)
+                    obj->rotateBy( {-0.1, 0.0f, 0.0f} );
+                if(key == SDLK_RIGHT)
+                    obj->rotateBy( {0.0f, 0.1f, 0.0f} );
+                if(key == SDLK_LEFT)
+                    obj->rotateBy( {0.0f, -0.1f, 0.0f} );
 
 				break;
 
