@@ -25,6 +25,7 @@ class Object
         void setTransform( glm::mat4 trans );
 
         glm::vec3 getPosition(void);
+        glm::vec3 getScale(void);
 
         //Should we apply physics steps to this object?
         bool isPhysicsObject = false;

@@ -91,7 +91,7 @@ bool Renderer::initGL()
     glEnable(GL_DEPTH_TEST);
     glViewport(0,0,800,600);
     
-    projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f);
+    projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 500.f);
     cameraPos = glm::vec3(0.0f, 1.0f, -1.0f);
 
     glm::vec3 lookat;
@@ -101,8 +101,8 @@ bool Renderer::initGL()
 
     camera = glm::lookAt(cameraPos, cameraPos + lookat, glm::vec3(0, 1, 0));
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_CULL_FACE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     simplePr = new Program("./src/shaders/simple.vs", "./src/shaders/simple.fs");
 
@@ -141,7 +141,7 @@ void Renderer::toggleFullScreen(SDL_Window* mainWindow)
     if(!isFullScreen)
     {
         SDL_SetWindowFullscreen(mainWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-        updateProjection( glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 50.f) );
+        updateProjection( glm::perspective(45.0f, 16.0f / 9.0f, 0.1f, 500.f) );
         SDL_GetWindowSize(mainWindow, &w, &h);
         printf("Going fullscreen: %ix%i\n", w, h);
         glViewport(0,0,w,h);
@@ -151,7 +151,7 @@ void Renderer::toggleFullScreen(SDL_Window* mainWindow)
     {
         SDL_SetWindowFullscreen(mainWindow, 0);
         SDL_SetWindowSize( mainWindow, 800, 600);
-        updateProjection( glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 50.f)) ;
+        updateProjection( glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 500.f)) ;
         printf("Leaving fullscreen!\n");
         glViewport(0,0,800,600);
         isFullScreen = false;

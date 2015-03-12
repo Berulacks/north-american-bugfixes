@@ -2,6 +2,13 @@
 
 void Pedestal::processEvents(float physT)
 {
+    myRenderer->cameraPos += cameraVel * glm::mat3(myRenderer->camera) * physT;
+
+    if( abs( cameraVel.length() ) <= 0.05 && cameraVel.length() != 0.0f)
+        cameraVel = {0,0,0};
+    else
+        cameraVel *= 0.8f;
+
 	SDL_Event event;
 	SDL_Keycode key;
 	glm::vec3 lookat;
@@ -23,16 +30,16 @@ void Pedestal::processEvents(float physT)
 					myEngine->quit();
 
 				if(key == SDLK_w)
-					myRenderer->cameraPos -= glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(myRenderer->camera) * physT;
+                    cameraVel -= glm::vec3(0.0f, 0.0f, 3.0f);
 
 				if(key == SDLK_s)
-					myRenderer->cameraPos += glm::vec3(0.0f, 0.0f, 3.0f) *  glm::mat3(myRenderer->camera) * physT;
+                    cameraVel += glm::vec3(0.0f, 0.0f, 3.0f);
 
 				if(key == SDLK_a)
-					myRenderer->cameraPos -= glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(myRenderer->camera) * physT;
+                    cameraVel -= glm::vec3(3.0f, 0.0f, 0.0f);
 
 				if(key == SDLK_d)
-					myRenderer->cameraPos += glm::vec3(3.0f, 0.0f, 0.0f) *  glm::mat3(myRenderer->camera) * physT;
+                    cameraVel += glm::vec3(3.0f, 0.0f, 0.0f);
 
 				if(key == SDLK_f)
 					myRenderer->toggleFullScreen(myEngine->getWindow() );
@@ -55,6 +62,12 @@ void Pedestal::processEvents(float physT)
 				myRenderer->yRot -= event.motion.yrel * 0.001;
 
 				break;
+            
+            case SDL_MOUSEWHEEL:
+
+                obj->setScale( ( obj->getScale() += 0.03 * event.wheel.y ) );
+                
+                break;
 		}
 
 	}

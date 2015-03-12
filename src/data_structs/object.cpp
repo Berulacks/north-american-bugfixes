@@ -114,6 +114,11 @@ glm::vec3 Object::getPosition()
     return position;
 }
 
+glm::vec3 Object::getScale()
+{
+    return scale;
+}
+
 void Object::translateBy(glm::vec3 vec)
 {
     position += vec; 
