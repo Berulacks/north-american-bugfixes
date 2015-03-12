@@ -25,12 +25,12 @@ bullet_demo
 .gdbinit
 
 #textures
-textures/*
+examples/textures/*
 
-!textures/mramor6x6.png
-!textures/checker.jpg
-!textures/credit.txt
-!textures/earthmap1k.jpg
+!examples/textures/mramor6x6.png
+!examples/textures/checker.jpg
+!examples/textures/credit.txt
+!examples/textures/earthmap1k.jpg
 
 #gdb files
 .gdbinit
