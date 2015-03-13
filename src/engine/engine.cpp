@@ -2,9 +2,11 @@
 
 std::vector<Object> objs;
 
-bool Engine::init( int argc, const char* argv[] )
+bool Engine::init( std::string name, int argc, const char* argv[] )
 {
     using namespace std::chrono;
+
+    this->name = name;
 
     steady_clock::time_point inter;
     duration<double> diff;
@@ -12,7 +14,7 @@ bool Engine::init( int argc, const char* argv[] )
 
     if(!initSDL())
     {
-        printf("Could not initiate SDL!\n");
+        printf("Could not initialize SDL!\n");
         return false;
     }
     else
@@ -146,7 +148,7 @@ bool Engine::initSDL()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    mainWindow = SDL_CreateWindow("Pedestal", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    mainWindow = SDL_CreateWindow( name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
     SDL_SetRelativeMouseMode( SDL_TRUE );
 

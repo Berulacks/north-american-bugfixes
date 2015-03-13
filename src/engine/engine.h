@@ -34,7 +34,7 @@ class Engine
 
         Engine();
         //Initializes the engine, renderer, and storage
-        bool init( int argc, const char* argv[] );
+        bool init( std::string name, int argc, const char* argv[] );
 
         void quit(void);
 
@@ -61,6 +61,8 @@ class Engine
         SDL_Window* getWindow(void) { return mainWindow; };
 
     private:
+        //The window name/name of this instance
+        std::string name;
         //The list of objects currently registered with the engine.
         std::vector<Object*> objs;
         //Outside functions to be appended

@@ -169,7 +169,7 @@ void BulletDemo::step(float physT)
 BulletDemo::BulletDemo( int argc, const char* argv[] )
 {
 	Engine program;
-	if( !program.init(argc, argv) )
+	if( !program.init("Bullet Demo", argc, argv) )
 		exit(1);
 
     myEngine = &program;

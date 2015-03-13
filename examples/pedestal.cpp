@@ -96,7 +96,7 @@ void Pedestal::processEvents(float physT)
 Pedestal::Pedestal( int argc, const char* argv[] )
 {
 	Engine program;
-	if( !program.init(argc, argv) )
+	if( !program.init("Pedestal", argc, argv) )
 		exit(1);
 
     myEngine = &program;
