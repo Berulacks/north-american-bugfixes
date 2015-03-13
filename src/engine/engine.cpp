@@ -4,13 +4,25 @@ std::vector<Object> objs;
 
 bool Engine::init( int argc, const char* argv[] )
 {
+    using namespace std::chrono;
+
+    steady_clock::time_point inter;
+    duration<double> diff;
+    beg = steady_clock::now();
+
     if(!initSDL())
     {
         printf("Could not initiate SDL!\n");
         return false;
     }
     else
-        printf("SDL Initialized!\n");
+    {
+        end = steady_clock::now();
+        diff = end - beg;
+        printf("SDL Initialized! Initialization time: %f seconds!\n",diff.count());
+    }
+
+    inter = steady_clock::now();
 
     if(!renderer.initGL())
     {
@@ -18,11 +30,17 @@ bool Engine::init( int argc, const char* argv[] )
         return false;
     }
     else
-        printf("Succesfully initialized OpenGL!\n");
+    {
+        end = steady_clock::now();
+        diff = end - inter;
+        printf("Succesfully initialized OpenGL! Initialization time: %f seconds!\n", diff.count());
+    }
 
     SDL_GL_SetSwapInterval(1);
 
-    printf("Completed initialization!\n");
+    end = steady_clock::now();
+    diff = end - beg;
+    printf("Completed initialization! Total initialization time: %f seconds!\n", diff.count());
 
     return true;
 }

@@ -68,6 +68,8 @@ class Engine
         //functions will be passed a 
         //deltaT value (in seconds)
         std::vector< std::function<void(float)> > functions;
+        //Timer for the program
+        std::chrono::steady_clock::time_point beg, end;
         //Render the objects in objs
         void render(void);
         //TODO
