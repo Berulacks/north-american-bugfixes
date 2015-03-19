@@ -1,6 +1,6 @@
-#version 130
-varying vec4 col;
-varying vec2 tex;
+#version 330
+in vec4 col;
+in vec2 tex;
 
 uniform sampler2D texSampler;
 

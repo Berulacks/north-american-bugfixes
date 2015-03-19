@@ -1,9 +1,9 @@
-#version 130
+#version 330
 //Most valuable player
 uniform mat4 mvp;
 
 //incoming vector
-attribute vec3 theV;
+in vec3 theV;
 
 void main()
 {

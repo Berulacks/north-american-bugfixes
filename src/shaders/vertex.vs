@@ -1,4 +1,4 @@
-#version 130
+#version 330
 //Most valuable player
 uniform mat4 mvp;
 uniform mat4 mv;
@@ -8,15 +8,15 @@ uniform vec3 Kd; // Diffuse reflectivity
 uniform vec3 Ld; // Light source intensity
 
 //outgoing color
-varying vec4 col;
-varying vec2 tex;
+out vec4 col;
+out vec2 tex;
 
 //incoming vector
-attribute vec3 theV;
+in vec3 theV;
 //incoming normal
-attribute vec3 theN;
+in vec3 theN;
 //incoming texture coord
-attribute vec2 tex_in;
+in vec2 tex_in;
 
 void main()
 {

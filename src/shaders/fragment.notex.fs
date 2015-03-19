@@ -1,7 +1,7 @@
-#version 130
-varying vec4 col;
+#version 330
+in vec4 col;
 //We'll just keep this here to prevent too many things from breaking
-varying vec2 tex;
+in vec2 tex;
 
 uniform sampler2D texSampler;
 
