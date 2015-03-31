@@ -132,7 +132,7 @@ Pedestal::Pedestal( int argc, const char* argv[] )
 
 	printf("Okay, our modelel is supposedly loaded, lets check it for some info:\n");
 	printf("Our modelel has %i meshes.\n", model.numMeshes() );
-	printf("The first mesh of our modelel is called %s\n", model.getBCombo(0).name.c_str());
+	printf("The first mesh of our modelel is called %s\n", model.getMeshInfo(0).name.c_str());
 	printf("...and its material is called %s\n", model.materials[0].name.c_str());
 	printf("And it looks for a texture called %s\n", model.materials[0].texDiffuse_name.c_str() );
 

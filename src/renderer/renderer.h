@@ -24,7 +24,7 @@ class Renderer
         void updateProjection(glm::mat4 projection);
     private:
 
-        BufferCombo boundingBox;
+        MeshInfo boundingBox;
         
         //A basic pair of shaders
         //that just renders incoming

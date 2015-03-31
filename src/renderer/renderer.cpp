@@ -26,7 +26,7 @@ void Renderer::render(std::vector<Object*> objects)
 
         for(int j = 0; j < model.numMeshes(); j++)
         {
-            mat = model.materials[ model.getBCombo(j).matIndex ];
+            mat = model.materials[ model.getMeshInfo(j).matIndex ];
             shader = mat.shader;
 
             setActiveProgram( shader );
@@ -40,14 +40,14 @@ void Renderer::render(std::vector<Object*> objects)
             //Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
             updateUniforms( *objects[i] );
             
-            glDrawElements(GL_TRIANGLES, model.getBCombo(j).numIndices, GL_UNSIGNED_INT, NULL); 
+            glDrawElements(GL_TRIANGLES, model.getMeshInfo(j).numIndices, GL_UNSIGNED_INT, NULL); 
 
             if( objects[i]->renderBoundingBox )
             {
                 setActiveProgram( simplePr );
                 glBindVertexArray( bBoxVao );
                 glBindTexture( GL_TEXTURE_2D, 0 );
-                glBindBuffer( GL_ARRAY_BUFFER, model.getBCombo( j ).boundingBox );
+                glBindBuffer( GL_ARRAY_BUFFER, model.getMeshInfo( j ).boundingBox );
                 //When you finally fix updateUniforms such that it isn't horrible, make sure to give a way to only send the mvp matrix in, so we can delete this line
                 glm::mat4 mv = projection * (camera * objects[i]->getTransform());
                 glUniformMatrix4fv(activeProgram->getUniform("mvp"), 1, GL_FALSE, glm::value_ptr(mv) );

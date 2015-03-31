@@ -32,21 +32,10 @@ examples/textures/*
 !examples/textures/credit.txt
 !examples/textures/earthmap1k.jpg
 
-#gdb files
-.gdbinit
+#models
+examples/models/*
 
-# Models I don't want in
-# version control
-rungholt
-rungholt*
-house*
-sibenik*
-kamen*
-dabrovic*
-humpback*
-dragon*
-bunny*
-teapot*
-default.mtl
-sanmiguel*
-sponza*
+!examples/models/cube/*
+!examples/models/plane/*
+!examples/models/sphere/*
+!examples/modeles/suzanne*

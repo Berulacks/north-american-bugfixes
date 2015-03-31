@@ -2,8 +2,6 @@
 
 Model::Model( ModelData data )
 {
-    //scene = _scene;
-    
 
     //Read in materials
     for(int i = 0; i < data.materials.size(); i++)
@@ -31,7 +29,7 @@ void Model::setUpBuffers(ModelData data)
 
         unsigned int numVertices = data.meshes[i].positions.size();
 
-        BufferCombo buffers;
+        MeshInfo buffers;
         buffers.numVertices = numVertices;
         buffers.numIndices = data.meshes[i].indices.size();
 
@@ -118,15 +116,17 @@ void Model::setUpBuffers(ModelData data)
 
             if( vert.x < min.x )
                 min.x = vert.x;
-            if( vert.x > max.x )
+            else if( vert.x > max.x )
                 max.x = vert.x;
+
             if( vert.y < min.y )
                 min.y = vert.y;
-            if( vert.y > max.y )
+            else if( vert.y > max.y )
                 max.y = vert.y;
+
             if( vert.z < min.z )
                 min.z = vert.z;
-            if( vert.z > max.z )
+            else if( vert.z > max.z )
                 max.z = vert.z;
 
         }
