@@ -1,18 +1,28 @@
 #pragma once
 #include "material.h"
 
+//A struct to store info on individual meshes
+//(assuming they've already been loaded onto the gpu and
+//are ready for rendering)
+//(created in Storage::loadModel() )
 struct MeshInfo
 {
     std::string name;
-    GLuint vao, vertices, indices, normals, texturecoords, boundingBox;
+    GLuint vao, vertexBuffer, indexBuffer, normalsBuffer, uvBuffer, boundingBoxBuffer;
 
     unsigned int numVertices;
     unsigned int numIndices;
     unsigned int matIndex;
+
+    //Our bounding box's width, height, and depth
+    //From the model's origin
+    glm::vec3 boundingBox;
 };
 
 //A simple struct to store
-//raw mesh data.
+//raw mesh data. Only used
+//to store raw data read from disk
+//(created in Storage::readModel() )
 struct MeshData
 {
         std::string name = std::string("NAMELESS_MESH");
@@ -38,7 +48,7 @@ struct ModelData
         std::vector<MeshData> meshes;
         std::vector<Material> materials;
 
-        uint numMeshes(void) { return meshes.size() ; };
+        unsigned int numMeshes(void) { return meshes.size() ; };
 };
 
 //Models are scenes that have their
