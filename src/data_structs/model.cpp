@@ -13,6 +13,54 @@ Model::Model( ModelData data )
     
 }
 
+void Model::generateOOBB(MeshData* data)
+{
+        int numPoints = data->positions.size();
+
+        //First, compute the centroid.
+        glm::vec3 centroid;
+
+        for(int i = 0; i < numPoints; i++)
+        {
+                centroid += data->positions[i];
+        }
+
+        centroid /= (float) numPoints;
+
+        //Then, the covariance matrix
+
+        glm::mat3 covar;
+        glm::vec3 point;
+
+        covar *= 0;
+
+        //Method 1 (book)
+        for(int i = 0; i < numPoints; i++)
+        {
+                point = data->positions[i];
+
+                covar[0][0] += pow(point.x - centroid.x, 2);
+                covar[1][1] += pow(point.y - centroid.y, 2);
+                covar[2][2] += pow(point.z - centroid.x, 2);
+
+                covar[1][0] = covar[0][1] += (point.x - centroid.x) * (point.y - centroid.y);
+                covar[2][0] = covar[0][2] += (point.x - centroid.x) * (point.z - centroid.z);
+                covar[2][1] = covar[1][2] += (point.y - centroid.y) * (point.z - centroid.z);
+        }
+
+        covar /= (float) numPoints;
+
+        //Method 2 (approx) 
+        //centroid = sum(0..N, x[i]) / N
+        //C = sum(0..N, mult(x[i]-centroid, transpose(x[i]-centroid)));
+
+        //Calculate eigenvalues
+        // det(C - eigenV * I )
+        
+        //det(mat3x3) = a11 ( a22a33 - a23a32 ) - a12 (a21a33 - a23a31) + a13 ( a21a32 - a22a31 )
+        // (covar[0][0] - e) * (
+}
+
 void Model::setUpBuffers(ModelData data)
 {
     Program::checkGLErrors( "beginning of model init" );
@@ -20,6 +68,8 @@ void Model::setUpBuffers(ModelData data)
     GLuint vao, vbo, nbo, ibo, tbo;
 
     int numMeshes = data.numMeshes() ;
+
+    generateOOBB(&data.meshes[0]);
 
     //Lets start with meshes
     for( int i = 0; i < numMeshes; i++)

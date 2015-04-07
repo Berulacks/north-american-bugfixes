@@ -1,5 +1,6 @@
 #pragma once
 #include "material.h"
+#include <math.h>
 
 //A struct to store info on individual meshes
 //(assuming they've already been loaded onto the gpu and
@@ -75,6 +76,8 @@ class Model
         //format to an array of floats, suitable for 
         //OpenGL)
         static std::vector<unsigned int> generateFacesVector(aiFace* assimpFaceArray, int numFaces);
+
+        void generateOOBB( MeshData* data );
 
     private:
 
