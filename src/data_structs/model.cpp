@@ -104,11 +104,11 @@ void Model::setUpBuffers(ModelData data)
         glBindVertexArray( 0 );
 
         //Setup bounding box buffer
-        glm::vec3 min = glm::vec3(FLT_MAX);
-        glm::vec3 max = glm::vec3(FLT_MIN);
+        glm::vec3 min = data.meshes[i].positions[0];
+        glm::vec3 max = data.meshes[i].positions[0];
         glm::vec3 vert, comp;
 
-        for(int j = 0; j < numVertices; j++)
+        for(int j = 1; j < numVertices; j++)
         {
             vert.x = data.meshes[i].positions[j].x;
             vert.y = data.meshes[i].positions[j].y;
