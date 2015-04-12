@@ -47,7 +47,7 @@ void Renderer::render(std::vector<Object*> objects)
                 setActiveProgram( simplePr );
                 glBindVertexArray( bBoxVao );
                 glBindTexture( GL_TEXTURE_2D, 0 );
-                glBindBuffer( GL_ARRAY_BUFFER, model.getMeshInfo( j ).boundingBox );
+                glBindBuffer( GL_ARRAY_BUFFER, model.getMeshInfo( j ).boundingBoxBuffer );
                 //When you finally fix updateUniforms such that it isn't horrible, make sure to give a way to only send the mvp matrix in, so we can delete this line
                 glm::mat4 mv = projection * (camera * objects[i]->getTransform());
                 glUniformMatrix4fv(activeProgram->getUniform("mvp"), 1, GL_FALSE, glm::value_ptr(mv) );
@@ -122,7 +122,7 @@ bool Renderer::initGL()
 
     boundingBox.name = "BoundingBox";
     boundingBox.vao = bBoxVao;
-    boundingBox.indices = bBoxIbo;
+    boundingBox.indexBuffer = bBoxIbo;
 
     //CheckGLErrors returns true if an error was found
     //so we return the opposite

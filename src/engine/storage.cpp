@@ -79,6 +79,7 @@ bool Storage::loadTexture(const char* filePath, const char* name)
     Program::checkGLErrors("Setting texture filtering mode");
 
     textureIDs.emplace( std::string( name ), tex );
+    printf("Loaded tex into %i!\n", tex);
 
     delete[] finalPixels;
 
@@ -286,13 +287,17 @@ Material Storage::initMaterial( aiMaterial* material, Program* shader )
 
     }
     else    
+    {
         //Have we already loaded our texture?
         if( textureIDs.find( mat.texDiffuse_name ) == textureIDs.end() )
         {
             printf("Texture %s for material %s not already loaded, loading...\n", mat.texDiffuse_name.c_str(), mat.name.c_str());
             loadTexture( mat.texDiffuse_name.c_str(), mat.texDiffuse_name.c_str() );
-            mat.texDiffuse = textureIDs[ mat.texDiffuse_name ];
         }
+
+        mat.texDiffuse = textureIDs[ mat.texDiffuse_name ];
+
+    }
 
     printf("Adding material %s to storage...\n", mat.name.c_str());
     materials.emplace(std::string(mat.name.c_str()), mat);

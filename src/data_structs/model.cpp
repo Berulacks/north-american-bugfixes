@@ -13,6 +13,54 @@ Model::Model( ModelData data )
     
 }
 
+void Model::generateOOBB(MeshData* data)
+{
+        int numPoints = data->positions.size();
+
+        //First, compute the centroid.
+        glm::vec3 centroid;
+
+        for(int i = 0; i < numPoints; i++)
+        {
+                centroid += data->positions[i];
+        }
+
+        centroid /= (float) numPoints;
+
+        //Then, the covariance matrix
+
+        glm::mat3 covar;
+        glm::vec3 point;
+
+        covar *= 0;
+
+        //Method 1 (book)
+        for(int i = 0; i < numPoints; i++)
+        {
+                point = data->positions[i];
+
+                covar[0][0] += pow(point.x - centroid.x, 2);
+                covar[1][1] += pow(point.y - centroid.y, 2);
+                covar[2][2] += pow(point.z - centroid.x, 2);
+
+                covar[1][0] = covar[0][1] += (point.x - centroid.x) * (point.y - centroid.y);
+                covar[2][0] = covar[0][2] += (point.x - centroid.x) * (point.z - centroid.z);
+                covar[2][1] = covar[1][2] += (point.y - centroid.y) * (point.z - centroid.z);
+        }
+
+        covar /= (float) numPoints;
+
+        //Method 2 (approx) 
+        //centroid = sum(0..N, x[i]) / N
+        //C = sum(0..N, mult(x[i]-centroid, transpose(x[i]-centroid)));
+
+        //Calculate eigenvalues
+        // det(C - eigenV * I )
+        
+        //det(mat3x3) = a11 ( a22a33 - a23a32 ) - a12 (a21a33 - a23a31) + a13 ( a21a32 - a22a31 )
+        // (covar[0][0] - e) * (
+}
+
 void Model::setUpBuffers(ModelData data)
 {
     Program::checkGLErrors( "beginning of model init" );
@@ -20,6 +68,8 @@ void Model::setUpBuffers(ModelData data)
     GLuint vao, vbo, nbo, ibo, tbo;
 
     int numMeshes = data.numMeshes() ;
+
+    generateOOBB(&data.meshes[0]);
 
     //Lets start with meshes
     for( int i = 0; i < numMeshes; i++)
@@ -46,21 +96,21 @@ void Model::setUpBuffers(ModelData data)
         Program::checkGLErrors( "VBO Binding" );
         glBufferData( GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float), &data.meshes[i].positions[0], GL_STATIC_DRAW);
         Program::checkGLErrors( "BufferData for vertices" );
-        buffers.vertices = vbo;
+        buffers.vertexBuffer = vbo;
         glVertexAttribPointer( mat.shader->getAttrib("theV"), 3, GL_FLOAT, 0, 0, 0 );
         Program::checkGLErrors( "Vertex attrib for vertices" );
         //Indices
         glGenBuffers(1, &ibo);
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, data.meshes[i].indices.size() * sizeof(unsigned int), &data.meshes[i].indices[0], GL_STATIC_DRAW);
-        buffers.indices = ibo;
+        buffers.indexBuffer = ibo;
 
         //Normals
         glGenBuffers(1, &nbo);
         glBindBuffer( GL_ARRAY_BUFFER, nbo );
         glBufferData( GL_ARRAY_BUFFER, data.meshes[i].normals.size() * 3 * sizeof(float), &data.meshes[i].normals[0], GL_STATIC_DRAW);
         Program::checkGLErrors( "BufferData for normals" );
-        buffers.normals = nbo;
+        buffers.normalsBuffer = nbo;
         glVertexAttribPointer( mat.shader->getAttrib("theN"), 3, GL_FLOAT, 0, 0, 0 );
         Program::checkGLErrors( "Vertex attrib for normals" );
 
@@ -89,7 +139,7 @@ void Model::setUpBuffers(ModelData data)
         }
         Program::checkGLErrors( "4" );
 
-        buffers.texturecoords = tbo;
+        buffers.uvBuffer = tbo;
         glVertexAttribPointer( mat.shader->getAttrib("tex_in"), 2, GL_FLOAT, 0, 0, 0);
         Program::checkGLErrors( "Vertex attrib for textures" );
 
@@ -154,13 +204,23 @@ void Model::setUpBuffers(ModelData data)
         cube[0] = min;
         cube[0].z = max.z;
 
+        glm::vec3 dimensions = max;
+        if( dimensions.x > 0 )
+                dimensions.x += min.x * -1;
+        if( dimensions.y > 0 )
+                dimensions.y += min.y * -1;
+        if( dimensions.z > 0 )
+                dimensions.z += min.z * -1;
+
+        buffers.boundingBox = dimensions;
+
         GLuint bBoxVbo;
         glGenBuffers( 1, &bBoxVbo );
         glBindBuffer( GL_ARRAY_BUFFER, bBoxVbo );
         //printf("bBoxVbo is %i\n", bBoxVbo);
         glBufferData( GL_ARRAY_BUFFER, 8 * 3 * sizeof(float), cube, GL_STATIC_DRAW );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
-        buffers.boundingBox = bBoxVbo;
+        buffers.boundingBoxBuffer = bBoxVbo;
         Program::checkGLErrors( "7" );
 
         //Add material index to storage
