@@ -7,7 +7,7 @@ class Pedestal
     Storage* myStorage;
     Engine* myEngine;
 
-    Object* obj;
+    DisplayObject* obj;
 
     public:
         Pedestal(int argc, const char* argv[]);

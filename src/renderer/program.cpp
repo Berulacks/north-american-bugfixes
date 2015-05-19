@@ -10,6 +10,8 @@ Program::Program(const char* vertexShader, const char* fragShader)
         glLinkProgram(id);
         ready = true;
     }
+    else
+        printf("Error initializing Program!\n");
 }
 
 Program::Program(const char* vertexShader, const char* fragShader, std::vector<const char*> uniforms, std::vector<const char*> attribs)

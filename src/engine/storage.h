@@ -27,7 +27,7 @@
 #include <SDL2/SDL.h>
 #include <SOIL/SOIL.h>
 
-#include "../data_structs/model.h"
+#include "../data_structs/scene.h"
 
 //Stores actual mesh information
 //and handles file IO

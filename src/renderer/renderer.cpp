@@ -1,10 +1,11 @@
 #include "renderer.h"
+
 Renderer::Renderer()
 {
     printf("Renderer created!\n");
 }
 
-void Renderer::render(std::vector<Object*> objects)
+void Renderer::render( Scene* toRender )
 {
     glClearColor(1.0f,0.8f,0.8f,1.0f);
     Program::checkGLErrors( "glClearColor" );
@@ -20,13 +21,23 @@ void Renderer::render(std::vector<Object*> objects)
     Material mat;
     Program* shader;
 
+    std::vector<DisplayObject> objects = toRender->getDisplayObjects();
+
     for(int i = 0; i < objects.size(); i++)
     {
-        model = objects[i]->getModel();
+        model = objects[i].getModel();
 
         for(int j = 0; j < model.numMeshes(); j++)
         {
-            mat = model.materials[ model.getMeshInfo(j).matIndex ];
+
+            //Doesn't work ;_;
+            //mat = *(objects[i].getMaterial( model.getMeshInfo(j).matIndex ));
+            
+            if(objects[i].customMatAvailable)
+                mat = (objects[i].getMaterial(0));
+            else
+                mat = model.materials[ model.getMeshInfo(j).matIndex ];
+
             shader = mat.shader;
 
             setActiveProgram( shader );
@@ -38,18 +49,18 @@ void Renderer::render(std::vector<Object*> objects)
             Program::checkGLErrors( "Binding texture" );
             
             //Update uniforms just loads the constant uniforms, e.g. Ld and stuff.
-            updateUniforms( *objects[i] );
+            updateUniforms( objects[i] );
             
             glDrawElements(GL_TRIANGLES, model.getMeshInfo(j).numIndices, GL_UNSIGNED_INT, NULL); 
 
-            if( objects[i]->renderBoundingBox )
+            if( objects[i].renderBoundingBox )
             {
                 setActiveProgram( simplePr );
                 glBindVertexArray( bBoxVao );
                 glBindTexture( GL_TEXTURE_2D, 0 );
                 glBindBuffer( GL_ARRAY_BUFFER, model.getMeshInfo( j ).boundingBoxBuffer );
                 //When you finally fix updateUniforms such that it isn't horrible, make sure to give a way to only send the mvp matrix in, so we can delete this line
-                glm::mat4 mv = projection * (camera * objects[i]->getTransform());
+                glm::mat4 mv = projection * (camera * objects[i].getTransform());
                 glUniformMatrix4fv(activeProgram->getUniform("mvp"), 1, GL_FALSE, glm::value_ptr(mv) );
 
                 glVertexAttribPointer( simplePr->getAttrib("theV"),3,GL_FLOAT,0,0,0);
@@ -159,7 +170,7 @@ void Renderer::toggleFullScreen(SDL_Window* mainWindow)
 }
 
 
-void Renderer::updateUniforms( Object obj, Program* program )
+void Renderer::updateUniforms( DisplayObject obj, Program* program )
 {
     
     bool prSwitch = false;

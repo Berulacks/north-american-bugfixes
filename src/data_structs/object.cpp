@@ -1,17 +1,9 @@
 #include "object.h"
 
 
-Object::Object(Model mod, Material* mat)
+Object::Object()
 {
-    model = mod;
-    if(mat != NULL)
-        customMat = mat;
     scale = {1,1,1};
-}
-
-Material* Object::getMaterial()
-{
-    return customMat;
 }
 
 void Object::setTransform( glm::mat4 trans )
@@ -97,9 +89,24 @@ void Object::setTransform( glm::mat4 trans )
     this->rotation = q;
     this->scale = tempScale;
 }
-
 glm::mat4 Object::getTransform(void)
 {
+    if(useTransform)
+        return *transform;
+
+    glm::mat4 trans = calculateTransform();
+
+    this->transform = new glm::mat4( trans );
+    useTransform = true;
+
+    return trans;
+}
+
+glm::mat4 Object::calculateTransform(void) const
+{
+    if(useTransform)
+            return *transform;
+
     glm::mat4 trans;
 
     trans = glm::translate( trans, position );
@@ -109,12 +116,12 @@ glm::mat4 Object::getTransform(void)
     return trans;
 }
 
-glm::vec3 Object::getPosition()
+glm::vec3 Object::getPosition() const
 {
     return position;
 }
 
-glm::vec3 Object::getScale()
+glm::vec3 Object::getScale() const
 {
     return scale;
 }
@@ -122,6 +129,7 @@ glm::vec3 Object::getScale()
 void Object::translateBy(glm::vec3 vec)
 {
     position += vec; 
+    clearTransform();
 }
 
 void Object::rotateBy(glm::vec3 eulerAngles)
@@ -153,4 +161,34 @@ void Object::rotateBy(glm::vec3 eulerAngles)
     }
     rotation = glm::normalize( rotation );
     //printf("Finishing rotate. Final rotation is %f, %f, %f, %f.\n\n", rotation[0], rotation[1], rotation[2], rotation[3]);
+    clearTransform();
+}
+
+void Object::setTranslation(glm::vec3 translation) 
+{ 
+    position = translation; 
+    clearTransform();
+}
+
+void Object::setScale(glm::vec3 target)
+{ 
+    scale = target; 
+    clearTransform();
+}
+
+void Object::setRotation(glm::quat target) 
+{ 
+    rotation = target; 
+    clearTransform();
+}
+
+void Object::clearTransform()
+{
+        //Sanity check
+        if(!useTransform)
+                return;
+
+        useTransform = false;
+        if(transform)
+                delete transform;
 }

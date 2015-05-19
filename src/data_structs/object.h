@@ -7,60 +7,45 @@
 class Object
 {
     public:
-        //Lets just say we're using SI units
-        float mass = 1.0f;
 
-        Object() { scale = {1,1,1}; };
-        Object(Model mod, Material* mat = NULL);
-        Model getModel(void) { return model; };
+        Object();
+
+        //Get transform is the same as calculateTransform
+        //Except it caches the matrix so that it doesn't
+        //have to be recalculated again until something
+        //changes
         glm::mat4 getTransform(void);
-        Material* getMaterial(void);
+        //Always use getTransform unless you need a const
+        //function!
+        virtual glm::mat4 calculateTransform(void) const;
 
         void translateBy(glm::vec3);
         void rotateBy(glm::vec3 eulerAngles);
 
-        void setTranslation(glm::vec3 translation) { position = translation; };
-        void setScale(glm::vec3 target){ scale = target; };
-        void setRotation(glm::quat target) { rotation = target; };
+        void setTranslation(glm::vec3 translation);
+        void setScale(glm::vec3 target);
+        void setRotation(glm::quat target);
         void setTransform( glm::mat4 trans );
 
-        glm::vec3 getPosition(void);
-        glm::vec3 getScale(void);
+        glm::vec3 getPosition(void) const;
+        glm::vec3 getScale(void) const;
 
-        //Should we apply physics steps to this object?
-        bool isPhysicsObject = false;
-        //Should we check if this object collides with others?
-        bool collidable = false;
-        //Should we NOT render this object?
-        bool hidden = false;
-
-        bool renderBoundingBox = false;
-
-        //TODO: After OOB generation
-        float momentOfInertia();
-
-    private:
-
-        Model model;
+    protected:
 
         glm::vec3 position;
         glm::quat rotation;
         glm::vec3 scale;
 
-        glm::vec3 velocity;
-        glm::vec3 rotVelocity;
+    private:
 
         //Should we use a static transform
         //instead of recalculating every frame?
         bool useTransform = false;
-        glm::mat4 transform;
+        glm::mat4* transform;
 
-        //By default, any object will
-        //use the material stored in
-        //its model. This can be 
-        //overridden with the customMat
-        //variable, which is NULL by
-        //default.
-        Material* customMat = NULL;
-
+        //Sets useTransform to false and wipes
+        //the pointer to the transformation matrix
+        //Should only be called by functions that
+        //affect position, rotation, or scale.
+        void clearTransform(void);
 };

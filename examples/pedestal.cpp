@@ -139,13 +139,21 @@ Pedestal::Pedestal( int argc, const char* argv[] )
     if( !myStorage->readModel( "./examples/models/plane/plane.obj" ) )
         program.quit();
 
-    Object plane = Object( myStorage->loadModel( "./examples/models/plane/plane.obj" ) );
+    DisplayObject plane = DisplayObject( myStorage->loadModel( "./examples/models/plane/plane.obj" ) );
     plane.setTranslation( {0, -2, 4} );
-    program.registerObject( &plane );
+    program.getActiveScene()->registerObject( &plane );
 
-	obj = new Object(model);
+	obj = new DisplayObject(model);
 	obj->translateBy( {0.0f,0.0f,5.0f} );
-	myEngine->registerObject( obj );
+	myEngine->getActiveScene()->registerObject( obj );
+
+    Program blurShader = Program( "./src/shaders/vertex.vs", "./src/shaders/blur.fs" );
+    /*if(blurShader.isReady())
+    {
+        Material h = obj->getMaterial(0);
+        h.shader = &blurShader;
+        obj->setMaterial( h );
+    }*/
 
 	program.start( SDL_GetTicks() );
 	
