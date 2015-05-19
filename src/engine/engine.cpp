@@ -51,6 +51,7 @@ void Engine::start(int lastFrame)
 {
     while(active)
     {
+    
         if(lastFrame == 0)
             lastFrame = SDL_GetTicks();
         
@@ -84,7 +85,7 @@ void Engine::start(int lastFrame)
 
         }
 
-        renderer.render(objs);
+        renderer.render(&activeScene);
         SDL_GL_SwapWindow(mainWindow);
 
         lastFrame = currentTime;
@@ -121,15 +122,6 @@ bool Engine::registerCallback( std::function<void(float)> function )
     //}
     //return false;
 
-}
-bool Engine::registerObject(Object* toAdd)
-{
-    if( std::find(objs.begin(), objs.end(), toAdd) == objs.end())
-    {
-        objs.push_back(toAdd);
-        return true;
-    }
-    return false;
 }
 
 bool Engine::initSDL()
@@ -185,6 +177,16 @@ void Engine::quit()
     SDL_Quit();
 
     exit(0);
+}
+
+void Engine::setActiveScene( Scene toSet )
+{
+    activeScene = toSet;
+}
+
+Scene* Engine::getActiveScene()
+{
+    return &activeScene;
 }
 
 Engine::Engine()

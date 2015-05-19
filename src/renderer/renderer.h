@@ -1,5 +1,5 @@
 #include "../engine/storage.h"
-#include "../data_structs/displayobject.h"
+//#include "../data_structs/scene.h"
 
 //A renderer object stores necessary scene data, such 
 //as the camera and projection matrices
@@ -15,7 +15,8 @@ class Renderer
         bool isFullScreen;
 
         Renderer();
-        void render(std::vector<DisplayObject*> objects);
+
+        void render( Scene* toRender );
 
         bool initGL(void);
         void toggleFullScreen(SDL_Window* mainWindow);

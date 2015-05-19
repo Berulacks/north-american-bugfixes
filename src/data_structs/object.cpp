@@ -89,8 +89,20 @@ void Object::setTransform( glm::mat4 trans )
     this->rotation = q;
     this->scale = tempScale;
 }
-
 glm::mat4 Object::getTransform(void)
+{
+    if(useTransform)
+        return *transform;
+
+    glm::mat4 trans = calculateTransform();
+
+    this->transform = new glm::mat4( trans );
+    useTransform = true;
+
+    return trans;
+}
+
+glm::mat4 Object::calculateTransform(void) const
 {
     if(useTransform)
             return *transform;
@@ -101,18 +113,15 @@ glm::mat4 Object::getTransform(void)
     trans *= glm::mat4_cast( rotation );
     trans = glm::scale( trans, scale );
 
-    this->transform = new glm::mat4( trans );
-    useTransform = true;
-
     return trans;
 }
 
-glm::vec3 Object::getPosition()
+glm::vec3 Object::getPosition() const
 {
     return position;
 }
 
-glm::vec3 Object::getScale()
+glm::vec3 Object::getScale() const
 {
     return scale;
 }

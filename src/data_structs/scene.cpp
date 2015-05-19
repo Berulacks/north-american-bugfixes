@@ -1,6 +1,6 @@
 #include "scene.h"
 
-template <class T, typename L> size_t Scene::getIndexInList( T toFind, L list )
+template <class T, typename L> int Scene::getIndexInList( T toFind, L list )
 {
     auto itr = std::find(list.begin(), list.end(), toFind);
 
@@ -13,7 +13,7 @@ template <class T, typename L> size_t Scene::getIndexInList( T toFind, L list )
     return -1;
 }
 
-template <typename L> size_t Scene::removeFromList( size_t index, L* list )
+template <typename L> bool Scene::removeFromList( size_t index, L* list )
 {
     if( index >= list->size() )
         return false;
@@ -22,9 +22,22 @@ template <typename L> size_t Scene::removeFromList( size_t index, L* list )
     return true;
 }
 
+std::vector<DisplayObject> Scene::getDisplayObjects()
+{
+    std::vector<DisplayObject> toReturn;
+
+    for( int i = 0; i < objects.size(); i++ )
+    {
+        if(DisplayObject* obj = dynamic_cast<DisplayObject*>(objects[i]) )
+            toReturn.push_back( *obj );
+    }
+
+    return toReturn;
+}
+
 bool Scene::registerObject(Object* toAdd)
 {
-    if( getObjectIndex(toAdd) != -1 )
+    if( getObjectIndex(toAdd) == -1 )
     {
         objects.push_back(toAdd);
         return true;
@@ -111,6 +124,7 @@ Camera* Scene::getActiveCameraPtr()
 int Scene::getCameraIndex( Camera toFind )
 {
     return getIndexInList( toFind, cameras );
+    return -1;
 }
 
 bool Scene::removeCamera( Camera toRemove )
@@ -121,4 +135,10 @@ bool Scene::removeCamera( Camera toRemove )
 bool Scene::removeCamera( int index )
 {
     return removeFromList( index, &cameras );
+    return false;
+}
+
+Scene::Scene()
+{
+
 }

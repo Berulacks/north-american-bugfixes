@@ -1,14 +1,10 @@
 #pragma once
-#include "../renderer/renderer.h"
+#include "displayobject.h"
 
-class Camera
+class Camera : Object
 {
         public:
                 Camera( glm::vec3 startPos = glm::vec3(), glm::vec3 face = glm::vec3(0.0f,0.0f,1.0f) );
-
-        private:
-
-                glm::mat4 *transformation;
-
+                bool operator== ( const Camera &toCompare );
 
 };

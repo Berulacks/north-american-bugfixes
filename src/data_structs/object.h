@@ -9,7 +9,15 @@ class Object
     public:
 
         Object();
+
+        //Get transform is the same as calculateTransform
+        //Except it caches the matrix so that it doesn't
+        //have to be recalculated again until something
+        //changes
         glm::mat4 getTransform(void);
+        //Always use getTransform unless you need a const
+        //function!
+        virtual glm::mat4 calculateTransform(void) const;
 
         void translateBy(glm::vec3);
         void rotateBy(glm::vec3 eulerAngles);
@@ -19,14 +27,16 @@ class Object
         void setRotation(glm::quat target);
         void setTransform( glm::mat4 trans );
 
-        glm::vec3 getPosition(void);
-        glm::vec3 getScale(void);
+        glm::vec3 getPosition(void) const;
+        glm::vec3 getScale(void) const;
 
-    private:
+    protected:
 
         glm::vec3 position;
         glm::quat rotation;
         glm::vec3 scale;
+
+    private:
 
         //Should we use a static transform
         //instead of recalculating every frame?

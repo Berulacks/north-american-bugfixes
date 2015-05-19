@@ -52,9 +52,14 @@ class Engine
         //Returns the main SDL window the engine has created
         SDL_Window* getWindow(void) { return mainWindow; };
 
+        void setActiveScene( Scene toSet );
+        Scene* getActiveScene( void );
+
     private:
         //The window name/name of this instance
         std::string name;
+        //The currently active scene
+        Scene activeScene;
         //Outside functions to be appended
         //to our main update loop. These
         //functions will be passed a 

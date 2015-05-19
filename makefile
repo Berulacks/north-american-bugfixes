@@ -6,11 +6,14 @@ all:
 	g++ -c ./src/data_structs/material.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o material.o && \
 	g++ -c ./src/data_structs/model.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o model.o && \
 	g++ -c ./src/data_structs/object.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o object.o && \
+	g++ -c ./src/data_structs/displayobject.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o displayobject.o && \
 	g++ -c ./src/renderer/program.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o program.o && \
 	g++ -c ./src/engine/storage.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o storage.o && \
 	g++ -c ./src/renderer/renderer.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o renderer.o && \
+	g++ -c ./src/data_structs/scene.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o scene.o && \
+	g++ -c ./src/data_structs/camera.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o camera.o && \
 	g++ -c ./src/engine/engine.cpp -ggdb -Wwrite-strings -std=c++11 -lGL -lGLU -lSDL2 -lSOIL -lassimp -o engine.o && \
-	ar rcs build/libNab.a c.o material.o model.o object.o program.o storage.o renderer.o engine.o && \
+	ar rcs build/libNab.a c.o material.o model.o object.o displayobject.o program.o camera.o scene.o storage.o renderer.o engine.o && \
 	rm -f *.o
 pedestal:
 	make && \

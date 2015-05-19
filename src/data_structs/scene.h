@@ -1,6 +1,8 @@
 #pragma once
 
-#include "displayobject.h"
+#include <typeinfo>
+
+//#include "displayobject.h"
 #include "camera.h"
 
 
@@ -8,6 +10,10 @@ class Scene
 {
     public:
         Scene();
+
+        //Gets the list of currently registered
+        //display objects
+        std::vector<DisplayObject> getDisplayObjects(void);
 
         //Adds an object to the scene's list of 
         //known objects. Then the engine can
@@ -62,8 +68,8 @@ class Scene
 
         size_t activeCamera = 0;
 
-        template <class T, typename L> size_t getIndexInList( T toFind, L list );
-        template <typename L> size_t removeFromList( size_t index, L* list );
+        template <class T, typename L> int getIndexInList( T toFind, L list );
+        template <typename L> bool removeFromList( size_t index, L* list );
         
 
 };
