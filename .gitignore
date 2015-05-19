@@ -39,3 +39,6 @@ examples/models/*
 !examples/models/plane/*
 !examples/models/sphere/*
 !examples/modeles/suzanne*
+
+#ctags
+tags
