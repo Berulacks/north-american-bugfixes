@@ -147,6 +147,14 @@ Pedestal::Pedestal( int argc, const char* argv[] )
 	obj->translateBy( {0.0f,0.0f,5.0f} );
 	myEngine->getActiveScene()->registerObject( obj );
 
+    Program blurShader = Program( "./src/shaders/vertex.vs", "./src/shaders/blur.fs" );
+    /*if(blurShader.isReady())
+    {
+        Material h = obj->getMaterial(0);
+        h.shader = &blurShader;
+        obj->setMaterial( h );
+    }*/
+
 	program.start( SDL_GetTicks() );
 	
 }

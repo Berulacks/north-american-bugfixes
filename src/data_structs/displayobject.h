@@ -8,7 +8,9 @@ class DisplayObject : public Object
         //Lets just say we're using SI units
         float mass = 1.0f;
 
-        Material* getMaterial(void);
+        Material getMaterial(size_t meshIndex = 0);
+        void setMaterial(Material mat);
+
         Model getModel(void) { return model; };
         //Should we apply physics steps to this object?
         bool isPhysicsObject = false;
@@ -22,6 +24,8 @@ class DisplayObject : public Object
         //TODO: After OOB generation
         float momentOfInertia();
 
+        bool customMatAvailable = false;
+
     private:
 
         Model model;
@@ -33,8 +37,7 @@ class DisplayObject : public Object
         //use the material stored in
         //its model. This can be 
         //overridden with the customMat
-        //variable, which is NULL by
-        //default.
-        Material* customMat = NULL;
+        //variable
+        Material customMat;
 
 };

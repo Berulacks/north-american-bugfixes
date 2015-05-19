@@ -29,7 +29,15 @@ void Renderer::render( Scene* toRender )
 
         for(int j = 0; j < model.numMeshes(); j++)
         {
-            mat = model.materials[ model.getMeshInfo(j).matIndex ];
+
+            //Doesn't work ;_;
+            //mat = *(objects[i].getMaterial( model.getMeshInfo(j).matIndex ));
+            
+            if(objects[i].customMatAvailable)
+                mat = (objects[i].getMaterial(0));
+            else
+                mat = model.materials[ model.getMeshInfo(j).matIndex ];
+
             shader = mat.shader;
 
             setActiveProgram( shader );

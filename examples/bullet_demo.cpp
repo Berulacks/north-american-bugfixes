@@ -137,13 +137,13 @@ std::pair<Object*,btRigidBody*> BulletDemo::addObj(Model model, bool isCube, flo
     dynamicsWorld->addRigidBody(body);
 
 
-	Object* obj = new Object(model);
+	DisplayObject* obj = new DisplayObject(model);
 
     if(isCube && renderBBox)
         obj->renderBoundingBox = true;
 	obj->translateBy( {position.x,position.y,position.z} );
 
-	myEngine->registerObject( obj );
+	myEngine->getActiveScene()->registerObject( obj );
     objs.push_back( obj );
 
     return std::pair<Object*,btRigidBody*>(obj, body);
@@ -219,13 +219,13 @@ BulletDemo::BulletDemo( int argc, const char* argv[] )
     if( !myStorage->readModel( "./examples/models/plane/plane.obj" ) )
         program.quit();
 
-    Object plane = Object( myStorage->loadModel( "./examples/models/plane/plane.obj" ) );
+    DisplayObject plane = DisplayObject( myStorage->loadModel( "./examples/models/plane/plane.obj" ) );
 
     plane.setTranslation( {0, 0, 10} );
     glm::vec3 scale(2.0f,2.0f,1.0f);
     plane.setScale( scale );
 
-    program.registerObject( &plane );
+    program.getActiveScene()->registerObject( &plane );
 
 	program.start( SDL_GetTicks() );
 	
