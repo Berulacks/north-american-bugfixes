@@ -4,7 +4,7 @@ Renderer::Renderer()
     printf("Renderer created!\n");
 }
 
-void Renderer::render(std::vector<Object*> objects)
+void Renderer::render(std::vector<DisplayObject*> objects)
 {
     glClearColor(1.0f,0.8f,0.8f,1.0f);
     Program::checkGLErrors( "glClearColor" );
@@ -159,7 +159,7 @@ void Renderer::toggleFullScreen(SDL_Window* mainWindow)
 }
 
 
-void Renderer::updateUniforms( Object obj, Program* program )
+void Renderer::updateUniforms( DisplayObject obj, Program* program )
 {
     
     bool prSwitch = false;
