@@ -41,14 +41,6 @@ class Engine
         //Starts the main update loop.
         void start(int lastFrame);
 
-        //Adds an object to the engine's list of 
-        //known objects. Then the engine can
-        //determine whether to apply physics,
-        //collisions, and render the object
-        //Returns true if object was added, false
-        //if object is already present in list
-        bool registerObject(Object* toAdd);
-
         //Add a custom function to our update loop.
         //This is for integrating your own program
         //with the engine's update loop.
@@ -63,8 +55,6 @@ class Engine
     private:
         //The window name/name of this instance
         std::string name;
-        //The list of objects currently registered with the engine.
-        std::vector<Object*> objs;
         //Outside functions to be appended
         //to our main update loop. These
         //functions will be passed a 
