@@ -3,7 +3,7 @@ north-american-bugfixes
 
 An opengl 3d renderer. Github recommended the title, and I happen to think it's brilliant. Unlike *some* people, I support github's creative endeavors.
 
-###Requirements
+### Requirements
 
 Nab requires:
 
@@ -13,7 +13,7 @@ Nab requires:
 * [GLM](http://glm.g-truc.net/0.9.6/index.html)
 * OpenGL 3.3+
 
-###Building
+### Building
 
 As it stands right now, the project only builds on \*nix systems. Running the included makefile without arguments will produce a static-library file (libNab.a) that can be included and used with any project. Just make sure to add the "*/src*" directory as an include folder, and libNab.a as a library.
 
